@@ -1,7 +1,3 @@
-(function() {
-
-'use strict';
-
 module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-wiredep');
@@ -10,7 +6,7 @@ module.exports = function(grunt) {
     grunt.initConfig({
         wiredep: {
             task: {
-                src: ['index.html']
+                src: ['app/index.html']
             }
         },
         watch: {
@@ -22,5 +18,3 @@ module.exports = function(grunt) {
     grunt.registerTask('changes', ['watch']);
     grunt.registerTask('default', ['wiredep']);
 };
-
-})();
