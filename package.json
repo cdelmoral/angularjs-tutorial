@@ -24,7 +24,13 @@
     "grunt-contrib-connect": "^0.10.1",
     "grunt-contrib-copy": "^0.8.0",
     "grunt-contrib-watch": "^0.6.1",
+    "grunt-karma": "^0.12.0",
     "grunt-wiredep": "^2.0.0",
-    "jit-grunt": "^0.9.1"
+    "jasmine-core": "^2.3.4",
+    "jit-grunt": "^0.9.1",
+    "karma": "^0.13.3",
+    "karma-jasmine": "^0.3.6",
+    "karma-phantomjs-launcher": "^0.2.0",
+    "phantomjs": "^1.9.17"
   }
 }

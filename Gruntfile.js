@@ -5,8 +5,24 @@ module.exports = function(grunt) {
 
     grunt.initConfig({
         wiredep: {
-            task: {
+            app: {
                 src: ['app/index.html']
+            },
+            test: {
+                devDependencies: true,
+                src: '<%= karma.unit.configFile %>',
+                ignorePath:  /\.\.\//,
+                fileTypes:{
+                    js: {
+                        block: /(([\s\t]*)\/{2}\s*?bower:\s*?(\S*))(\n|\r|.)*?(\/{2}\s*endbower)/gi,
+                        detect: {
+                            js: /'(.*\.js)'/gi
+                        },
+                        replace: {
+                            js: '\'{{filePath}}\','
+                        }
+                    }
+                }
             }
         },
 
@@ -46,7 +62,8 @@ module.exports = function(grunt) {
         },
 
         concurrent: {
-            server: ['copy:styles']
+            server: ['copy:styles'],
+            test: ['copy:styles']
         },
 
         // Add vendor prefixed styles
@@ -86,7 +103,31 @@ module.exports = function(grunt) {
                         ];
                     }
                 }
+            },
+            test: {
+                options: {
+                    port: 8001,
+                    middleware: function (connect) {
+                        return [
+                            connect.static('.tmp'),
+                            connect.static('test'),
+                            connect().use(
+                                '/bower_components',
+                                connect.static('./bower_components')
+                            ),
+                            connect.static('app')
+                        ];
+                    }
+                }
             }
+        },
+
+        // Test settings
+        karma: {
+            unit: {
+                configFile: 'test/karma.conf.js',
+                singleRun: true
+            } 
         }
     });
 
@@ -94,11 +135,20 @@ module.exports = function(grunt) {
     grunt.registerTask('default', ['wiredep']);
 
     grunt.registerTask('serve', [
-            'clean:server',
-            'wiredep',
-            'concurrent:server',
-            'autoprefixer:server',
-            'connect:livereload',
-            'watch'
+        'clean:server',
+        'wiredep:app',
+        'concurrent:server',
+        'autoprefixer:server',
+        'connect:livereload',
+        'watch'
+    ]);
+
+    grunt.registerTask('test', [
+        'clean:server',
+        'wiredep:test',
+        'concurrent:test',
+        'autoprefixer',
+        'connect:test',
+        'karma'
     ]);
 };
