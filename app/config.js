@@ -10,10 +10,10 @@ Config.$inject = ['$routeProvider'];
 function Config($routeProvider) {
     $routeProvider
         .when('/home', {
-            templateUrl: 'templates/home.html'
+            templateUrl: 'static-pages/home.html'
         })
         .when('/help', {
-            templateUrl: 'templates/help.html'
+            templateUrl: 'static-pages/help.html'
         })
         .otherwise({
             redirectTo: '/home'
