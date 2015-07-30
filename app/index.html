@@ -1,12 +1,12 @@
 <!doctype html>
-<html>
+<html ng-app="angularjsTutorial">
 <head>
   <meta charset="utf-8">
-  <title>AngularJS Tutorial</title>
+  <title ng-bind="title">AngularJS Tutorial</title>
   <!-- bower:css -->
   <!-- endbower -->
 </head>
-<body ng-app="angularjsTutorial">
+<body>
 
   <div ng-view></div>
 
@@ -17,9 +17,11 @@
   <!-- endbower -->
 
   <script src="app.js"></script>
-  <script src="config.js"></script>
-
-  <script src="static-pages/static-pages-module.js"></script>
-  <script src="static-pages/static-pages-controller.js"></script>
+  <script src="page/page-module.js"></script>
+  
+  <script src="page/page-config.js"></script>
+  <script src="page/home-controller.js"></script>
+  <script src="page/help-controller.js"></script>
+  <script src="page/about-controller.js"></script>
 </body>
 </html>

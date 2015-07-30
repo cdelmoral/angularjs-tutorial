@@ -4,7 +4,7 @@
 angular
     .module('angularjsTutorial', [
         'ngRoute',
-        'angularjsTutorial.staticPages'
+        'angularjsTutorial.page'
     ]);
 
 })();

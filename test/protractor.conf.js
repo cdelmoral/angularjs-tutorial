@@ -4,7 +4,7 @@ exports.config = {
 
     // Spec patterns are relative to the location of this config.
     specs: [
-        'e2e/*.test.js'
+        'e2e/**/*.test.js'
     ],
 
     capabilities: {

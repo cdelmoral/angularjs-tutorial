@@ -3,6 +3,7 @@ describe('Application Routes', function() {
     browser.get('/');
     browser.getLocationAbsUrl().then(function(url) {
         expect(url).toEqual('/home');
+        expect(browser.getTitle()).toEqual('Home - AngularJS Tutorial');
       });
   });
 
@@ -10,6 +11,15 @@ describe('Application Routes', function() {
     browser.get('#/help');
     browser.getLocationAbsUrl().then(function(url) {
         expect(url).toEqual('/help');
+        expect(browser.getTitle()).toEqual('Help - AngularJS Tutorial');
+      });
+  });
+
+  it('should redirect /about to /about', function() {
+    browser.get('#/about');
+    browser.getLocationAbsUrl().then(function(url) {
+        expect(url).toEqual('/about');
+        expect(browser.getTitle()).toEqual('About - AngularJS Tutorial');
       });
   });
 });
