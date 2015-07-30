@@ -3,6 +3,10 @@ module.exports = function(grunt) {
     // Automatically load required Grunt tasks
     require('jit-grunt')(grunt);
 
+    require('jit-grunt')(grunt, {
+        protractor: 'grunt-protractor-runner'
+    });
+
     grunt.initConfig({
         wiredep: {
             app: {
@@ -128,6 +132,17 @@ module.exports = function(grunt) {
                 configFile: 'test/karma.conf.js',
                 singleRun: true
             } 
+        },
+
+        // End to end test settings
+        protractor: {
+            options: {
+                configFile: "test/protractor.conf.js",
+                noColor: false,
+                keepAlive: true,
+                args: {}
+            },
+            all: {}
         }
     });
 
@@ -150,5 +165,14 @@ module.exports = function(grunt) {
         'autoprefixer',
         'connect:test',
         'karma'
+    ]);
+
+    grunt.registerTask('e2e', [
+        'clean:server',
+        'wiredep:test',
+        'concurrent:test',
+        'autoprefixer',
+        'connect:test',
+        'protractor'
     ]);
 };
