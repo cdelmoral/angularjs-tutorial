@@ -34,5 +34,6 @@
     "karma-phantomjs-launcher": "^0.2.0",
     "phantomjs": "^1.9.17",
     "protractor": "^2.1.0"
+    "time-grunt": "^1.2.1"
   }
 }
