@@ -5,10 +5,10 @@ angular
     .module('angularjsTutorial.page')
     .controller('HomeCtrl', HomeCtrl);
 
-HomeCtrl.$inject = ['$rootScope'];
+HomeCtrl.$inject = ['$rootScope', 'PageSvc'];
 
-function HomeCtrl($rootScope) {
-    $rootScope.title = 'Home - AngularJS Tutorial';
+function HomeCtrl($rootScope, pageSvc) {
+    $rootScope.title = pageSvc.getPageTitle('Home');
 }
 
 })();

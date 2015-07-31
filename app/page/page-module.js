@@ -1,6 +1,8 @@
 (function() {
 'use strict';
 
-angular.module('angularjsTutorial.page', []);
+angular.module('angularjsTutorial.page', [
+    'ngRoute'
+]);
 
 })();

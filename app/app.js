@@ -3,7 +3,6 @@
 
 angular
     .module('angularjsTutorial', [
-        'ngRoute',
         'angularjsTutorial.page'
     ]);
 
