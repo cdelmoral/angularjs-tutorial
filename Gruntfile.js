@@ -13,7 +13,8 @@ module.exports = function(grunt) {
     grunt.initConfig({
         wiredep: {
             app: {
-                src: ['app/index.html']
+                src: ['app/index.html'],
+                ignorePath:  /\.\.\//
             },
             test: {
                 devDependencies: true,
@@ -33,6 +34,18 @@ module.exports = function(grunt) {
             }
         },
 
+        injector: {
+            options: {
+                template: 'app/index.html',
+                relative: true
+            },
+            all: {
+                files: {
+                    'app/index.html': ['app/app.js', 'app/**/*module.js', 'app/**/*.js']
+                }
+            }
+        },
+
         watch: {
             options: {
                 livereload: true
@@ -42,7 +55,8 @@ module.exports = function(grunt) {
                 tasks: ['wiredep']
             },
             js: {
-                files: ['app/{,*/}*.js']
+                files: ['app/{,*/}*.js'],
+                tasks: ['injector']
             },
             livereload: {
                 files: [
@@ -155,6 +169,7 @@ module.exports = function(grunt) {
     grunt.registerTask('serve', [
         'clean:server',
         'wiredep:app',
+        'injector',
         'concurrent:server',
         'autoprefixer:server',
         'connect:livereload',
@@ -172,7 +187,8 @@ module.exports = function(grunt) {
 
     grunt.registerTask('e2e', [
         'clean:server',
-        'wiredep:test',
+        'wiredep:app',
+        'injector',
         'concurrent:test',
         'autoprefixer',
         'connect:test',
