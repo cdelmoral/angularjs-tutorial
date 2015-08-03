@@ -219,7 +219,6 @@ module.exports = function(grunt) {
         'wiredep:dev',
         'autoprefixer:dev',
         'connect:test',
-        'protractor',
-        'watch:e2e'
+        'protractor'
     ]);
 };
