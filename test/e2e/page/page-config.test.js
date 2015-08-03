@@ -32,4 +32,12 @@ describe('Application Routes', function() {
         expect(browser.getTitle()).toEqual('Home' + baseTitle);
       });
   });
+
+  it('should redirect /contact to /contact', function() {
+    browser.get('#/contact');
+    browser.getLocationAbsUrl().then(function(url) {
+        expect(url).toEqual('/contact');
+        expect(browser.getTitle()).toEqual('Contact' + baseTitle);
+      });
+  });
 });

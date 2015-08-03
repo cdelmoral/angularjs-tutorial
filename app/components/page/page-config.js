@@ -21,6 +21,10 @@ function Config($routeProvider) {
             templateUrl: 'components/page/about.html',
             controller: 'AboutCtrl'
         })
+        .when('/contact', {
+            templateUrl: 'components/page/contact.html',
+            controller: 'ContactCtrl'
+        })
         .otherwise({
             redirectTo: '/home'
         });
