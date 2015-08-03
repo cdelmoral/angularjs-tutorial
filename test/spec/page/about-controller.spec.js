@@ -1,5 +1,3 @@
-"use strict";
-
 describe('Controller: AboutCtrl', function() {
 
     beforeEach(module('angularjsTutorial.page'));

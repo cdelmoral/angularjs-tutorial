@@ -5,10 +5,10 @@ angular
     .module('angularjsTutorial.page')
     .controller('AboutCtrl', AboutCtrl);
 
-AboutCtrl.$inject = ['$rootScope', 'PageSvc'];
+AboutCtrl.$inject = ['PageSvc'];
 
-function AboutCtrl($rootScope, pageSvc) {
-    $rootScope.title = pageSvc.getPageTitle('About');
+function AboutCtrl(pageSvc) {
+    pageSvc.setPageTitle('About');
 }
 
 })();

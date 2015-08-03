@@ -1,5 +1,3 @@
-"use strict";
-
 describe('Controller: HomeCtrl', function() {
 
     beforeEach(module('angularjsTutorial.page'));

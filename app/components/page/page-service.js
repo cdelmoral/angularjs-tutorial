@@ -7,18 +7,20 @@ angular
 
 var BASE_TITLE = 'AngularJS Tutorial';
 
-function PageSvc() {
+PageSvc.$inject = ['$rootScope'];
+
+function PageSvc($rootScope) {
     var svc = this;
-    svc.getPageTitle = getPageTitle;
+    svc.setPageTitle = setPageTitle;
 
     return svc;
 
-    /** returns the full title depending on the section */
-    function getPageTitle(section) {
+    /** sets the full title of the page depending on the section */
+    function setPageTitle(section) {
         if (section && section !== '') {
-            return section + ' - ' + BASE_TITLE;
+            $rootScope.title = section + ' - ' + BASE_TITLE;
         } else {
-            return BASE_TITLE;
+            $rootScope.title = BASE_TITLE;
         }
     }
 }
