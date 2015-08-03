@@ -48,7 +48,7 @@ module.exports = function(grunt) {
 
         watch: {
             options: {
-                livereload: true
+                livereload: 35729
             },
             dev: {
                 files: ['bower_components/*', 'app/**/*.js', 'app/**/*.html',  'app/**/*.css'],
@@ -56,7 +56,12 @@ module.exports = function(grunt) {
             },
             sass: {
                 files: ['app/**/*.scss', 'app/**/*.sass'],
-                tasks: ['sass:dev']
+                tasks: ['sass:dev'],
+                options: {
+                    livereload: {
+                        port: 35730
+                    }
+                }
             },
             e2e: {
                 files: ['bower_components/*', 'app/**/*.js', 'app/**/*.html'],
@@ -75,10 +80,13 @@ module.exports = function(grunt) {
                 loadPath: 'bower_components/bootstrap-sass/assets/stylesheets/'
             },
             dev: {
-                style: 'expanded',
-                files: {
-                    '.dev/styles/main.css': 'app/**/*.{scss, sass}'
-                }
+                files: [{
+                    expand: true,
+                    cwd: 'app',
+                    src: ['**/*.scss'],
+                    dest: '.dev/',
+                    ext: '.css'
+                }]
             }
         },
 
@@ -88,7 +96,7 @@ module.exports = function(grunt) {
                 expand: true,
                 cwd: 'app/',
                 dest: '.dev/',
-                src: ['**/*.html', '**/*.js', '**/*.css']
+                src: ['**/*.html', '**/*.js', '**/*.css', '**/*.scss', '**/*.sass']
             }
         },
 
@@ -96,7 +104,16 @@ module.exports = function(grunt) {
             dev: [
                 'sass:dev',
                 'copy:dev'
-            ]
+            ],
+            watch_dev: {
+                tasks: [
+                    'watch:dev',
+                    'watch:sass'
+                ],
+                options: {
+                    logConcurrentOutput: true
+                }
+            }
         },
 
         // Add vendor prefixed styles
@@ -116,7 +133,7 @@ module.exports = function(grunt) {
             options: {
                 port: 8000,
                 hostname: 'localhost',
-                livereload: true
+                livereload: 35729
             },
             livereload: {
                 options: {
@@ -176,7 +193,7 @@ module.exports = function(grunt) {
         'wiredep:dev',
         'autoprefixer:dev',
         'connect:livereload',
-        'watch:dev'
+        'concurrent:watch_dev'
     ]);
 
     grunt.registerTask('refresh', [
