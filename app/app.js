@@ -3,7 +3,8 @@
 
 angular
     .module('angularjsTutorial', [
-        'angularjsTutorial.page'
+        'angularjsTutorial.page',
+        'angularjsTutorial.users'
     ]);
 
 })();

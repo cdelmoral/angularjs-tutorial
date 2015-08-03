@@ -25,6 +25,9 @@ function Config($routeProvider) {
             templateUrl: 'components/page/contact.html',
             controller: 'ContactCtrl'
         })
+        .when('/sign-up', {
+            templateUrl: 'components/users/new.html'
+        })
         .otherwise({
             redirectTo: '/home'
         });

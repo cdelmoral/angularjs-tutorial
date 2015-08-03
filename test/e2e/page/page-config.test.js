@@ -9,6 +9,14 @@ describe('Application Routes', function() {
       });
   });
 
+  it('should redirect /ajbkc93 to /home', function() {
+    browser.get('#/ajbkc93');
+    browser.getLocationAbsUrl().then(function(url) {
+        expect(url).toEqual('/home');
+        expect(browser.getTitle()).toEqual('Home' + baseTitle);
+      });
+  });
+
   it('should redirect /help to /help', function() {
     browser.get('#/help');
     browser.getLocationAbsUrl().then(function(url) {
@@ -25,19 +33,19 @@ describe('Application Routes', function() {
       });
   });
 
-  it('should redirect /ajbkc93 to /home', function() {
-    browser.get('#/ajbkc93');
-    browser.getLocationAbsUrl().then(function(url) {
-        expect(url).toEqual('/home');
-        expect(browser.getTitle()).toEqual('Home' + baseTitle);
-      });
-  });
-
   it('should redirect /contact to /contact', function() {
     browser.get('#/contact');
     browser.getLocationAbsUrl().then(function(url) {
         expect(url).toEqual('/contact');
         expect(browser.getTitle()).toEqual('Contact' + baseTitle);
+      });
+  });
+
+  it('should redirect /sign-up to /sign-up', function() {
+    browser.get('#/sign-up');
+    browser.getLocationAbsUrl().then(function(url) {
+        expect(url).toEqual('/sign-up');
+        expect(browser.getTitle()).toEqual('Sign up' + baseTitle);
       });
   });
 });
