@@ -10,15 +10,15 @@ Config.$inject = ['$routeProvider'];
 function Config($routeProvider) {
     $routeProvider
         .when('/home', {
-            templateUrl: 'page/home.html',
+            templateUrl: 'components/page/home.html',
             controller: 'HomeCtrl'
         })
         .when('/help', {
-            templateUrl: 'page/help.html',
+            templateUrl: 'components/page/help.html',
             controller: 'HelpCtrl'
         })
         .when('/about', {
-            templateUrl: 'page/about.html',
+            templateUrl: 'components/page/about.html',
             controller: 'AboutCtrl'
         })
         .otherwise({

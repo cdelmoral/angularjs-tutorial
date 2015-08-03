@@ -12,8 +12,8 @@ module.exports = function(grunt) {
 
     grunt.initConfig({
         wiredep: {
-            app: {
-                src: ['app/index.html'],
+            dev: {
+                src: ['.dev/index.html'],
                 ignorePath:  /\.\.\//
             },
             test: {
@@ -39,9 +39,9 @@ module.exports = function(grunt) {
                 template: 'app/index.html',
                 relative: true
             },
-            all: {
+            dev: {
                 files: {
-                    'app/index.html': ['app/app.js', 'app/**/*module.js', 'app/**/*.js']
+                    '.dev/index.html': ['.dev/app.js', '.dev/**/*module.js', '.dev/**/*.js', '.dev/**/*.css']
                 }
             }
         },
@@ -50,41 +50,49 @@ module.exports = function(grunt) {
             options: {
                 livereload: true
             },
-            bower: {
-                files: ['bower_components/*'],
-                tasks: ['wiredep']
+            dev: {
+                files: ['bower_components/*', 'app/**/*.js', 'app/**/*.html',  'app/**/*.css'],
+                tasks: ['refresh']
             },
-            js: {
-                files: ['app/{,*/}*.js'],
-                tasks: ['injector']
-            },
-            livereload: {
-                files: [
-                    'app/{,*/}*.html',
-                    '.tmp/styles/{,*/}*.css',
-                    'app/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
-                ]
+            sass: {
+                files: ['app/**/*.scss', 'app/**/*.sass'],
+                tasks: ['sass:dev']
             }
         },
 
         // Empties folders to start fresh
         clean: {
-            server: '.tmp'
+            dev: ['.tmp', '.dev']
+        },
+
+        // Compiles Sass to CSS and generates necessary files if requested
+        sass: {
+            options: {
+                loadPath: 'bower_components/bootstrap-sass/assets/stylesheets/'
+            },
+            dev: {
+                style: 'expanded',
+                files: {
+                    '.dev/styles/main.css': 'app/**/*.{scss, sass}'
+                }
+            }
         },
 
         // Copies remaining files to places other tasks can use
         copy: {
-            styles: {
+            dev: {
                 expand: true,
-                cwd: '<%= app/styles',
-                dest: '.tmp/styles/',
-                src: '{,*/}*.css'
+                cwd: 'app/',
+                dest: '.dev/',
+                src: ['**/*.html', '**/*.js', '**/*.css']
             }
         },
 
         concurrent: {
-            server: ['copy:styles'],
-            test: ['copy:styles']
+            dev: [
+                'sass:dev',
+                'copy:dev'
+            ]
         },
 
         // Add vendor prefixed styles
@@ -92,7 +100,7 @@ module.exports = function(grunt) {
             options: {
                 browsers: ['last 1 version']
             },
-            server: {
+            dev: {
                 options: {
                     map: true,
                 }
@@ -111,16 +119,11 @@ module.exports = function(grunt) {
                     open: true,
                     middleware: function (connect) {
                         return [
-                            connect.static('.tmp'),
                             connect().use(
                                 '/bower_components',
                                 connect.static('./bower_components')
                             ),
-                            connect().use(
-                                '/app/styles',
-                                connect.static('./app/styles')
-                            ),
-                            connect.static('app')
+                            connect.static('.dev')
                         ];
                     }
                 }
@@ -130,13 +133,12 @@ module.exports = function(grunt) {
                     port: 8001,
                     middleware: function (connect) {
                         return [
-                            connect.static('.tmp'),
                             connect.static('test'),
                             connect().use(
                                 '/bower_components',
                                 connect.static('./bower_components')
                             ),
-                            connect.static('app')
+                            connect.static('.dev')
                         ];
                     }
                 }
@@ -163,34 +165,36 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.registerTask('changes', ['watch']);
-    grunt.registerTask('default', ['wiredep']);
-
     grunt.registerTask('serve', [
-        'clean:server',
-        'wiredep:app',
-        'injector',
-        'concurrent:server',
-        'autoprefixer:server',
+        'clean:dev',
+        'concurrent:dev',
+        'injector:dev',
+        'wiredep:dev',
+        'autoprefixer:dev',
         'connect:livereload',
         'watch'
     ]);
 
+    grunt.registerTask('refresh', [
+        'copy:dev',
+        'injector:dev',
+        'wiredep:dev',
+        'autoprefixer:dev'
+    ]);
+
     grunt.registerTask('test', [
-        'clean:server',
         'wiredep:test',
-        'concurrent:test',
         'autoprefixer',
         'connect:test',
         'karma'
     ]);
 
     grunt.registerTask('e2e', [
-        'clean:server',
-        'wiredep:app',
-        'injector',
-        'concurrent:test',
-        'autoprefixer',
+        'clean:dev',
+        'copy:dev',
+        'injector:dev',
+        'wiredep:dev',
+        'autoprefixer:dev',
         'connect:test',
         'protractor'
     ]);
