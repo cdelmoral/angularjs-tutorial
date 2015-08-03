@@ -57,12 +57,16 @@ module.exports = function(grunt) {
             sass: {
                 files: ['app/**/*.scss', 'app/**/*.sass'],
                 tasks: ['sass:dev']
+            },
+            e2e: {
+                files: ['bower_components/*', 'app/**/*.js', 'app/**/*.html'],
+                tasks: ['refresh', 'protractor']
             }
         },
 
         // Empties folders to start fresh
         clean: {
-            dev: ['.tmp', '.dev']
+            dev: '.dev'
         },
 
         // Compiles Sass to CSS and generates necessary files if requested
@@ -172,7 +176,7 @@ module.exports = function(grunt) {
         'wiredep:dev',
         'autoprefixer:dev',
         'connect:livereload',
-        'watch'
+        'watch:dev'
     ]);
 
     grunt.registerTask('refresh', [
@@ -183,9 +187,11 @@ module.exports = function(grunt) {
     ]);
 
     grunt.registerTask('test', [
-        'wiredep:test',
-        'autoprefixer',
-        'connect:test',
+        'clean:dev',
+        'copy:dev',
+        'injector:dev',
+        'wiredep',
+        'autoprefixer:dev',
         'karma'
     ]);
 
@@ -196,6 +202,7 @@ module.exports = function(grunt) {
         'wiredep:dev',
         'autoprefixer:dev',
         'connect:test',
-        'protractor'
+        'protractor',
+        'watch:e2e'
     ]);
 };

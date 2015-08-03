@@ -25,11 +25,12 @@ module.exports = function(config) {
       'bower_components/jquery/dist/jquery.js',
       'bower_components/angular/angular.js',
       'bower_components/angular-route/angular-route.js',
-      'bower_components/bootstrap/dist/js/bootstrap.js',
+      'bower_components/bootstrap-sass/assets/javascripts/bootstrap.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
-      "app/**/*-module.js",
-      "app/**/*.js",
+      ".dev/app.js",
+      ".dev/**/*-module.js",
+      ".dev/**/*.js",
       "test/mock/**/*.js",
       "test/spec/**/*.js"
     ],
@@ -39,7 +40,7 @@ module.exports = function(config) {
     ],
 
     // web server port
-    port: 8001,
+    port: 9000,
 
     // Start these browsers, currently available:
     // - Chrome
