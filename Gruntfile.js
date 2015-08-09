@@ -7,7 +7,8 @@ module.exports = function(grunt) {
     require('jit-grunt')(grunt);
 
     require('jit-grunt')(grunt, {
-        protractor: 'grunt-protractor-runner'
+        protractor: 'grunt-protractor-runner',
+        express: 'grunt-express-server'
     });
 
     grunt.initConfig({
@@ -128,40 +129,21 @@ module.exports = function(grunt) {
             }
         },
 
-        // The actual grunt server settings
-        connect: {
+        // Express server
+        express: {
             options: {
                 port: 8000,
-                hostname: 'localhost',
-                livereload: 35729
+                delay: 100
             },
-            livereload: {
+            dev: {
                 options: {
-                    open: true,
-                    middleware: function (connect) {
-                        return [
-                            connect().use(
-                                '/bower_components',
-                                connect.static('./bower_components')
-                            ),
-                            connect.static('.dev')
-                        ];
-                    }
+                    script: './bin/www'
                 }
             },
             test: {
                 options: {
-                    port: 8001,
-                    middleware: function (connect) {
-                        return [
-                            connect.static('test'),
-                            connect().use(
-                                '/bower_components',
-                                connect.static('./bower_components')
-                            ),
-                            connect.static('.dev')
-                        ];
-                    }
+                    script: './bin/www',
+                    port: 8001
                 }
             }
         },
@@ -192,7 +174,7 @@ module.exports = function(grunt) {
         'injector:dev',
         'wiredep:dev',
         'autoprefixer:dev',
-        'connect:livereload',
+        'express:dev',
         'concurrent:watch_dev'
     ]);
 
@@ -218,7 +200,7 @@ module.exports = function(grunt) {
         'injector:dev',
         'wiredep:dev',
         'autoprefixer:dev',
-        'connect:test',
+        'express:test',
         'protractor'
     ]);
 };
