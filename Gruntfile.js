@@ -8,7 +8,8 @@ module.exports = function(grunt) {
 
     require('jit-grunt')(grunt, {
         protractor: 'grunt-protractor-runner',
-        express: 'grunt-express-server'
+        express: 'grunt-express-server',
+        shell: 'grunt-shell-spawn'
     });
 
     grunt.initConfig({
@@ -133,22 +134,47 @@ module.exports = function(grunt) {
         express: {
             options: {
                 port: 8000,
-                delay: 100
+                delay: 5000
             },
             dev: {
                 options: {
-                    script: './bin/www'
+                    script: './bin/www',
+                    node_env: 'development'
                 }
             },
             test: {
                 options: {
+                    port: 8001,
                     script: './bin/www',
-                    port: 8001
+                    node_env: 'development'
                 }
             }
         },
 
-        // Test settings
+        // Open server in browser
+        open: {
+            dev: {
+                path: 'http://localhost:8000/'
+            }
+        },
+
+        // Start mongodb
+        shell: {
+            mongodb: {
+                command: 'mongod --dbpath ./.db/data',
+                options: {
+                    async: true,
+                    stdout: false,
+                    stderr: true,
+                    failOnError: true,
+                    execOptions: {
+                        cwd: '.'
+                    }
+                }
+            }
+        },
+
+        // Front-end test settings
         karma: {
             unit: {
                 configFile: 'test/karma.conf.js',
@@ -169,12 +195,14 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('serve', [
+        'shell:mongodb',
         'clean:dev',
         'concurrent:dev',
         'injector:dev',
         'wiredep:dev',
         'autoprefixer:dev',
         'express:dev',
+        'open:dev',
         'concurrent:watch_dev'
     ]);
 
