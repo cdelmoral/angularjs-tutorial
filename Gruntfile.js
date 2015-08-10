@@ -182,6 +182,18 @@ module.exports = function(grunt) {
             } 
         },
 
+        // Back-end test settings
+        mochaTest: {
+            test: {
+                options: {
+                    reporter: 'spec',
+                    require: 'should',
+                    ui: 'bdd'
+                },
+                src: ['test/server/**/*.js']
+            }
+        },
+
         // End to end test settings
         protractor: {
             options: {
