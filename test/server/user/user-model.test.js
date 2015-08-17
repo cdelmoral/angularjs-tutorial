@@ -1,3 +1,6 @@
+var mongoose = require('mongoose');
+var conn = mongoose.connect('mongodb://localhost/angularjs_tutorial');
+
 var User = require('../../../server/user/user-model');
 var should = require('should');
 var validator = require('validator');
@@ -12,12 +15,35 @@ describe('Model: User', function() {
         user.email = 'test@test.com';
     });
 
-    it('should be valid', function(done) {
-        user.validate(function(err) {
-            should(err).undefined();
-            done();
-        });
-    });
+    // describe('with fresh database', function() {
+    //     beforeEach(function() {
+    //         conn.connection.db.dropDatabase();
+    //     });
+
+    //     it('should be valid', function(done) {
+    //         user.save(function(err) {
+    //             expect(err).toBe(null, 'There should not be any errors');
+    //             done();
+    //         });
+    //     });
+
+    //     describe('when email is not unique', function() {
+    //         this.timeout(5000);
+    //         var duplicateUser = new User();
+    //         duplicateUser.name = 'Test User';
+    //         duplicateUser.email = 'test@test.com';
+    //         it('should throw error', function(done) {
+    //             user.save(function(err) {
+    //                 console.log();
+    //                 duplicateUser.save(function(err) {
+    //                     console.log();
+    //                     expect(err).toNotBe(null, 'There should be a dupication error');
+    //                     done();
+    //                 });
+    //             });
+    //         });
+    //     });
+    // });
 
     it('should not be valid with null name', function(done) {
         user.name = null;
@@ -96,6 +122,4 @@ describe('Model: User', function() {
             });
         });
     });
-
-    
 });

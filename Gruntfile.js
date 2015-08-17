@@ -160,8 +160,20 @@ module.exports = function(grunt) {
 
         // Start mongodb
         shell: {
-            mongodb: {
-                command: 'mongod --dbpath ./.db/data',
+            mongodb_dev: {
+                command: 'mongod --dbpath ./.db/dev',
+                options: {
+                    async: true,
+                    stdout: false,
+                    stderr: true,
+                    failOnError: true,
+                    execOptions: {
+                        cwd: '.'
+                    }
+                }
+            },
+            mongodb_test: {
+                command: 'mongod --dbpath ./.db/test',
                 options: {
                     async: true,
                     stdout: false,
@@ -172,6 +184,13 @@ module.exports = function(grunt) {
                     }
                 }
             }
+        },
+
+        wait: {
+            options: {
+                delay: 2000
+            },
+            pause: {}
         },
 
         // Front-end test settings
@@ -207,7 +226,7 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('serve', [
-        'shell:mongodb',
+        'shell:mongodb_dev',
         'clean:dev',
         'concurrent:dev',
         'injector:dev',
@@ -223,6 +242,12 @@ module.exports = function(grunt) {
         'injector:dev',
         'wiredep:dev',
         'autoprefixer:dev'
+    ]);
+
+    grunt.registerTask('mocha', [
+        'shell:mongodb_test',
+        'wait:pause',
+        'mochaTest'
     ]);
 
     grunt.registerTask('test', [

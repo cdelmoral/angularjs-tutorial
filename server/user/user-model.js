@@ -13,6 +13,7 @@ var UserSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
+        unique: true,
         validate: [
             validate({ validator: 'isNotWhiteSpace' }),
             validate({ validator: 'isLength', arguments: [0, 255]}),
