@@ -1,4 +1,21 @@
-<div ng-controller="UsersNewCtrl as ctrl">
-  <h1>Sign up</h1>
-  <p>This will be a signup page for new users.</p>
+<h1>Sign up</h1>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <form name="userForm" ng-submit="ctrl.createUser()">
+      <label for="username">Name</label>
+      <input id="username" type="text" ng-model="ctrl.user.name" autofocus="true">
+
+      <label for="email">Email</label>
+      <input id="email" type="email" ng-model="ctrl.user.email">
+
+      <label for="password">Password</label>
+      <input id="password" type="password" ng-model="ctrl.password">
+
+      <label for="password-confirmation">Confirmation</label>
+      <input id="password-confirmation" type="password" ng-model="ctrl.confirmation">
+
+      <input type="submit" class="btn btn-primary" value="Create my account">
+    </form>
+  </div>
 </div>

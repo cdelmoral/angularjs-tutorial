@@ -8,7 +8,27 @@ angular
 UsersNewCtrl.$inject = ['PageSvc'];
 
 function UsersNewCtrl(pageSvc) {
-    pageSvc.setPageTitle('Sign up');
+    var ctrl = this;
+
+    ctrl.user = {
+        name: '',
+        email: ''
+    };
+
+    ctrl.password = '';
+    ctrl.confirmation = '';
+
+    ctrl.createUser = createUser;
+
+    initializeController();
+
+    function initializeController() {
+        pageSvc.setPageTitle('Sign up');
+    }
+
+    function createUser() {
+        console.log('User ready to be created: ' + ctrl.user);
+    }
 }
 
 })();
