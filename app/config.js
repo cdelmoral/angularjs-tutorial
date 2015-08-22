@@ -2,7 +2,7 @@
 'use strict';
 
 angular
-    .module('angularjsTutorial.page')
+    .module('angularjsTutorial')
     .config(Config);
 
 Config.$inject = ['$routeProvider'];
@@ -26,7 +26,9 @@ function Config($routeProvider) {
             controller: 'ContactCtrl'
         })
         .when('/sign-up', {
-            templateUrl: 'components/users/new.html'
+            templateUrl: 'components/users/new.html',
+            controller: 'UsersNewCtrl',
+            controllerAs: 'ctrl'
         })
         .when('/users/:id', {
             templateUrl: 'components/users/show.html',
