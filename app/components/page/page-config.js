@@ -28,6 +28,11 @@ function Config($routeProvider) {
         .when('/sign-up', {
             templateUrl: 'components/users/new.html'
         })
+        .when('/users/:id', {
+            templateUrl: 'components/users/show.html',
+            controller: 'UsersShowCtrl',
+            controllerAs: 'ctrl'
+        })
         .otherwise({
             redirectTo: '/home'
         });
