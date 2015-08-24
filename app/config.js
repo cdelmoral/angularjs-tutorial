@@ -30,6 +30,11 @@ function Config($routeProvider) {
             controller: 'UsersNewCtrl',
             controllerAs: 'ctrl'
         })
+        .when('/users', {
+            templateUrl: 'components/users/index.html',
+            controller: 'UsersIndexCtrl',
+            controllerAs: 'ctrl'
+        })
         .when('/users/:id', {
             templateUrl: 'components/users/show.html',
             controller: 'UsersShowCtrl',
