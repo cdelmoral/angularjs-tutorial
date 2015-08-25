@@ -16,12 +16,8 @@ function UsersShowCtrl(pageSvc, $routeParams, userService) {
 
     function initializeController() {
         pageSvc.setPageTitle('Show user');
-        userService.getUserById($routeParams.id).success(function(user) {
-            ctrl.user = user;
-        }).error(function(data, status) {
-            console.log(data, status);
-            ctrl.user = {};
-        });
+
+        ctrl.user = userService.get({id: $routeParams.id});
     }
 }
 

@@ -17,12 +17,7 @@ function UsersIndexCtrl(pageSvc, usersService) {
     function initializeController() {
         pageSvc.setPageTitle('Users');
 
-        usersService.getUsers().success(function(users) {
-            ctrl.users = users;
-        }).error(function(data, status) {
-            console.log(data, status);
-            ctrl.users = [];
-        });
+        ctrl.users = usersService.query();
     }
 }
 

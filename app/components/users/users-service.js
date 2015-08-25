@@ -5,24 +5,12 @@ angular
     .module('angularjsTutorial.users')
     .factory('UsersService', UsersService);
 
-UsersService.$inject = ['$http'];
+UsersService.$inject = ['$resource'];
 
-function UsersService($http) {
-    var svc = this;
-    svc.getUserById = getUserById;
-    svc.getUsers = getUsers;
+function UsersService($resource) {
+    var svc = $resource('/users/:id');
 
     return svc;
-
-    /* Gets the index of users */
-    function getUsers() {
-        return $http.get('/users');
-    }
-
-    /* Gets user by id */
-    function getUserById(userId) {
-        return $http.get('/users/' + userId);
-    }
 }
 
 })();
