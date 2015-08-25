@@ -5,15 +5,12 @@ angular
     .module('angularjsTutorial.users')
     .controller('UsersNewCtrl', UsersNewCtrl);
 
-UsersNewCtrl.$inject = ['PageSvc'];
+UsersNewCtrl.$inject = ['PageSvc', 'UsersService'];
 
-function UsersNewCtrl(pageSvc) {
+function UsersNewCtrl(pageSvc, usersService) {
     var ctrl = this;
 
-    ctrl.user = {
-        name: '',
-        email: ''
-    };
+    ctrl.user = {};
 
     ctrl.password = '';
     ctrl.confirmation = '';
@@ -27,7 +24,7 @@ function UsersNewCtrl(pageSvc) {
     }
 
     function createUser() {
-        console.log('User ready to be created: ' + ctrl.user);
+        usersService.save(ctrl.user);
     }
 }
 
