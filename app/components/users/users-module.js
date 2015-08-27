@@ -3,6 +3,7 @@
 
 angular.module('angularjsTutorial.users', [
     'ngResource',
+    'ngMessages',
     'angularjsTutorial.page'
 ]);
 

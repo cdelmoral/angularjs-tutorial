@@ -2,20 +2,45 @@
 
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
-    <form name="userForm" ng-submit="ctrl.createUser()">
-      <label for="username">Name</label>
-      <input id="username" type="text" ng-model="ctrl.user.name" autofocus="true">
+    <form name="userForm" ng-submit="ctrl.createUser()" novalidate>
 
-      <label for="email">Email</label>
-      <input id="email" type="email" ng-model="ctrl.user.email">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input id="name" name="name" class="form-control"
+               type="text" placeholder="Name" autofocus="true" required
+               ng-model="ctrl.user.name" ng-maxlength="50">
+      </div>
 
-      <label for="password">Password</label>
-      <input id="password" type="password" ng-model="ctrl.password">
+      <div ng-messages="userForm.name.$error" ng-if='userForm.name.$dirty' role="alert">
+        <div ng-message="required">Name is required</div>
+        <div ng-message="maxlength">Your name is too long</div>
+      </div>
 
-      <label for="password-confirmation">Confirmation</label>
-      <input id="password-confirmation" type="password" ng-model="ctrl.confirmation">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" name="email" class="form-control" type="email" placeholder="Email" required
+             ng-model="ctrl.user.email" ng-maxlength="255">
+      </div>
 
-      <input type="submit" class="btn btn-primary" value="Create my account">
+      <div ng-messages="userForm.email.$error" ng-if='userForm.email.$dirty'  role="alert">
+        <div ng-message="required">Email is required</div>
+        <div ng-message="maxlength">Your email is too long</div>
+        <div ng-message="email">Invalid email address</div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" class="form-control" type="password"
+               placeholder="Password" ng-model="ctrl.password">
+      </div>
+
+      <div class="form-group">
+        <label for="password-confirmation">Confirmation</label>
+        <input id="password-confirmation" class="form-control" type="password"
+               placeholder="Confirm password" ng-model="ctrl.confirmation">
+      </div>
+
+      <input type="submit" class="btn btn-primary" value="Create my account" ng-disabled="userForm.$invalid">
     </form>
   </div>
 </div>
