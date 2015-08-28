@@ -4,6 +4,7 @@
 /* mixins, variables, etc. */
 
 $gray-medium-light: #eaeaea;
+$error-red: #a94442;
 
 @mixin box_sizing {
   -moz-box-sizing:    border-box;
@@ -98,4 +99,15 @@ input, textarea, select, .uneditable-input {
 
 input {
   height: auto !important;
+}
+
+.help-error div {
+  @extend small;
+  color: $error-red;
+  margin-top: -17px;
+  text-align: right;
+}
+
+.form-group {
+  margin-bottom: 20px;
 }
