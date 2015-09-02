@@ -13,9 +13,9 @@ function atSubmit($parse) {
         compile: compileFunction
     };
 
-    return directive;
-
     ctrlFunction.$inject = ['$scope'];
+
+    return directive;
 
     function ctrlFunction($scope) {
         var ctrl = this;
@@ -73,7 +73,7 @@ function atSubmit($parse) {
             element.bind('submit', function(event) {
                 scope.$apply(function() {
                     submitCtrl.setAttempted();
-                })
+                });
 
                 if(!formCtrl.$valid) {
                     return false;

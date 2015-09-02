@@ -45,10 +45,17 @@
         <div ng-message="maxlength">Password can't be longer than 255 characters</div>
       </div>
 
-      <div class="form-group">
-        <label for="password-confirmation">Confirmation</label>
-        <input id="password-confirmation" class="form-control" type="password"
-               placeholder="Confirm password" ng-model="ctrl.confirmation">
+      <div class="form-group" ng-class="{'has-error': at.userForm.needsAttention(userForm.password_confirmation)}">
+        <label for="password_confirmation" class="control-label">Confirmation</label>
+        <input id="password_confirmation" name="password_confirmation" class="form-control"
+               type="password" placeholder="Confirm password"
+               ng-model="ctrl.confirmation" at-confirm-password="ctrl.password">
+      </div>
+
+      <div class="help-error" role="alert"
+           ng-messages="userForm.password_confirmation.$error"
+           ng-if="at.userForm.needsAttention(userForm.password_confirmation)">
+        <div ng-message="atConfirmPassword">Passwords have to match</div>
       </div>
 
       <input type="submit" class="btn btn-primary" value="Create my account">
