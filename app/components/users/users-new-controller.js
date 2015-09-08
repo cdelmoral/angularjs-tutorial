@@ -5,9 +5,9 @@ angular
     .module('angularjsTutorial.users')
     .controller('UsersNewCtrl', UsersNewCtrl);
 
-UsersNewCtrl.$inject = ['PageSvc', 'UsersService'];
+UsersNewCtrl.$inject = ['$location', 'PageSvc', 'UsersService'];
 
-function UsersNewCtrl(pageSvc, usersService) {
+function UsersNewCtrl($location, pageSvc, usersService) {
     var ctrl = this;
 
     ctrl.user = {};
@@ -17,6 +17,8 @@ function UsersNewCtrl(pageSvc, usersService) {
 
     ctrl.createUser = createUser;
 
+    var requestSent = false;
+
     initializeController();
 
     function initializeController() {
@@ -24,7 +26,15 @@ function UsersNewCtrl(pageSvc, usersService) {
     }
 
     function createUser() {
-        usersService.save(ctrl.user);
+        if (!requestSent) {
+            requestSent = true;
+            usersService.save(ctrl.user, function(res) {
+                requestSent = false;
+                if (res && res._id) {
+                    $location.path('/users/' + res._id).replace();
+                }
+            });
+        }
     }
 }
 
