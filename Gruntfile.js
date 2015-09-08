@@ -49,25 +49,30 @@ module.exports = function(grunt) {
         },
 
         watch: {
-            options: {
-                livereload: 35729
-            },
             dev: {
                 files: ['bower_components/*', 'app/**/*.js', 'app/**/*.html',  'app/**/*.css'],
                 tasks: ['refresh']
             },
             sass: {
                 files: ['app/**/*.scss', 'app/**/*.sass'],
-                tasks: ['sass:dev'],
-                options: {
-                    livereload: {
-                        port: 35730
-                    }
-                }
+                tasks: ['sass:dev']
             },
             e2e: {
                 files: ['bower_components/*', 'app/**/*.js', 'app/**/*.html'],
                 tasks: ['refresh', 'protractor']
+            },
+            express: {
+                files: ['server/**/*.js'],
+                tasks: ['express:dev'],
+                options: {
+                    spawn: false
+                }
+            }
+        },
+
+        focus: {
+            dev: {
+                include: ['dev', 'sass', 'express']
             }
         },
 
@@ -105,7 +110,7 @@ module.exports = function(grunt) {
         concurrent: {
             dev: [
                 'sass:dev',
-                'copy:dev'
+                'copy:dev',
             ],
             watch_dev: {
                 tasks: [
@@ -132,12 +137,9 @@ module.exports = function(grunt) {
 
         // Express server
         express: {
-            options: {
-                port: 8000,
-                delay: 5000
-            },
             dev: {
                 options: {
+                    port: 8000,
                     script: './bin/www',
                     node_env: 'development'
                 }
@@ -234,7 +236,7 @@ module.exports = function(grunt) {
         'autoprefixer:dev',
         'express:dev',
         'open:dev',
-        'concurrent:watch_dev'
+        'focus:dev'
     ]);
 
     grunt.registerTask('refresh', [

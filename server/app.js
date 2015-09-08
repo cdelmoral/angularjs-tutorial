@@ -36,9 +36,9 @@ app.use(function(req, res, next) {
 
 mongoose.connect('mongodb://localhost/angularjs_tutorial', function(err) {
     if (err) {
-        console.log('connection error', err);
+        console.log('Database connection error', err);
     } else {
-        console.log('connection successful');
+        console.log('Connection to database successful');
     }
 });
 
