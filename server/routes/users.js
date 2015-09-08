@@ -15,20 +15,24 @@ router.get('/', function(req, res, next) {
   });
 });
 
-/* Check if user name is available. */
-router.get('/is_name_available', function(req, res, next) {
-  User.count({name: req.query.name}, function (err, count) {
-    if (err) {
-        console.log(err);
-        return next(err);
+/* Check if the username or email is valid. */
+router.get('/valid', function(req, res, next) {
+    function setValid(err, count) {
+        if (err) {
+            console.log(err);
+            return next(err);
+        }
+
+        res.json({valid: count === 0});
     }
 
-    if (count === 1) {
-      res.json({available: false});
+    if (req.query.name) {
+        User.count({name: req.query.name}, setValid);
+    } else if (req.query.email) {
+        User.count({email: req.query.email}, setValid);
     } else {
-      res.json({available: true});
+        res.json({valid: false});
     }
-  });
 });
 
 /* Get user by id. */
