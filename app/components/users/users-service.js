@@ -8,7 +8,9 @@ angular
 UsersService.$inject = ['$resource'];
 
 function UsersService($resource) {
-    var svc = $resource('/users/:id');
+    var svc = $resource('/users/:id', {},
+        { isAvailable: { method: 'GET', url: '/users/is_name_available' } }
+    );
 
     return svc;
 }

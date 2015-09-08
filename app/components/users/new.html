@@ -8,12 +8,15 @@
         <label for="name" class="control-label">Name</label>
         <input id="name" name="name" class="form-control"
                type="text" placeholder="Name" autofocus="true" required
-               ng-model="ctrl.user.name" ng-maxlength="50">
+               ng-model="ctrl.user.name" ng-maxlength="50"
+               ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }"
+               at-validate-unique>
       </div>
 
       <div class="help-error" role="alert"
            ng-messages="userForm.name.$error" ng-if="at.userForm.needsAttention(userForm.name)">
         <div ng-message="required">Name is required</div>
+        <div ng-message="atValidateUnique">Your name is already picked</div>
         <div ng-message="maxlength">Your name is too long</div>
       </div>
 

@@ -15,6 +15,22 @@ router.get('/', function(req, res, next) {
   });
 });
 
+/* Check if user name is available. */
+router.get('/is_name_available', function(req, res, next) {
+  User.count({name: req.query.name}, function (err, count) {
+    if (err) {
+        console.log(err);
+        return next(err);
+    }
+
+    if (count === 1) {
+      res.json({available: false});
+    } else {
+      res.json({available: true});
+    }
+  });
+});
+
 /* Get user by id. */
 router.get('/:id', function(req, res, next) {
   User.findById(req.params.id, function (err, user) {
@@ -33,12 +49,12 @@ router.post('/', function(req, res, next) {
     email: req.body.email
   };
 
-  User.create(newUser, function (err, post) {
+  User.create(newUser, function (err, user) {
     if (err) {
       return next(err);
     }
 
-    res.json(post);
+    res.json(user);
   });
 });
 
