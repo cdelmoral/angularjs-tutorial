@@ -6,13 +6,13 @@ var User = require('../user/user-model.js');
 
 /* Get users listing. */
 router.get('/', function(req, res, next) {
-  User.find(function (err, users) {
-    if (err) {
-      return next(err);
-    }
-    
-    res.json(users);
-  });
+    User.find(function (err, users) {
+        if (err) {
+            return next(err);
+        }
+
+        res.json(users);
+    });
 });
 
 /* Check if the username or email is valid. */
@@ -37,29 +37,29 @@ router.get('/valid', function(req, res, next) {
 
 /* Get user by id. */
 router.get('/:id', function(req, res, next) {
-  User.findById(req.params.id, function (err, user) {
-    if (err) {
-        return next(err);
-    }
+    User.findById(req.params.id, function (err, user) {
+        if (err) {
+            return next(err);
+        }
 
-    res.json(user);
-  });
+        res.json(user);
+    });
 });
 
 /* Create new user. */
 router.post('/', function(req, res, next) {
-  var newUser = {
-    name: req.body.name,
-    email: req.body.email
-  };
+    var newUser = {
+        name: req.body.name,
+        email: req.body.email
+    };
 
-  User.create(newUser, function (err, user) {
-    if (err) {
-      return next(err);
-    }
+    User.create(newUser, function (err, user) {
+        if (err) {
+            return next(err);
+        }
 
-    res.json(user);
-  });
+        res.json(user);
+    });
 });
 
 module.exports = router;

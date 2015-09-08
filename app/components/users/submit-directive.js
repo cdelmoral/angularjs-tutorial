@@ -75,7 +75,7 @@ function atSubmit($parse) {
                     submitCtrl.setAttempted();
                 });
 
-                if(!formCtrl.$valid) {
+                if (!formCtrl.$valid) {
                     return false;
                 } else {
                     scope.$apply(function() {
