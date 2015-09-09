@@ -50,7 +50,8 @@ router.get('/:id', function(req, res, next) {
 router.post('/', function(req, res, next) {
     var newUser = {
         name: req.body.name,
-        email: req.body.email
+        email: req.body.email,
+        password: req.body.password
     };
 
     User.create(newUser, function (err, user) {

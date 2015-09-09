@@ -41,7 +41,7 @@
         <label for="password" class="control-label">Password</label>
         <input id="password" name="password" class="form-control"
                type="password" placeholder="Password" required
-               ng-model="ctrl.password" ng-minlength="6" ng-maxlength="255"
+               ng-model="ctrl.user.password" ng-minlength="6" ng-maxlength="255"
                ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }">
       </div>
 
@@ -56,7 +56,7 @@
         <label for="password_confirmation" class="control-label">Confirmation</label>
         <input id="password_confirmation" name="password_confirmation" class="form-control"
                type="password" placeholder="Confirm password"
-               ng-model="ctrl.confirmation" at-confirm-password="ctrl.password"
+               ng-model="ctrl.confirmation" at-confirm-password="ctrl.user.password"
                ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }">
       </div>
 

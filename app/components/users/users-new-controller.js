@@ -12,7 +12,6 @@ function UsersNewCtrl($location, pageSvc, usersService) {
 
     ctrl.user = {};
 
-    ctrl.password = '';
     ctrl.confirmation = '';
 
     ctrl.createUser = createUser;
