@@ -111,16 +111,7 @@ module.exports = function(grunt) {
             dev: [
                 'sass:dev',
                 'copy:dev',
-            ],
-            watch_dev: {
-                tasks: [
-                    'watch:dev',
-                    'watch:sass'
-                ],
-                options: {
-                    logConcurrentOutput: true
-                }
-            }
+            ]
         },
 
         // Add vendor prefixed styles
@@ -162,6 +153,9 @@ module.exports = function(grunt) {
 
         // Start mongodb
         shell: {
+            mongodb_dev_folder: {
+                command: 'mkdir -p ./.db/dev'
+            },
             mongodb_dev: {
                 command: 'mongod --dbpath ./.db/dev',
                 options: {
@@ -228,6 +222,7 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('serve', [
+        'shell:mongodb_dev_folder',
         'shell:mongodb_dev',
         'clean:dev',
         'concurrent:dev',
