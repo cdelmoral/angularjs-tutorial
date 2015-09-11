@@ -4,6 +4,8 @@
 angular.module('angularjsTutorial.users', [
     'ngResource',
     'ngMessages',
+    'angular-flash.service',
+    'angular-flash.flash-alert-directive',
     'angularjsTutorial.page'
 ]);
 
