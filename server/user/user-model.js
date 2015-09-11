@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-var credential = require('credential');
+var bcrypt = require('bcrypt');
 var validate = require('../common/validator');
 
 var userSchema = new mongoose.Schema({
@@ -37,21 +37,27 @@ userSchema.pre('save', function(next) {
         return next();
     }
 
-    credential.hash(user.password, function(err, hash) {
+    bcrypt.genSalt(10, function(err, salt) {
         if (err) {
-            console.log(err);
             return next(err);
         }
 
-        user.password = hash;
-        next();
+        bcrypt.hash(user.password, salt, function(err, hash) {
+            if (err) {
+                return next(err);
+            }
+
+            user.password = hash;
+            next();
+        });
     });
 });
 
 userSchema.methods.isValidPassword = function(password, callback) {
-    var user = this;
+    return bcrypt.compareSync(password, user.password);
+    // bcrypt.compare(password, user.password, funtion(err, res) {
 
-    return credential.verify(user.password, password, callback);
+    // });
 };
 
 module.exports = mongoose.model('User', userSchema);
