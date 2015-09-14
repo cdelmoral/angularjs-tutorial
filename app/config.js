@@ -40,6 +40,11 @@ function Config($routeProvider) {
             controller: 'UsersShowCtrl',
             controllerAs: 'ctrl'
         })
+        .when('/login', {
+            templateUrl: 'components/sessions/sessions-new.html',
+            controller: 'SessionsNewCtrl',
+            controllerAs: 'ctrl'
+        })
         .otherwise({
             redirectTo: '/home'
         });
