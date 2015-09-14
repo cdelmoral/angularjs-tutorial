@@ -10,7 +10,7 @@
                type="text" placeholder="Name" autofocus="true" required
                ng-model="ctrl.user.name" ng-maxlength="50"
                ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }"
-               at-validate-unique>
+               at-validate-unique="ctrl.isNameUnique(value)">
       </div>
 
       <div class="help-error" role="alert"
@@ -26,7 +26,7 @@
                type="email" placeholder="Email" required
                ng-model="ctrl.user.email" ng-maxlength="255"
                ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }"
-               at-validate-unique>
+               at-validate-unique="ctrl.isEmailUnique(value)">
       </div>
 
       <div class="help-error" role="alert"
