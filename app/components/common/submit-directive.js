@@ -1,6 +1,6 @@
 (function() {
 angular
-    .module('angularjsTutorial.users')
+    .module('angularjsTutorial.common')
     .directive('atSubmit', atSubmit);
 
 atSubmit.$inject = ['$parse'];

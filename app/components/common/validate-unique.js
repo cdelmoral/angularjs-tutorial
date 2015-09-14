@@ -1,11 +1,11 @@
 (function() {
 angular
-    .module('angularjsTutorial.users')
+    .module('angularjsTutorial.common')
     .directive('atValidateUnique', atValidateUnique);
 
-atValidateUnique.$inject = ['$q', 'UsersService'];
+atValidateUnique.$inject = ['$parse', '$q', 'UsersService'];
 
-function atValidateUnique($q, usersService) {
+function atValidateUnique($parse, $q, usersService) {
     var directive = {
         restrict: 'A',
         require: 'ngModel',
@@ -16,20 +16,16 @@ function atValidateUnique($q, usersService) {
 
     function linkFunction(scope, element, attrs, ctrl) {
         ctrl.$asyncValidators.atValidateUnique = validateUnique;
-        var query = attrs.name;
 
         function validateUnique(modelValue, viewValue) {
-            var value = modelValue || viewValue;
-            var params = {};
-            params[query] = value;
             var defer = $q.defer();
+            var value = modelValue || viewValue;
 
-            usersService.isAvailable(params, function(res) {
-                if (res && res.valid) {
-                    defer.resolve();
-                } else {
-                    defer.reject();
-                }
+            var fn = $parse(attrs.atValidateUnique);
+            fn(scope, { value: value }).then(function() {
+                defer.resolve();
+            }, function() {
+                defer.reject();
             });
 
             return defer.promise;

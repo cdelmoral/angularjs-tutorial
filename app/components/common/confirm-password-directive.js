@@ -1,6 +1,6 @@
 (function() {
 angular
-    .module('angularjsTutorial.users')
+    .module('angularjsTutorial.common')
     .directive('atConfirmPassword', atConfirmPassword);
 
 function atConfirmPassword() {

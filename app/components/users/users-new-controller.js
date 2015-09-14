@@ -5,9 +5,9 @@ angular
     .module('angularjsTutorial.users')
     .controller('UsersNewCtrl', UsersNewCtrl);
 
-UsersNewCtrl.$inject = ['$location', 'PageSvc', 'UsersService', 'flash'];
+UsersNewCtrl.$inject = ['$location', '$q', 'PageSvc', 'UsersService', 'flash'];
 
-function UsersNewCtrl($location, pageSvc, usersService, flash) {
+function UsersNewCtrl($location, $q, pageSvc, usersService, flash) {
     var ctrl = this;
 
     ctrl.user = {};
@@ -15,6 +15,8 @@ function UsersNewCtrl($location, pageSvc, usersService, flash) {
     ctrl.confirmation = '';
 
     ctrl.createUser = createUser;
+    ctrl.isNameUnique = isNameUnique;
+    ctrl.isEmailUnique = isEmailUnique;
 
     var requestSent = false;
 
@@ -35,6 +37,29 @@ function UsersNewCtrl($location, pageSvc, usersService, flash) {
                 }
             });
         }
+    }
+
+    function isNameUnique(value) {
+        var params = { name: value };
+        return checkUnique(params);
+    }
+
+    function isEmailUnique(value) {
+        var params = { email: value };
+        return checkUnique(params);
+    }
+
+    function checkUnique(params) {
+        var defer = $q.defer();
+        usersService.isAvailable(params, function(res) {
+            if (res && res.valid) {
+                defer.resolve();
+            } else {
+                defer.reject();
+            }
+        });
+
+        return defer.promise;
     }
 }
 
