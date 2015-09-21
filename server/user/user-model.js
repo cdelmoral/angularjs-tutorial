@@ -54,6 +54,7 @@ userSchema.pre('save', function(next) {
 });
 
 userSchema.methods.isValidPassword = function(password, callback) {
+    var user = this;
     return bcrypt.compareSync(password, user.password);
     // bcrypt.compare(password, user.password, funtion(err, res) {
 

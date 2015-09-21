@@ -5,9 +5,9 @@ angular
     .module('angularjsTutorial.sessions')
     .controller('SessionsNewCtrl', SessionsNewCtrl);
 
-SessionsNewCtrl.$inject = ['PageSvc'];
+SessionsNewCtrl.$inject = ['PageSvc', 'SessionsService'];
 
-function SessionsNewCtrl(pageSvc) {
+function SessionsNewCtrl(pageSvc, sessionsService) {
     var ctrl = this;
 
     ctrl.user = {};
@@ -20,7 +20,7 @@ function SessionsNewCtrl(pageSvc) {
     }
 
     function createSession() {
-        console.log('Create a session');
+        sessionsService.authenticate(ctrl.user);
     }
 }
 

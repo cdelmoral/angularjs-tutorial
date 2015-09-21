@@ -1,11 +1,12 @@
 var express = require('express');
+var session = require('express-session');
 var router = express.Router();
 
 var mongoose = require('mongoose');
 var User = require('../user/user-model.js');
 
 /* Get users listing. */
-router.get('/', function(req, res, next) {
+router.get('/', requireLogin, function(req, res, next) {
     User.find(function (err, users) {
         if (err) {
             return next(err);
@@ -36,7 +37,7 @@ router.get('/valid', function(req, res, next) {
 });
 
 /* Get user by id. */
-router.get('/:id', function(req, res, next) {
+router.get('/:id', requireLogin, function(req, res, next) {
     User.findById(req.params.id, function (err, user) {
         if (err) {
             return next(err);
@@ -62,5 +63,13 @@ router.post('/', function(req, res, next) {
         res.json(user);
     });
 });
+
+function requireLogin(req, res, next) {
+    if (!req.user_id) {
+        res.json({error: true});
+    } else {
+        next();
+    }
+}
 
 module.exports = router;
