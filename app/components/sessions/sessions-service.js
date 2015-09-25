@@ -11,8 +11,11 @@ function SessionsService($location, $resource, flash) {
     var Sessions = $resource('/api/sessions', {},
         { authenticate: { method: 'POST' } }
     );
+    var LOGGING_EVENT = 'LoggingEvent';
 
     var svc = this;
+
+    svc.currentUser = null;
 
     svc.authenticate = authenticate;
 
