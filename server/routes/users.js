@@ -4,6 +4,7 @@ var router = express.Router();
 
 var mongoose = require('mongoose');
 var User = require('../user/user-model.js');
+var requireLogin = require('../helpers/sessions-helper.js').requireLogin;
 
 /* Get users listing. */
 router.get('/', requireLogin, function(req, res, next) {
@@ -63,13 +64,5 @@ router.post('/', function(req, res, next) {
         res.json(user);
     });
 });
-
-function requireLogin(req, res, next) {
-    if (!req.user_id) {
-        res.json({error: true});
-    } else {
-        next();
-    }
-}
 
 module.exports = router;

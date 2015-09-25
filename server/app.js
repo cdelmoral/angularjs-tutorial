@@ -23,12 +23,11 @@ app.use(session({
     saveUninitialized: true
 }));
 
-app.use(function(req, res, next) {
+app.use('/api', function(req, res, next) {
     var sess = req.session;
     if (sess && sess.user_id) {
         User.findById(sess.user_id, function(err, user) {
             if (user) {
-                req.user_id = user._id;
                 sess.user_id = user._id;
             }
             next();
@@ -45,7 +44,6 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use('/api/users', users);
 app.use('/api/sessions', sessions);
-
 app.use('/', routes);
 
 // catch 404 and forward to error handler
@@ -54,7 +52,6 @@ app.use(function(req, res, next) {
     err.status = 404;
     next(err);
 });
-
 
 mongoose.connect('mongodb://localhost/angularjs_tutorial', function(err) {
     if (err) {
