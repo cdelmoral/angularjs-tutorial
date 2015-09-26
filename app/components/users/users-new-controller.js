@@ -5,9 +5,9 @@ angular
     .module('angularjsTutorial.users')
     .controller('UsersNewCtrl', UsersNewCtrl);
 
-UsersNewCtrl.$inject = ['$location', '$q', 'PageSvc', 'UsersService', 'flash'];
+UsersNewCtrl.$inject = ['$location', '$q', 'PageSvc', 'SessionsService', 'UsersService', 'flash'];
 
-function UsersNewCtrl($location, $q, pageSvc, usersService, flash) {
+function UsersNewCtrl($location, $q, pageSvc, sessionsService, usersService, flash) {
     var ctrl = this;
 
     ctrl.user = {};
@@ -33,6 +33,7 @@ function UsersNewCtrl($location, $q, pageSvc, usersService, flash) {
                 requestSent = false;
                 if (res && res._id) {
                     flash.success = 'Welcome to the sample app!';
+                    sessionsService.authenticate(ctrl.user);
                     $location.path('/users/' + res._id).replace();
                 }
             });
