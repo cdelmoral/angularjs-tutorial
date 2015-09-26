@@ -59,6 +59,12 @@ function Config($routeProvider) {
             controllerAs: 'ctrl',
             resolve: initAuth
         })
+        .when('/users/:id/edit', {
+            templateUrl: 'components/users/users-edit.html',
+            controller: 'UsersEditCtrl',
+            controllerAs: 'ctrl',
+            resolve: initAuth
+        })
         .when('/login', {
             templateUrl: 'components/sessions/sessions-new.html',
             controller: 'SessionsNewCtrl',

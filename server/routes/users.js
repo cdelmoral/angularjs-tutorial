@@ -39,13 +39,42 @@ router.get('/valid', function(req, res, next) {
 
 /* Get user by id. */
 router.get('/:id', requireLogin, function(req, res, next) {
-    User.findById(req.params.id, function (err, user) {
+    User.findById(req.params.id, 'name _id email', function (err, user) {
         if (err) {
             return next(err);
         }
 
-        res.json(user);
+        res.json({
+            name: user.name,
+            email: user.email,
+            id: user._id
+        });
     });
+});
+
+/** Update user by id. */
+router.put('/:id', requireLogin, function(req, res, next) {
+    User.findById(req.params.id, function(err, user) {
+        if (err) {
+            return next(err);
+        }
+
+        user.name = req.body.name;
+        user.email = req.body.email;
+        user.password = req.body.password;
+
+        user.save(function(err, user) {
+            if (err) {
+                return next(err);
+            }
+
+            res.json({
+                name: user.name,
+                email: user.email,
+                id: user._id
+            });
+        })
+    })
 });
 
 /* Create new user. */
