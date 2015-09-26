@@ -3,3 +3,6 @@ bower_components
 .dev
 .sass-cache
 .db
+
+// WebStorm IDE
+.idea/
