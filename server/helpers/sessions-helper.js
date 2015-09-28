@@ -1,8 +1,10 @@
-exports.requireLogin = function(req, res, next) {
+exports.requireLogin = requireLogin;
+
+function requireLogin(req, res, next) {
     var sess = req.session;
-    if (!sess.user_id) {
-        res.status(401).send('Unauthorized');
-    } else {
+    if (sess.user && sess.user._id) {
         next();
+    } else {
+        res.status(401).send('Unauthorized');
     }
-};
+}

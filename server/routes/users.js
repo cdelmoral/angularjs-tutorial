@@ -17,23 +17,43 @@ router.get('/', requireLogin, function(req, res, next) {
     });
 });
 
-/* Check if the username or email is valid. */
-router.get('/valid', function(req, res, next) {
-    function setValid(err, count) {
-        if (err) {
-            console.log(err);
-            return next(err);
-        }
+/* Check if the username is not already being used. */
+router.get('/valid_name', function(req, res, next) {
+    var sess = req.session;
+    var query = req.query;
 
-        res.json({valid: count === 0});
-    }
+    if (sess.user && sess.user.name === query.name) {
+        res.json({ valid: true });
+    } else if (query.name) {
+        User.count({ name: query.name }, function(err, count) {
+            if (err) {
+                return next(err);
+            }
 
-    if (req.query.name) {
-        User.count({name: req.query.name}, setValid);
-    } else if (req.query.email) {
-        User.count({email: req.query.email}, setValid);
+            res.json({valid: count === 0});
+        });
     } else {
-        res.json({valid: false});
+        res.json({ valid: false });
+    }
+});
+
+/* Check if the email is not already being used. */
+router.get('/valid_email', function(req, res, next) {
+    var sess = req.session;
+    var query = req.query;
+
+    if (sess.user && sess.user.email === query.email) {
+        res.json({ valid: true });
+    } else if (query.email) {
+        User.count({ email: query.email }, function(err, count) {
+            if (err) {
+                return next(err);
+            }
+
+            res.json({valid: count === 0});
+        });
+    } else {
+        res.json({ valid: false });
     }
 });
 

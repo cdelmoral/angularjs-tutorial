@@ -25,10 +25,10 @@ app.use(session({
 
 app.use('/api', function(req, res, next) {
     var sess = req.session;
-    if (sess && sess.user_id) {
-        User.findById(sess.user_id, function(err, user) {
-            if (user) {
-                sess.user_id = user._id;
+    if (sess && sess.user) {
+        User.findById(sess.user._id, 'name email _id', function(err, user) {
+            if (user && user._id) {
+                sess.user = user;
             }
             next();
         });

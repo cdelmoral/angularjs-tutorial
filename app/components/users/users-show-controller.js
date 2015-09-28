@@ -5,9 +5,9 @@ angular
     .module('angularjsTutorial.users')
     .controller('UsersShowCtrl', UsersShowCtrl);
 
-UsersShowCtrl.$inject = ['PageSvc', '$routeParams', 'UsersService'];
+UsersShowCtrl.$inject = ['$routeParams', 'PageSvc', 'UsersService'];
 
-function UsersShowCtrl(pageSvc, $routeParams, userService) {
+function UsersShowCtrl($routeParams, pageSvc, usersService) {
     var ctrl = this;
 
     ctrl.user = {};
@@ -17,7 +17,7 @@ function UsersShowCtrl(pageSvc, $routeParams, userService) {
     function initializeController() {
         pageSvc.setPageTitle('Show user');
 
-        ctrl.user = userService.get({id: $routeParams.id});
+        ctrl.user = usersService.getUser($routeParams.id);
     }
 }
 

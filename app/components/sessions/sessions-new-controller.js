@@ -3,7 +3,7 @@
 
 angular
     .module('angularjsTutorial.sessions')
-    .controller('SessionsNewCtrl', SessionsNewCtrl);
+    .controller('SessionsNewCtrl', SessionsNewCtrl, UsersService);
 
 SessionsNewCtrl.$inject = ['PageSvc', 'SessionsService'];
 
@@ -21,6 +21,12 @@ function SessionsNewCtrl(pageSvc, sessionsService) {
 
     function createSession() {
         sessionsService.authenticate(ctrl.user);
+        if (sessionsService.beforeLoginAttempt === null) {
+            $location.path('/users/' + svc.currentUser.id).replace();
+        } else {
+            $location.path(beforeLoginAttempt).replace();
+            beforeLoginAttempt = null;
+        }
     }
 }
 

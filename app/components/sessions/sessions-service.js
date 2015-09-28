@@ -14,6 +14,7 @@ function SessionsService($location, $q, $resource, $rootScope, flash) {
 
     svc.initAuthPromise = null;
     svc.currentUser = null;
+    svc.beforeLoginAttempt = null;
 
     svc.authenticate = authenticate;
     svc.logout = logout;
@@ -51,13 +52,13 @@ function SessionsService($location, $q, $resource, $rootScope, flash) {
         Sessions.logout();
         
         svc.currentUser = null;
-        $rootScope.$broadcast(LOGGING_EVENT);
+        $rootScope.$broadcast(svc.LOGGING_EVENT);
         $location.path('/home').replace();
     }
 
     function requireLogin() {
         if (svc.currentUser === null) {
-            beforeLoginAttempt = $location.path();
+            svc.beforeLoginAttempt = $location.path();
             flash.error = 'You need to be logged in to access this page';
             $location.path('/login').replace();
         }
@@ -81,7 +82,7 @@ function SessionsService($location, $q, $resource, $rootScope, flash) {
 
     function handleLoginRedirect() {
         if (beforeLoginAttempt === null) {
-            $location.path('/users/' + user.id).replace();
+            $location.path('/users/' + svc.currentUser.id).replace();
         } else {
             $location.path(beforeLoginAttempt).replace();
             beforeLoginAttempt = null;

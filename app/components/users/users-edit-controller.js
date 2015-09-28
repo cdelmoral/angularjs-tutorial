@@ -23,23 +23,21 @@
         initializeController();
 
         function updateUser() {
-            usersService.update({id: ctrl.user.id}, ctrl.user, function(user) {
+            usersService.updateUser(ctrl.user).then(function(user) {
                 if (user && user.id) {
                     flash.success = 'Your profile was successfully updated!';
                     sessionsService.currentUser = user;
-                    $location.path('/users/' + user.id).replace();
+                    $location.path(usersService.userPath(user)).replace();
                 }
             })
         }
 
         function isNameUnique(value) {
-            var params = { name: value };
-            return checkUnique(params);
+            return usersService.isNameUnique(value);
         }
 
         function isEmailUnique(value) {
-            var params = { email: value };
-            return checkUnique(params);
+            return usersService.isEmailUnique(value);
         }
 
         // Private methods
@@ -47,20 +45,7 @@
         function initializeController() {
             sessionsService.requireLogin();
             pageSvc.setPageTitle('Edit user');
-            ctrl.user = usersService.get({id: $routeParams.id});
-        }
-
-        function checkUnique(params) {
-            var defer = $q.defer();
-            usersService.isAvailable(params, function(res) {
-                if (res && res.valid) {
-                    defer.resolve();
-                } else {
-                    defer.reject();
-                }
-            });
-
-            return defer.promise;
+            ctrl.user = usersService.getUser($routeParams.id);
         }
     }
 

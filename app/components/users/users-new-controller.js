@@ -5,9 +5,9 @@ angular
     .module('angularjsTutorial.users')
     .controller('UsersNewCtrl', UsersNewCtrl);
 
-UsersNewCtrl.$inject = ['$location', '$q', 'PageSvc', 'SessionsService', 'UsersService', 'flash'];
+UsersNewCtrl.$inject = ['$location', 'PageSvc', 'SessionsService', 'UsersService', 'flash'];
 
-function UsersNewCtrl($location, $q, pageSvc, sessionsService, usersService, flash) {
+function UsersNewCtrl($location, pageSvc, sessionsService, usersService, flash) {
     var ctrl = this;
 
     ctrl.user = {};
@@ -18,49 +18,38 @@ function UsersNewCtrl($location, $q, pageSvc, sessionsService, usersService, fla
     ctrl.isNameUnique = isNameUnique;
     ctrl.isEmailUnique = isEmailUnique;
 
+    // Private variables
+
     var requestSent = false;
 
     initializeController();
 
-    function initializeController() {
-        pageSvc.setPageTitle('Sign up');
-    }
-
     function createUser() {
         if (!requestSent) {
             requestSent = true;
-            usersService.save(ctrl.user, function(res) {
+            usersService.createUser(ctrl.user).then(function(user) {
                 requestSent = false;
-                if (res && res._id) {
+                if (user && user.id) {
                     flash.success = 'Welcome to the sample app!';
                     sessionsService.authenticate(ctrl.user);
-                    $location.path('/users/' + res._id).replace();
+                    $location.path(usersService.userPath(user)).replace();
                 }
             });
         }
     }
 
     function isNameUnique(value) {
-        var params = { name: value };
-        return checkUnique(params);
+        return usersService.isNameUnique(value);
     }
 
     function isEmailUnique(value) {
-        var params = { email: value };
-        return checkUnique(params);
+        return usersService.isEmailUnique(value);
     }
 
-    function checkUnique(params) {
-        var defer = $q.defer();
-        usersService.isAvailable(params, function(res) {
-            if (res && res.valid) {
-                defer.resolve();
-            } else {
-                defer.reject();
-            }
-        });
+    // Private methods
 
-        return defer.promise;
+    function initializeController() {
+        pageSvc.setPageTitle('Sign up');
     }
 }
 
