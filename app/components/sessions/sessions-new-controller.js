@@ -25,7 +25,7 @@ function SessionsNewCtrl($location, flash, pageSvc, sessionsService) {
             if (sessionsService.beforeLoginAttempt === null) {
                 $location.path('/users/' + user.id).replace();
             } else {
-                $location.path(beforeLoginAttempt).replace();
+                $location.path(sessionsService.beforeLoginAttempt).replace();
                 sessionsService.beforeLoginAttempt = null;
             }
         }).catch(function() {
