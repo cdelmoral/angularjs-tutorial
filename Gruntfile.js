@@ -13,6 +13,7 @@ module.exports = function(grunt) {
     });
 
     grunt.initConfig({
+        pkg: grunt.file.readJSON('package.json'),
         wiredep: {
             dev: {
                 src: ['.dev/index.html'],
@@ -78,7 +79,21 @@ module.exports = function(grunt) {
 
         // Empties folders to start fresh
         clean: {
-            dev: '.dev'
+            dev: '.dev',
+            dist: 'dist'
+        },
+
+        uglify: {
+            option: {
+                compress: {
+                    drop_console: true
+                }
+            },
+            dist: {
+                files: {
+                    'dist/<%= pkg.name %>-<%= pkg.version %>.min.js': ['app/app.js', 'app/**/*module.js', 'app/**/*.js']
+                }
+            }
         },
 
         // Compiles Sass to CSS and generates necessary files if requested
@@ -87,30 +102,38 @@ module.exports = function(grunt) {
                 loadPath: 'bower_components/bootstrap-sass/assets/stylesheets/'
             },
             dev: {
-                files: [{
-                    expand: true,
-                    cwd: 'app',
-                    src: ['**/*.scss'],
-                    dest: '.dev/',
-                    ext: '.css'
-                }]
+                options: {
+                    style: 'expanded',
+                    sourcemap: 'inline'
+                },
+                files: {
+                    '.dev/styles.css': 'app/styles/main.scss'
+                }
+            },
+            dist: {
+                options: {
+                    style: 'compressed',
+                    sourcemap: 'none'
+                },
+                files: {
+                    'dist/styles.css': 'app/styles/main.scss'
+                }
             }
         },
 
-        // Copies remaining files to places other tasks can use
         copy: {
             dev: {
                 expand: true,
                 cwd: 'app/',
                 dest: '.dev/',
-                src: ['**/*.html', '**/*.js', '**/*.css', '**/*.scss', '**/*.sass']
+                src: ['**/*.html', '**/*.js']
             }
         },
 
         concurrent: {
             dev: [
                 'sass:dev',
-                'copy:dev',
+                'copy:dev'
             ]
         },
 
@@ -121,7 +144,7 @@ module.exports = function(grunt) {
             },
             dev: {
                 options: {
-                    map: true,
+                    map: true
                 }
             }
         },
@@ -232,6 +255,12 @@ module.exports = function(grunt) {
         'express:dev',
         'open:dev',
         'focus:dev'
+    ]);
+
+    grunt.registerTask('build', [
+        'clean:dist',
+        'uglify:dist',
+        'sass:dist'
     ]);
 
     grunt.registerTask('refresh', [

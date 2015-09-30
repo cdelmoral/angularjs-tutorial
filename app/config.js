@@ -15,10 +15,14 @@ function Run(sessionsService) {
 
 function Config($routeProvider) {
     var initAuth = {
-        auth: function(SessionsService) {
-            return SessionsService.initAuthPromise;
-        }
+        auth: authFn
     };
+
+    authFn.$inject = ['SessionsService'];
+
+    function authFn(sessionsService) {
+        return sessionsService.initAuthPromise;
+    }
 
     $routeProvider
         .when('/home', {
