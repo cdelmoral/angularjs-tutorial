@@ -5,9 +5,9 @@ angular
     .module('angularjsTutorial.users')
     .controller('UsersIndexCtrl', UsersIndexCtrl);
 
-UsersIndexCtrl.$inject = ['PageSvc', 'UsersService'];
+UsersIndexCtrl.$inject = ['PageSvc', 'SessionsService', 'UsersService'];
 
-function UsersIndexCtrl(pageSvc, usersService) {
+function UsersIndexCtrl(pageSvc, sessionsService, usersService) {
     var ctrl = this;
 
     ctrl.users = [];
@@ -15,6 +15,8 @@ function UsersIndexCtrl(pageSvc, usersService) {
     initializeController();
 
     function initializeController() {
+        sessionsService.requireLogin();
+
         pageSvc.setPageTitle('Users');
 
         ctrl.users = usersService.getUsersIndex();
