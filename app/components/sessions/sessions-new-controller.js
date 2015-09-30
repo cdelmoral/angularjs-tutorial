@@ -3,11 +3,11 @@
 
 angular
     .module('angularjsTutorial.sessions')
-    .controller('SessionsNewCtrl', SessionsNewCtrl, UsersService);
+    .controller('SessionsNewCtrl', SessionsNewCtrl);
 
-SessionsNewCtrl.$inject = ['PageSvc', 'SessionsService'];
+SessionsNewCtrl.$inject = ['$location', 'flash', 'PageSvc', 'SessionsService'];
 
-function SessionsNewCtrl(pageSvc, sessionsService) {
+function SessionsNewCtrl($location, flash, pageSvc, sessionsService) {
     var ctrl = this;
 
     ctrl.user = {};
@@ -20,13 +20,18 @@ function SessionsNewCtrl(pageSvc, sessionsService) {
     }
 
     function createSession() {
-        sessionsService.authenticate(ctrl.user);
-        if (sessionsService.beforeLoginAttempt === null) {
-            $location.path('/users/' + svc.currentUser.id).replace();
-        } else {
-            $location.path(beforeLoginAttempt).replace();
-            beforeLoginAttempt = null;
-        }
+        sessionsService.authenticate(ctrl.user).then(function(user) {
+            flash.success = 'Welcome!';
+            if (sessionsService.beforeLoginAttempt === null) {
+                $location.path('/users/' + user.id).replace();
+            } else {
+                $location.path(beforeLoginAttempt).replace();
+                sessionsService.beforeLoginAttempt = null;
+            }
+        }).catch(function() {
+            flash.error = 'Invalid login';
+            $location.path('/login').replace();
+        });
     }
 }
 

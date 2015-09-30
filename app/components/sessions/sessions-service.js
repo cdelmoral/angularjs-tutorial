@@ -14,6 +14,8 @@ function SessionsService($location, $q, $resource, $rootScope, flash) {
 
     svc.initAuthPromise = null;
     svc.currentUser = null;
+
+    /** String for holding the attempt to access a unauthorized page. */
     svc.beforeLoginAttempt = null;
 
     svc.authenticate = authenticate;
@@ -29,23 +31,20 @@ function SessionsService($location, $q, $resource, $rootScope, flash) {
         logout: { method: 'DELETE', url: '/api/sessions/logout'}
     });
 
-    /** String for holding the attempt to access a unauthorized page. */
-    var beforeLoginAttempt = null;
-
     return svc;
 
     function authenticate(user) {
+        var defer = $q.defer()
         Sessions.authenticate(user, function(user) {
             if (user && user.id) {
                 svc.currentUser = user;
-                flash.success = 'Welcome!';
                 $rootScope.$broadcast(svc.LOGGING_EVENT);
-                handleLoginRedirect();
+                defer.resolve(svc.currentUser);
             } else {
-                flash.error = 'Invalid login';
-                $location.path('/login').replace();
+                defer.reject();
             }
         });
+        return defer.promise;
     }
 
     function logout() {
@@ -78,15 +77,6 @@ function SessionsService($location, $q, $resource, $rootScope, flash) {
         });
 
         svc.initAuthPromise = defer.promise;
-    }
-
-    function handleLoginRedirect() {
-        if (beforeLoginAttempt === null) {
-            $location.path('/users/' + svc.currentUser.id).replace();
-        } else {
-            $location.path(beforeLoginAttempt).replace();
-            beforeLoginAttempt = null;
-        }
     }
 }
 
