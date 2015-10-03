@@ -49,6 +49,10 @@ function UsersNewCtrl($location, pageSvc, sessionsService, usersService, flash) 
     // Private methods
 
     function initializeController() {
+        if (sessionsService.currentUser) {
+            $location.path(usersService.userPath(sessionsService.currentUser)).replace();
+        }
+
         pageSvc.setPageTitle('Sign up');
     }
 }

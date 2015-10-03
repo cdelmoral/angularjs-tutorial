@@ -28,6 +28,7 @@ function Config($routeProvider) {
         .when('/home', {
             templateUrl: 'components/page/home.html',
             controller: 'HomeCtrl',
+            controllerAs: 'ctrl',
             resolve: initAuth
         })
         .when('/help', {

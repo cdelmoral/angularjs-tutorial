@@ -15,10 +15,6 @@ function SessionsNewCtrl($location, flash, pageSvc, sessionsService) {
 
     initializeController();
 
-    function initializeController() {
-        pageSvc.setPageTitle('Log in');
-    }
-
     function createSession() {
         sessionsService.authenticate(ctrl.user).then(function(user) {
             flash.success = 'Welcome!';
@@ -32,6 +28,16 @@ function SessionsNewCtrl($location, flash, pageSvc, sessionsService) {
             flash.error = 'Invalid login';
             $location.path('/login').replace();
         });
+    }
+
+    // Private methods
+
+    function initializeController() {
+        if (sessionsService.currentUser) {
+            $location.path('/users/' + sessionsService.currentUser.id).replace();
+        }
+
+        pageSvc.setPageTitle('Log in');
     }
 }
 

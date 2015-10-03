@@ -5,9 +5,9 @@ angular
     .module('angularjsTutorial.users')
     .controller('UsersShowCtrl', UsersShowCtrl);
 
-UsersShowCtrl.$inject = ['$routeParams', 'PageSvc', 'UsersService'];
+UsersShowCtrl.$inject = ['$routeParams', 'PageSvc', 'SessionsService', 'UsersService'];
 
-function UsersShowCtrl($routeParams, pageSvc, usersService) {
+function UsersShowCtrl($routeParams, pageSvc, sessionsService, usersService) {
     var ctrl = this;
 
     ctrl.user = {};
@@ -15,6 +15,8 @@ function UsersShowCtrl($routeParams, pageSvc, usersService) {
     initializeController();
 
     function initializeController() {
+        sessionsService.requireLogin();
+
         pageSvc.setPageTitle('Show user');
 
         ctrl.user = usersService.getUser($routeParams.id);
