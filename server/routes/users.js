@@ -110,7 +110,9 @@ router.post('/', function(req, res, next) {
             return next(err);
         }
 
-        res.json(user);
+        res.json({
+            id: user._id
+        });
     });
 });
 
