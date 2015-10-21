@@ -99,12 +99,13 @@ module.exports = function(grunt) {
         // Compiles Sass to CSS and generates necessary files if requested
         sass: {
             options: {
-                loadPath: 'bower_components/bootstrap-sass/assets/stylesheets/'
+                includePaths: ['bower_components/bootstrap-sass/assets/stylesheets/']
             },
             dev: {
                 options: {
-                    style: 'expanded',
-                    sourcemap: 'inline'
+                    outputStyle: 'expanded',
+                    sourceMap: true,
+                    sourceMapContents: true
                 },
                 files: {
                     '.dev/styles.css': 'app/styles/main.scss'
@@ -112,8 +113,8 @@ module.exports = function(grunt) {
             },
             dist: {
                 options: {
-                    style: 'compressed',
-                    sourcemap: 'none'
+                    outputStyle: 'compressed',
+                    sourceMap: false
                 },
                 files: {
                     'dist/styles.css': 'app/styles/main.scss'
