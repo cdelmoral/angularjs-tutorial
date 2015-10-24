@@ -24,7 +24,6 @@ module.exports = function(grunt) {
             }
         },
 
-        // Express server
         express: {
             dev: {
                 options: {
@@ -42,18 +41,18 @@ module.exports = function(grunt) {
             }
         },
 
-        // Open server in browser
         open: {
             dev: {
                 path: 'http://localhost:8000/'
             }
         },
 
-        // Start mongodb
         shell: {
+            // Create mongodb folder for development
             mongodb_dev_folder: {
                 command: 'mkdir -p ./.db/dev'
             },
+            // Start mongodb in development
             mongodb_dev: {
                 command: 'mongod --dbpath ./.db/dev',
                 options: {
@@ -66,6 +65,7 @@ module.exports = function(grunt) {
                     }
                 }
             },
+            // Start mongodb in test
             mongodb_test: {
                 command: 'mongod --dbpath ./.db/test',
                 options: {
@@ -87,7 +87,6 @@ module.exports = function(grunt) {
             pause: {}
         },
 
-        // Back-end test settings
         mochaTest: {
             test: {
                 options: {
