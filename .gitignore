@@ -1,9 +1,5 @@
 node_modules
-/bower_components
-/.dev
-/.sass-cache
 /.db
-/dist
 
 // WebStorm IDE
 /.idea
