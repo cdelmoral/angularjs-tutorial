@@ -1,8 +1,6 @@
 var express = require('express');
-var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
 var session = require('express-session');
 
 var routes = require('./routes/index');
@@ -37,28 +35,7 @@ app.use('/api', function(req, res, next) {
     }
 });
 
-if (process.env.NODE_ENV === 'development') {
-    app.use('/bower_components', express.static(path.join(__dirname, '../../angularjs-tutorial-ui/bower_components')));
-    app.use(express.static(path.join(__dirname, '../../angularjs-tutorial-ui/.dev')));
-}
-
 app.use('/api/users', users);
 app.use('/api/sessions', sessions);
-app.use('/', routes);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
-
-mongoose.connect('mongodb://localhost/angularjs_tutorial', function(err) {
-    if (err) {
-        console.log('Database connection error', err);
-    } else {
-        console.log('Connection to database successful');
-    }
-});
 
 module.exports = app;
