@@ -38,8 +38,8 @@ app.use('/api', function(req, res, next) {
 });
 
 if (process.env.NODE_ENV === 'development') {
-    app.use('/bower_components', express.static(path.join(__dirname, '../bower_components')));
-    app.use(express.static(path.join(__dirname, '../.dev')));
+    app.use('/bower_components', express.static(path.join(__dirname, '../../angularjs-tutorial-ui/bower_components')));
+    app.use(express.static(path.join(__dirname, '../../angularjs-tutorial-ui/.dev')));
 }
 
 app.use('/api/users', users);
