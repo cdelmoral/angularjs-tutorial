@@ -2,8 +2,8 @@ var express = require('express');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var cors = require('cors');
 
-var routes = require('./routes/index');
 var users = require('./routes/users');
 var sessions = require('./routes/sessions');
 
@@ -20,6 +20,8 @@ app.use(session({
     resave: false,
     saveUninitialized: true
 }));
+
+app.use(cors());
 
 app.use('/api', function(req, res, next) {
     var sess = req.session;
