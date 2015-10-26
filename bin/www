@@ -16,8 +16,7 @@ var mongoose = require('mongoose');
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
-app.use('/bower_components', express.static(path.join(__dirname, '../../angularjs-tutorial-ui/bower_components')));
-app.use(express.static(path.join(__dirname, '../../angularjs-tutorial-ui/.dev')));
+app.use(express.static(path.join(__dirname, '/../public')));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

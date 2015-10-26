@@ -16,7 +16,7 @@ module.exports = function(grunt) {
 
         watch: {
             express: {
-                files: ['server/**/*.js'],
+                files: ['server/**/*.js', 'bin/www'],
                 tasks: ['express:dev'],
                 options: {
                     spawn: false
@@ -28,22 +28,16 @@ module.exports = function(grunt) {
             dev: {
                 options: {
                     port: 8000,
-                    script: './bin/www',
+                    script: 'bin/www',
                     node_env: 'development'
                 }
             },
             test: {
                 options: {
                     port: 8001,
-                    script: './bin/www',
+                    script: 'bin/www',
                     node_env: 'development'
                 }
-            }
-        },
-
-        open: {
-            dev: {
-                path: 'http://localhost:8000/'
             }
         },
 
@@ -103,7 +97,6 @@ module.exports = function(grunt) {
         'shell:mongodb_dev_folder',
         'shell:mongodb_dev',
         'express:dev',
-        'open:dev',
         'watch:express'
     ]);
 
