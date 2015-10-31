@@ -18,20 +18,19 @@ app.set('port', port);
 
 app.use(express.static(path.join(__dirname, '/../public')));
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
+if (process.env.NODE_ENV === "production") {
+    mongoose.connect('mongodb://angularjs-tutorial:password@ds045734.mongolab.com:45734/angularjs-tutorial', mongooseCallback);
+} else if (process.env.NODE_ENV === "development") {
+    mongoose.connect('mongodb://localhost/angularjs_tutorial', mongooseCallback);
+}
 
-mongoose.connect('mongodb://localhost/angularjs_tutorial', function(err) {
+function mongooseCallback(err) {
     if (err) {
         console.log('Database connection error', err);
     } else {
         console.log('Connection to database successful');
     }
-});
+}
 
 /**
  * Create HTTP server.
