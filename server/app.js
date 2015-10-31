@@ -2,7 +2,6 @@ var express = require('express');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var session = require('express-session');
-var cors = require('cors');
 var path = require('path');
 
 var users = require(path.join(__dirname, '/routes/users'));
@@ -21,8 +20,6 @@ app.use(session({
     resave: false,
     saveUninitialized: true
 }));
-
-app.use(cors());
 
 app.use('/api', function(req, res, next) {
     var sess = req.session;
