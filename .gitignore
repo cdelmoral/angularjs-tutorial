@@ -1,6 +1,8 @@
 node_modules
 /.db
 
+// Upload ui artifacts to git for now
+// public
+
 // WebStorm IDE
 /.idea
-public

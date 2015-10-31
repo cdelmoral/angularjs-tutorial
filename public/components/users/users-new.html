@@ -1,0 +1,72 @@
+<h1>Sign up</h1>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <form name="userForm" at-submit="ctrl.createUser()" novalidate>
+
+      <div class="form-group" ng-class="{'has-error': at.userForm.needsAttention(userForm.name)}">
+        <label for="name" class="control-label">Name</label>
+        <input id="name" name="name" class="form-control"
+               type="text" placeholder="Name" autofocus="true" required
+               ng-model="ctrl.user.name" ng-maxlength="50"
+               ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }"
+               at-validate-unique="ctrl.isNameUnique(value)">
+      </div>
+
+      <div class="help-error" role="alert"
+           ng-messages="userForm.name.$error" ng-if="at.userForm.needsAttention(userForm.name)">
+        <div ng-message="required">Name is required</div>
+        <div ng-message="atValidateUnique">Your name is already picked</div>
+        <div ng-message="maxlength">Your name is too long</div>
+      </div>
+
+      <div class="form-group" ng-class="{'has-error': at.userForm.needsAttention(userForm.email)}">
+        <label for="email" class="control-label">Email</label>
+        <input id="email" name="email" class="form-control"
+               type="email" placeholder="Email" required
+               ng-model="ctrl.user.email" ng-maxlength="255"
+               ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }"
+               at-validate-unique="ctrl.isEmailUnique(value)">
+      </div>
+
+      <div class="help-error" role="alert"
+           ng-messages="userForm.email.$error" ng-if="at.userForm.needsAttention(userForm.email)">
+        <div ng-message="required">Email is required</div>
+        <div ng-message="atValidateUnique">This email address is already in use</div>
+        <div ng-message="maxlength">Your email is too long</div>
+        <div ng-message="email">Invalid email address</div>
+      </div>
+
+      <div class="form-group" ng-class="{'has-error': at.userForm.needsAttention(userForm.password)}">
+        <label for="password" class="control-label">Password</label>
+        <input id="password" name="password" class="form-control"
+               type="password" placeholder="Password" required
+               ng-model="ctrl.user.password" ng-minlength="6" ng-maxlength="255"
+               ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }">
+      </div>
+
+      <div class="help-error" role="alert"
+           ng-messages="userForm.password.$error" ng-if="at.userForm.needsAttention(userForm.password)">
+        <div ng-message="required">Password is required</div>
+        <div ng-message="minlength">Password should be at least 6 characters long</div>
+        <div ng-message="maxlength">Password can't be longer than 255 characters</div>
+      </div>
+
+      <div class="form-group" ng-class="{'has-error': at.userForm.needsAttention(userForm.password_confirmation)}">
+        <label for="password_confirmation" class="control-label">Confirmation</label>
+        <input id="password_confirmation" name="password_confirmation" class="form-control"
+               type="password" placeholder="Confirm password"
+               ng-model="ctrl.confirmation" at-confirm-password="ctrl.user.password"
+               ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }">
+      </div>
+
+      <div class="help-error" role="alert"
+           ng-messages="userForm.password_confirmation.$error"
+           ng-if="at.userForm.needsAttention(userForm.password_confirmation)">
+        <div ng-message="atConfirmPassword">Passwords have to match</div>
+      </div>
+
+      <input type="submit" class="btn btn-primary" value="Create my account">
+    </form>
+  </div>
+</div>
