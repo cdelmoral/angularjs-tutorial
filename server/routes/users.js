@@ -8,12 +8,21 @@ var requireLogin = require('../helpers/sessions-helper.js').requireLogin;
 
 /* Get users listing. */
 router.get('/', requireLogin, function(req, res, next) {
-    User.find(function (err, users) {
+    User.find({}, '_id name email', function (err, users) {
         if (err) {
             return next(err);
         }
 
-        res.json(users);
+        var retUsers = [];
+        for (var i = 0; i < users.length; i++) {
+            retUsers.push({
+                id: users[i]._id,
+                name: users[i].name,
+                email: users[i].email
+            });
+        };
+
+        res.json(retUsers);
     });
 });
 
