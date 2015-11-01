@@ -16,11 +16,12 @@ var mongoose = require('mongoose');
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
-app.use(express.static(path.join(__dirname, '/../public')));
-
 if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, '/../public')));
     mongoose.connect('mongodb://angularjs-tutorial:password@ds045734.mongolab.com:45734/angularjs-tutorial', mongooseCallback);
 } else if (process.env.NODE_ENV === "development") {
+    app.use('/bower_components', express.static(path.join(__dirname, '/../../angularjs-tutorial-ui/bower_components')));
+    app.use(express.static(path.join(__dirname, '/../../angularjs-tutorial-ui/.dev')));
     mongoose.connect('mongodb://localhost/angularjs_tutorial', mongooseCallback);
 }
 
