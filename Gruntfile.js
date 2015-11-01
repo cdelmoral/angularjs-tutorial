@@ -24,6 +24,12 @@ module.exports = function(grunt) {
             }
         },
 
+        env: {
+            dev: {
+                src: '.env.json'
+            }
+        },
+
         express: {
             dev: {
                 options: {
@@ -96,6 +102,7 @@ module.exports = function(grunt) {
     grunt.registerTask('serve', [
         'shell:mongodb_dev_folder',
         'shell:mongodb_dev',
+        'env:dev',
         'express:dev',
         'watch:express'
     ]);

@@ -18,12 +18,12 @@ app.set('port', port);
 
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, '/../public')));
-    mongoose.connect('mongodb://angularjs-tutorial:password@ds045734.mongolab.com:45734/angularjs-tutorial', mongooseCallback);
 } else if (process.env.NODE_ENV === "development") {
-    app.use('/bower_components', express.static(path.join(__dirname, '/../../angularjs-tutorial-ui/bower_components')));
-    app.use(express.static(path.join(__dirname, '/../../angularjs-tutorial-ui/.dev')));
-    mongoose.connect('mongodb://localhost/angularjs_tutorial', mongooseCallback);
+    app.use('/bower_components', express.static(path.join(process.env.UI_PROJECT_PATH, '/bower_components')));
+    app.use(express.static(path.join(process.env.UI_PROJECT_PATH, '/.dev')));
 }
+
+mongoose.connect(process.env.DB_URL, mongooseCallback);
 
 function mongooseCallback(err) {
     if (err) {
@@ -37,7 +37,7 @@ function mongooseCallback(err) {
  * Create HTTP server.
  */
 var server = http.createServer(app).listen(port, function() {
-    console.log('Express server listening on port ' + port);
+    console.log('Express ' + process.env.NODE_ENV + ' server listening on port ' + port);
 });
 
 /**

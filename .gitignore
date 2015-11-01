@@ -1,5 +1,6 @@
 node_modules
 /.db
+.env.json
 
 // Upload ui artifacts to git for now
 // public
