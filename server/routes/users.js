@@ -5,6 +5,7 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var User = require('../user/user-model.js');
 var requireLogin = require('../helpers/sessions-helper.js').requireLogin;
+var requireCorrectUser = require('../helpers/sessions-helper.js').requireCorrectUser;
 
 /* Get users listing. */
 router.get('/', requireLogin, function(req, res, next) {
@@ -82,7 +83,7 @@ router.get('/:id', requireLogin, function(req, res, next) {
 });
 
 /** Update user by id. */
-router.put('/:id', requireLogin, function(req, res, next) {
+router.put('/:id', requireCorrectUser, function(req, res, next) {
     User.findById(req.params.id, function(err, user) {
         if (err) {
             return next(err);
