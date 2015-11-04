@@ -20,12 +20,21 @@ router.get('/index_page', function(req, res, next) {
             return next(err);
         }
 
+        var retUsers = [];
+        for (var i = 0; i < users.length; i++) {
+            retUsers.push({
+                id: users[i]._id,
+                name: users[i].name,
+                email: users[i].email
+            });
+        };
+
         User.count({}, function (err, count) {
             if (err) {
                 return next(err);
             }
 
-            res.json({ count: count, users: users });
+            res.json({ count: count, users: retUsers });
         });
     });
 });
