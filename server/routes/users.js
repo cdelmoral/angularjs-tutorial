@@ -7,23 +7,26 @@ var User = require('../user/user-model.js');
 var requireLogin = require('../helpers/sessions-helper.js').requireLogin;
 var requireCorrectUser = require('../helpers/sessions-helper.js').requireCorrectUser;
 
-/* Get users listing. */
-router.get('/', requireLogin, function(req, res, next) {
-    User.find({}, '_id name email', function (err, users) {
+/**
+ * Get users page. Expects pageNumber and usersPerPage queries. If they are not present it takes 
+ * 1 and 25 respectively as default values.
+ */
+router.get('/index_page', function(req, res, next) {
+    var pageNumber = req.query.pageNumber || 1;
+    var usersPerPage = req.query.usersPerPage || 25;
+    var skipUsers = (pageNumber - 1) * usersPerPage;
+    User.find({}, '_id name email', { limit: usersPerPage, skip: skipUsers }, function (err, users) {            
         if (err) {
             return next(err);
         }
 
-        var retUsers = [];
-        for (var i = 0; i < users.length; i++) {
-            retUsers.push({
-                id: users[i]._id,
-                name: users[i].name,
-                email: users[i].email
-            });
-        };
+        User.count({}, function (err, count) {
+            if (err) {
+                return next(err);
+            }
 
-        res.json(retUsers);
+            res.json({ count: count, users: users });
+        });
     });
 });
 
