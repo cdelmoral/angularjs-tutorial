@@ -15,7 +15,8 @@ router.get('/index_page', function(req, res, next) {
     var pageNumber = req.query.pageNumber || 1;
     var usersPerPage = req.query.usersPerPage || 25;
     var skipUsers = (pageNumber - 1) * usersPerPage;
-    User.find({}, '_id name email', { limit: usersPerPage, skip: skipUsers }, function (err, users) {            
+    var params = { limit: usersPerPage, skip: skipUsers };
+    User.find({}, '_id name email schema_version', params, function (err, users) {
         if (err) {
             return next(err);
         }
@@ -81,7 +82,7 @@ router.get('/valid_email', function(req, res, next) {
 
 /* Get user by id. */
 router.get('/:id', requireLogin, function(req, res, next) {
-    User.findById(req.params.id, 'name _id email', function (err, user) {
+    User.findById(req.params.id, function (err, user) {
         if (err) {
             return next(err);
         }
@@ -89,7 +90,8 @@ router.get('/:id', requireLogin, function(req, res, next) {
         res.json({
             name: user.name,
             email: user.email,
-            id: user._id
+            id: user._id,
+            admin: user.admin
         });
     });
 });
@@ -116,6 +118,17 @@ router.put('/:id', requireCorrectUser, function(req, res, next) {
                 id: user._id
             });
         })
+    })
+});
+
+/** Delete user by id. */
+router.delete('/:id', requireLogin, function(req, res, next) {
+    User.findByIdAndRemove(req.params.id, function(err) {
+        if (err) {
+            return next(err);
+        }
+
+        res.status(200).send('User deleted');
     })
 });
 

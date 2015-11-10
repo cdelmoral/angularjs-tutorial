@@ -7,16 +7,16 @@ var User = require('../user/user-model.js');
 
 /** Authenticates a user. */
 router.post('/', function(req, res, next) {
-    User.findOne({ email: req.body.email }, '_id password name email', function (err, user) {
+    User.findOne({ email: req.body.email }, function (err, user) {
         if (err) {
             return next(err);
         }
 
         if (user && user.isValidPassword(req.body.password)) {
             var sess = req.session;
-            sess.user = { name: user.name, email: user.email, _id: user._id };
+            sess.user = { name: user.name, email: user.email, _id: user._id, admin: user.admin };
 
-            res.json({ id: user._id });
+            res.json({ name: user.name, email: user.email, id: user._id, admin: user.admin });
         } else {
             res.json();
         }

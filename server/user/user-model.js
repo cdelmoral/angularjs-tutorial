@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 var validate = require('../common/validator');
+var schemaVersion = 1;
 
 var userSchema = new mongoose.Schema({
     name: {
@@ -22,12 +23,24 @@ var userSchema = new mongoose.Schema({
             validate({ validator: 'isEmail' })
         ]
     },
-    password: {
-        type: String,
-        required: true
-    },
+    password: { type: String, required: true },
+    admin: { type: Boolean, default: false },
+    schema_version: { type: Number, default: schemaVersion },
     created_at: { type: Date, default: Date.now() },
     updated_at: { type: Date, default: Date.now() },
+});
+
+userSchema.post('init', function(user) {
+    if (!user.schema_version) {
+        user.schema_version = 0;
+    }
+
+    if (user.schema_version !== schemaVersion) {
+        user.admin = false;
+        user.schema_version = 1;
+
+        user.save();
+    }
 });
 
 userSchema.pre('save', function(next) {
