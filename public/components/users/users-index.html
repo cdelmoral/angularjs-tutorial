@@ -6,6 +6,9 @@
   <li dir-paginate="user in ctrl.users | itemsPerPage: ctrl.usersPerPage" total-items="ctrl.totalUsers"
       current-page="ctrl.pagination.current">
     <a ng-href="#/users/{{user.id}}">{{user.name}}</a> ({{user.email}})
+    <span ng-if="ctrl.userIsAdmin()">
+       | <a href="" ng-click="ctrl.deleteUser(user)" at-confirm="ctrl.CONFIRM">delete</a>
+    </span>
   </li>
 </ul>
 
