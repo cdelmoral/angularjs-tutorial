@@ -25,7 +25,7 @@ var userSchema = new mongoose.Schema({
     },
     password: { type: String, required: true },
     admin: { type: Boolean, default: false },
-    schema_version: { type: Number, default: schemaVersion },
+    schema_version: { type: Number},
     created_at: { type: Date, default: Date.now() },
     updated_at: { type: Date, default: Date.now() },
 });
@@ -45,6 +45,8 @@ userSchema.post('init', function(user) {
 
 userSchema.pre('save', function(next) {
     var user = this;
+
+    user.schema_version = schemaVersion;
 
     if (!user.isModified('password')) {
         return next();
