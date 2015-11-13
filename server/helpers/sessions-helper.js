@@ -4,7 +4,9 @@ exports.requireCorrectUser = requireCorrectUser;
 /** Checks that the user is logged in. */
 function requireLogin(req, res, next) {
     var sess = req.session;
-    console.log(sess.user);
+
+    console.log('sessions-helper.js 8');
+    console.log(sess);
     if (sess.user && sess.user._id) {
         next();
     } else {
