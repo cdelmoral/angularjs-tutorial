@@ -30,8 +30,6 @@ app.use('/api', function(req, res, next) {
     console.log(sess);
     if (sess && sess.user) {
         User.findById(sess.user._id, function(err, user) {
-            console.log('app.js 33');
-            console.log(user);
             if (user && user._id) {
                 sess.user = user;
             }
