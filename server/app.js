@@ -26,8 +26,6 @@ app.use(cors());
 
 app.use('/api', function(req, res, next) {
     var sess = req.session;
-    console.log('app.js 29');
-    console.log(sess);
     if (sess && sess.user) {
         User.findById(sess.user._id, function(err, user) {
             if (user && user._id) {
