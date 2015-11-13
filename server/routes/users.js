@@ -7,39 +7,6 @@ var User = require('../user/user-model.js');
 var requireLogin = require('../helpers/sessions-helper.js').requireLogin;
 var requireCorrectUser = require('../helpers/sessions-helper.js').requireCorrectUser;
 
-/**
- * Get users page. Expects pageNumber and usersPerPage queries. If they are not present it takes 
- * 1 and 25 respectively as default values.
- */
-router.get('/index_page', function(req, res, next) {
-    var pageNumber = req.query.pageNumber || 1;
-    var usersPerPage = req.query.usersPerPage || 25;
-    var skipUsers = (pageNumber - 1) * usersPerPage;
-    var params = { limit: usersPerPage, skip: skipUsers };
-    User.find({}, '_id name email schema_version', params, function (err, users) {
-        if (err) {
-            return next(err);
-        }
-
-        var retUsers = [];
-        for (var i = 0; i < users.length; i++) {
-            retUsers.push({
-                id: users[i]._id,
-                name: users[i].name,
-                email: users[i].email
-            });
-        };
-
-        User.count({}, function (err, count) {
-            if (err) {
-                return next(err);
-            }
-
-            res.json({ count: count, users: retUsers });
-        });
-    });
-});
-
 /* Check if the username is not already being used. */
 router.get('/valid_name', function(req, res, next) {
     var sess = req.session;
@@ -80,7 +47,40 @@ router.get('/valid_email', function(req, res, next) {
     }
 });
 
-/* Get user by id. */
+/**
+ * Get users page. Expects pageNumber and usersPerPage queries. If they are not present it takes 
+ * 1 and 25 respectively as default values.
+ */
+router.get('/index_page', requireLogin, function(req, res, next) {
+    var pageNumber = req.query.pageNumber || 1;
+    var usersPerPage = req.query.usersPerPage || 25;
+    var skipUsers = (pageNumber - 1) * usersPerPage;
+    var params = { limit: usersPerPage, skip: skipUsers };
+    User.find({}, '_id name email schema_version', params, function (err, users) {
+        if (err) {
+            return next(err);
+        }
+
+        var retUsers = [];
+        for (var i = 0; i < users.length; i++) {
+            retUsers.push({
+                id: users[i]._id,
+                name: users[i].name,
+                email: users[i].email
+            });
+        };
+
+        User.count({}, function (err, count) {
+            if (err) {
+                return next(err);
+            }
+
+            res.json({ count: count, users: retUsers });
+        });
+    });
+});
+
+/** Get user by id. */
 router.get('/:id', requireLogin, function(req, res, next) {
     User.findById(req.params.id, function (err, user) {
         if (err) {
@@ -132,7 +132,7 @@ router.delete('/:id', requireLogin, function(req, res, next) {
     })
 });
 
-/* Create new user. */
+/** Create new user. */
 router.post('/', function(req, res, next) {
     var newUser = {
         name: req.body.name,
