@@ -15,6 +15,7 @@ router.post('/', function(req, res, next) {
         if (user && user.isValidPassword(req.body.password)) {
             var sess = req.session;
             sess.user = { name: user.name, email: user.email, _id: user._id, admin: user.admin };
+            console.log(sess.user);
 
             res.json({ name: user.name, email: user.email, id: user._id, admin: user.admin });
         } else {
