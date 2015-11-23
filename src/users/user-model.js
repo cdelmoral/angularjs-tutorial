@@ -1,7 +1,9 @@
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 var validate = require('../common/validator');
-var schemaVersion = 1;
+var upgradeSchema = require('./user-migrations').upgradeSchema;
+var downgradeSchema = require('./user-migrations').downgradeSchema;
+var currentSchemaVersion = require('./user-migrations').currentSchemaVersion;
 
 var userSchema = new mongoose.Schema({
     name: {
@@ -25,7 +27,7 @@ var userSchema = new mongoose.Schema({
     },
     password: { type: String, required: true },
     admin: { type: Boolean, default: false },
-    schema_version: { type: Number},
+    schema_version: { type: Number, default: currentSchemaVersion },
     created_at: { type: Date, default: Date.now() },
     updated_at: { type: Date, default: Date.now() },
 });
@@ -35,18 +37,17 @@ userSchema.post('init', function(user) {
         user.schema_version = 0;
     }
 
-    if (user.schema_version !== schemaVersion) {
-        user.admin = false;
-        user.schema_version = 1;
-
-        user.save();
+    if (user.schema_version < currentSchemaVersion) {
+        upgradeSchema(user);
+    } else if (user.schema_version > currentSchemaVersion) {
+        downgradeSchema(user);
     }
 });
 
 userSchema.pre('save', function(next) {
     var user = this;
 
-    user.schema_version = schemaVersion;
+    user.schema_version = currentSchemaVersion;
 
     if (!user.isModified('password')) {
         return next();
@@ -71,9 +72,7 @@ userSchema.pre('save', function(next) {
 userSchema.methods.isValidPassword = function(password, callback) {
     var user = this;
     return bcrypt.compareSync(password, user.password);
-    // bcrypt.compare(password, user.password, funtion(err, res) {
-
-    // });
+    // bcrypt.compare(password, user.password, funtion(err, res) {});
 };
 
 module.exports = mongoose.model('User', userSchema);
