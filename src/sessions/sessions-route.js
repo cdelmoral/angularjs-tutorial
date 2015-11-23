@@ -3,7 +3,7 @@ var session = require('express-session');
 var router = express.Router();
 
 var mongoose = require('mongoose');
-var User = require('../user/user-model.js');
+var User = require('../users/user-model');
 
 /** Authenticates a user. */
 router.post('/', function(req, res, next) {

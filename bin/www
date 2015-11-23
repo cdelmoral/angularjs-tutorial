@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-var app = require('../server/app');
+var app = require('../src/app');
 var express = require('express');
 var path = require('path');
 var debug = require('debug')('express-test:server');

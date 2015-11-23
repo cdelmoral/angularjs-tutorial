@@ -16,7 +16,7 @@ module.exports = function(grunt) {
 
         watch: {
             express: {
-                files: ['server/**/*.js', 'bin/www'],
+                files: ['src/**/*.js', 'bin/www'],
                 tasks: ['express:dev'],
                 options: {
                     spawn: false
@@ -94,7 +94,7 @@ module.exports = function(grunt) {
                     require: 'should',
                     ui: 'bdd'
                 },
-                src: ['test/server/**/*.js']
+                src: ['test/**/*.js']
             }
         }
     });

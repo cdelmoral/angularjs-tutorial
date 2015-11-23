@@ -3,9 +3,9 @@ var session = require('express-session');
 var router = express.Router();
 
 var mongoose = require('mongoose');
-var User = require('../user/user-model.js');
-var requireLogin = require('../helpers/sessions-helper.js').requireLogin;
-var requireCorrectUser = require('../helpers/sessions-helper.js').requireCorrectUser;
+var User = require('./user-model');
+var requireLogin = require('../sessions/sessions-helper').requireLogin;
+var requireCorrectUser = require('../sessions/sessions-helper').requireCorrectUser;
 
 /* Check if the username is not already being used. */
 router.get('/valid_name', function(req, res, next) {

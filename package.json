@@ -2,7 +2,7 @@
   "name": "angularjs-tutorial",
   "version": "1.0.0",
   "description": "This is the server side for the sample application for the Ruby on Rails Tutorial: Learn Web Development with Rails by Michael Hartl made with AngularJS.",
-  "main": "server/app.js",
+  "main": "src/app.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cdelmoral/angularjs-tutorial.git"

@@ -5,12 +5,12 @@ var session = require('express-session');
 var path = require('path');
 var cors = require('cors');
 
-var users = require(path.join(__dirname, '/routes/users'));
-var sessions = require(path.join(__dirname, '/routes/sessions'));
+var users = require(path.join(__dirname, '/users/users-route'));
+var sessions = require(path.join(__dirname, '/sessions/sessions-route'));
 
 var app = express();
 
-var User = require(path.join(__dirname, '/user/user-model'));
+var User = require(path.join(__dirname, '/users/user-model'));
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
