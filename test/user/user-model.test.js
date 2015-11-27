@@ -1,11 +1,11 @@
 var mongoose = require('mongoose');
 var conn = mongoose.connect('mongodb://localhost/angularjs_tutorial');
 
-var User = require('../../../server/user/user-model');
+var User = require('../../src/users/user-model');
 var should = require('should');
 var validator = require('validator');
 
-describe('Model: User', function() {
+describe('User model', function() {
 
     var user;
 
@@ -13,6 +13,7 @@ describe('Model: User', function() {
         user = new User();
         user.name = 'User Name';
         user.email = 'test@test.com';
+        user.password = 'password';
     });
 
     // describe('with fresh database', function() {
@@ -93,9 +94,14 @@ describe('Model: User', function() {
         });
     });
 
-    describe('valid emails', function() {
-        var validEmails = ['user@example.com', 'USER@foo.COM', 'A_US-ER@foo.bar.org',
-                           'first.last@foo.jp', 'alice+bob@baz.cn'];
+    describe('with valid emails', function() {
+        var validEmails = [
+            'user@example.com',
+            'USER@foo.COM',
+            'A_US-ER@foo.bar.org',
+            'first.last@foo.jp',
+            'alice+bob@baz.cn'
+        ];
 
         validEmails.forEach(function(email) {
             it('should be valid', function(done) {
@@ -108,9 +114,14 @@ describe('Model: User', function() {
         });
     });
 
-    describe('invalid emails', function() {
-        var invalidEmails = ['user@example,com', 'user_at_foo.org', 'user.name@example.',
-                           'foo@bar_baz.com', 'foo@bar+baz.com'];
+    describe('with invalid emails', function() {
+        var invalidEmails = [
+            'user@example,com',
+            'user_at_foo.org',
+            'user.name@example.',
+            'foo@bar_baz.com',
+            'foo@bar+baz.com'
+        ];
 
         invalidEmails.forEach(function(email) {
             it('should not be valid', function(done) {

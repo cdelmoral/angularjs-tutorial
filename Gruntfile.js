@@ -52,6 +52,10 @@ module.exports = function(grunt) {
             mongodb_dev_folder: {
                 command: 'mkdir -p ./.db/dev'
             },
+            // Create mongodb folder for test
+            mongodb_test_folder: {
+                command: 'mkdir -p ./.db/test'
+            },
             // Start mongodb in development
             mongodb_dev: {
                 command: 'mongod --dbpath ./.db/dev',
@@ -108,6 +112,7 @@ module.exports = function(grunt) {
     ]);
 
     grunt.registerTask('test', [
+        'shell:mongodb_test_folder',
         'shell:mongodb_test',
         'wait:pause',
         'mochaTest'
