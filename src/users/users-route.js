@@ -35,7 +35,7 @@ router.get('/valid_email', function(req, res, next) {
     if (sess.user && sess.user.email === query.email) {
         res.json({ valid: true });
     } else if (query.email) {
-        User.count({ email: query.email }, function(err, count) {
+        User.count({ email: query.email.toLowerCase() }, function(err, count) {
             if (err) {
                 return next(err);
             }

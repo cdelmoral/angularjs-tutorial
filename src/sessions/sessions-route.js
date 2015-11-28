@@ -7,11 +7,11 @@ var User = require('../users/user-model');
 
 /** Authenticates a user. */
 router.post('/', function(req, res, next) {
-    User.findOne({ email: req.body.email }, function (err, user) {
+    User.findOne({ email: req.body.email.toLowerCase() }, function (err, user) {
         if (err) {
             return next(err);
         }
-
+        
         if (user && user.isValidPassword(req.body.password)) {
             var sess = req.session;
             sess.user = { name: user.name, email: user.email, _id: user._id, admin: user.admin };

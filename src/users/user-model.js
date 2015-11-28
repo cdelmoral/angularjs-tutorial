@@ -48,6 +48,7 @@ userSchema.pre('save', function(next) {
     var user = this;
 
     user.schema_version = currentSchemaVersion;
+    user.email = user.email.toLowerCase();
 
     if (!user.isModified('password')) {
         return next();
