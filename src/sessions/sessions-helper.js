@@ -1,5 +1,6 @@
 exports.requireLogin = requireLogin;
 exports.requireCorrectUser = requireCorrectUser;
+exports.createSessionForUser = createSessionForUser;
 
 /** Checks that the user is logged in. */
 function requireLogin(req, res, next) {
@@ -22,4 +23,9 @@ function requireCorrectUser(req, res, next) {
 			res.status(401).send('Unauthorized');
 		}
 	});
+}
+
+function createSessionForUser(user, session) {
+    session.user = { name: user.name, email: user.email, _id: user._id, admin: user.admin };
+    return { name: user.name, email: user.email, id: user._id, admin: user.admin };
 }

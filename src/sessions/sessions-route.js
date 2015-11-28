@@ -5,36 +5,41 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var User = require('../users/user-model');
 
+var createSessionForUser = require('./sessions-helper').createSessionForUser;
+
+router.get('/authenticated', isAuthenticated);
+router.post('/', authenticateUser);
+router.delete('/logout', endSession);
+
+module.exports = router;
+
 /** Authenticates a user. */
-router.post('/', function(req, res, next) {
+function authenticateUser(req, res, next) {
     User.findOne({ email: req.body.email.toLowerCase() }, function (err, user) {
         if (err) {
             return next(err);
         }
         
         if (user && user.isValidPassword(req.body.password)) {
-            var sess = req.session;
-            sess.user = { name: user.name, email: user.email, _id: user._id, admin: user.admin };
-
-            res.json({ name: user.name, email: user.email, id: user._id, admin: user.admin });
+            res.json(createSessionForUser(user, req.session));
         } else {
-            res.json();
+            res.status(400).send('Invalid credentials.');
         }
     });
-});
+}
 
 /** Gets if the user is currently logged in. */
-router.get('/authenticated', function(req, res, next) {
+function isAuthenticated(req, res, next) {
     var sess = req.session;
     if (sess.user && sess.user._id) {
-        res.send({ id: sess.user._id });
+        res.send({ id: sess.user._id, name: sess.user.name, email: sess.user.email });
     } else {
-        res.send({authenticated: false});
+        res.send({ authenticated: false });
     }
-});
+}
 
 /** Delete the current session for the currently logged in user. */
-router.delete('/logout', function(req, res, next) {
+function endSession(req, res, next) {
     var sess = req.session;
     if (sess.user && sess.user._id) {
         sess.destroy(function(err) {
@@ -47,6 +52,4 @@ router.delete('/logout', function(req, res, next) {
             }
         });
     }
-});
-
-module.exports = router;
+}

@@ -6,11 +6,13 @@ var mongoose = require('mongoose');
 var User = require('./user-model');
 var requireLogin = require('../sessions/sessions-helper').requireLogin;
 var requireCorrectUser = require('../sessions/sessions-helper').requireCorrectUser;
+var createSessionForUser = require('../sessions/sessions-helper').createSessionForUser;
 
 router.get('/valid_name', validName);
 router.get('/valid_email', validEmail);
 router.get('/index_page', requireLogin, getIndexPage);
 router.get('/:id', requireLogin, getUserById);
+router.get('/activate_user/:id/:token', activateUser)
 router.put('/:id', requireCorrectUser, updateUser);
 router.post('/', createUser);
 router.delete('/:id', requireLogin, deleteUser);
@@ -92,7 +94,7 @@ function getIndexPage(req, res, next) {
 
 /** Get user by id. */
 function getUserById(req, res, next) {
-    User.findById(req.params.id, function (err, user) {
+    User.findById(req.params.id, function(err, user) {
         if (err) {
             return next(err);
         }
@@ -103,6 +105,23 @@ function getUserById(req, res, next) {
             id: user._id,
             admin: user.admin
         });
+    });
+}
+
+/** Activates user. */
+function activateUser(req, res, next) {
+    User.findById(req.params.id, function(err, user) {
+        if (err) {
+            return next(err);
+        }
+
+        if (!user.activated && user.isValidActivationToken(req.params.token)) {
+            user.activate();
+            createSessionForUser(user, req.session)
+            res.redirect(200, 'http://localhost:8000/#/users/' + user._id);
+        } else {
+            res.status(400).send('Invalid activation link.');
+        }
     });
 }
 
