@@ -7,8 +7,18 @@ var User = require('./user-model');
 var requireLogin = require('../sessions/sessions-helper').requireLogin;
 var requireCorrectUser = require('../sessions/sessions-helper').requireCorrectUser;
 
+router.get('/valid_name', validName);
+router.get('/valid_email', validEmail);
+router.get('/index_page', requireLogin, getIndexPage);
+router.get('/:id', requireLogin, getUserById);
+router.put('/:id', requireCorrectUser, updateUser);
+router.post('/', createUser);
+router.delete('/:id', requireLogin, deleteUser);
+
+module.exports = router;
+
 /* Check if the username is not already being used. */
-router.get('/valid_name', function(req, res, next) {
+function validName(req, res, next) {
     var sess = req.session;
     var query = req.query;
 
@@ -25,10 +35,10 @@ router.get('/valid_name', function(req, res, next) {
     } else {
         res.json({ valid: false });
     }
-});
+}
 
 /* Check if the email is not already being used. */
-router.get('/valid_email', function(req, res, next) {
+function validEmail(req, res, next) {
     var sess = req.session;
     var query = req.query;
 
@@ -45,13 +55,13 @@ router.get('/valid_email', function(req, res, next) {
     } else {
         res.json({ valid: false });
     }
-});
+}
 
 /**
  * Get users page. Expects pageNumber and usersPerPage queries. If they are not present it takes 
  * 1 and 25 respectively as default values.
  */
-router.get('/index_page', requireLogin, function(req, res, next) {
+function getIndexPage(req, res, next) {
     var pageNumber = req.query.pageNumber || 1;
     var usersPerPage = req.query.usersPerPage || 25;
     var skipUsers = (pageNumber - 1) * usersPerPage;
@@ -78,10 +88,10 @@ router.get('/index_page', requireLogin, function(req, res, next) {
             res.json({ count: count, users: retUsers });
         });
     });
-});
+}
 
 /** Get user by id. */
-router.get('/:id', requireLogin, function(req, res, next) {
+function getUserById(req, res, next) {
     User.findById(req.params.id, function (err, user) {
         if (err) {
             return next(err);
@@ -94,10 +104,10 @@ router.get('/:id', requireLogin, function(req, res, next) {
             admin: user.admin
         });
     });
-});
+}
 
 /** Update user by id. */
-router.put('/:id', requireCorrectUser, function(req, res, next) {
+function updateUser(req, res, next) {
     User.findById(req.params.id, function(err, user) {
         if (err) {
             return next(err);
@@ -119,10 +129,10 @@ router.put('/:id', requireCorrectUser, function(req, res, next) {
             });
         })
     })
-});
+}
 
 /** Delete user by id. */
-router.delete('/:id', requireLogin, function(req, res, next) {
+function deleteUser(req, res, next) {
     User.findByIdAndRemove(req.params.id, function(err) {
         if (err) {
             return next(err);
@@ -130,10 +140,10 @@ router.delete('/:id', requireLogin, function(req, res, next) {
 
         res.status(200).send('User deleted');
     })
-});
+}
 
 /** Create new user. */
-router.post('/', function(req, res, next) {
+function createUser(req, res, next) {
     var newUser = {
         name: req.body.name,
         email: req.body.email,
@@ -149,6 +159,5 @@ router.post('/', function(req, res, next) {
             id: user._id
         });
     });
-});
+}
 
-module.exports = router;
