@@ -21,9 +21,13 @@ function authenticateUser(req, res, next) {
         }
         
         if (user && user.isValidPassword(req.body.password)) {
-            res.json(createSessionForUser(user, req.session));
+            if (user.activated) {
+                res.json(createSessionForUser(user, req.session));
+            } else {
+                res.status(403).send('User not yet activated');
+            }
         } else {
-            res.status(400).send('Invalid credentials.');
+            res.status(401).send('Invalid credentials');
         }
     });
 }
@@ -44,11 +48,9 @@ function endSession(req, res, next) {
     if (sess.user && sess.user._id) {
         sess.destroy(function(err) {
             if (err) {
-                res.status(500);
-                res.send();
+                res.status(500).send();
             } else {
-                res.status(200);
-                res.send();
+                res.status(200).send();
             }
         });
     }

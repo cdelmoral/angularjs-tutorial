@@ -20,7 +20,7 @@ function requireCorrectUser(req, res, next) {
 		if (req.params.id == sess.user._id) {
 			next();
 		} else {
-			res.status(401).send('Unauthorized');
+			res.status(403).send('Forbidden');
 		}
 	});
 }
