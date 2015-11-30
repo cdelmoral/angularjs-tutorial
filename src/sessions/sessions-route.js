@@ -5,48 +5,53 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var User = require('../users/user-model');
 
+var createSessionForUser = require('./sessions-helper').createSessionForUser;
+
+router.get('/authenticated', isAuthenticated);
+router.post('/', authenticateUser);
+router.delete('/logout', endSession);
+
+module.exports = router;
+
 /** Authenticates a user. */
-router.post('/', function(req, res, next) {
-    User.findOne({ email: req.body.email }, function (err, user) {
+function authenticateUser(req, res, next) {
+    User.findOne({ email: req.body.email.toLowerCase() }, function (err, user) {
         if (err) {
             return next(err);
         }
-
+        
         if (user && user.isValidPassword(req.body.password)) {
-            var sess = req.session;
-            sess.user = { name: user.name, email: user.email, _id: user._id, admin: user.admin };
-
-            res.json({ name: user.name, email: user.email, id: user._id, admin: user.admin });
+            if (user.activated) {
+                res.json(createSessionForUser(user, req.session));
+            } else {
+                res.status(403).send('User not yet activated');
+            }
         } else {
-            res.json();
+            res.status(401).send('Invalid credentials');
         }
     });
-});
+}
 
 /** Gets if the user is currently logged in. */
-router.get('/authenticated', function(req, res, next) {
+function isAuthenticated(req, res, next) {
     var sess = req.session;
     if (sess.user && sess.user._id) {
-        res.send({ id: sess.user._id });
+        res.send({ id: sess.user._id, name: sess.user.name, email: sess.user.email });
     } else {
-        res.send({authenticated: false});
+        res.send({ authenticated: false });
     }
-});
+}
 
 /** Delete the current session for the currently logged in user. */
-router.delete('/logout', function(req, res, next) {
+function endSession(req, res, next) {
     var sess = req.session;
     if (sess.user && sess.user._id) {
         sess.destroy(function(err) {
             if (err) {
-                res.status(500);
-                res.send();
+                res.status(500).send();
             } else {
-                res.status(200);
-                res.send();
+                res.status(200).send();
             }
         });
     }
-});
-
-module.exports = router;
+}
