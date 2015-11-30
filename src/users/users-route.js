@@ -12,7 +12,7 @@ router.get('/valid_name', validName);
 router.get('/valid_email', validEmail);
 router.get('/index_page', requireLogin, getIndexPage);
 router.get('/:id', requireLogin, getUserById);
-router.get('/activate_user/:id/:token', activateUser)
+router.put('/activate/:id/:token', activateUser);
 router.put('/:id', requireCorrectUser, updateUser);
 router.post('/', createUser);
 router.delete('/:id', requireLogin, deleteUser);
@@ -117,8 +117,11 @@ function activateUser(req, res, next) {
 
         if (!user.activated && user.isValidActivationToken(req.params.token)) {
             user.activate();
-            createSessionForUser(user, req.session)
-            res.redirect(200, 'http://localhost:8000/#/users/' + user._id);
+            var jsonRes = {
+                user: createSessionForUser(user, req.session),
+                message: 'The account has been activated.'
+            };
+            res.json(jsonRes);
         } else {
             res.status(400).send('Invalid activation link.');
         }
@@ -147,7 +150,7 @@ function updateUser(req, res, next) {
                 id: user._id
             });
         })
-    })
+    });
 }
 
 /** Delete user by id. */

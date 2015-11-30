@@ -7,6 +7,7 @@ var cors = require('cors');
 
 var users = require(path.join(__dirname, '/users/users-route'));
 var sessions = require(path.join(__dirname, '/sessions/sessions-route'));
+var passwordResets = require(path.join(__dirname, '/password-resets/password-resets-routes'));
 
 var app = express();
 
@@ -40,5 +41,6 @@ app.use('/api', function(req, res, next) {
 
 app.use('/api/users', users);
 app.use('/api/sessions', sessions);
+app.use('/api/password_resets', passwordResets);
 
 module.exports = app;

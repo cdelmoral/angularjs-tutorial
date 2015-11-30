@@ -33,6 +33,9 @@ var userSchema = new mongoose.Schema({
     activation_digest: { type: String },
     activated: { type: Boolean, default: false },
     activated_at: { type: Date },
+    reset_digest: { type: String },
+    reset_sent_at: { type: Date },
+    reset_password_at: { type: Date },
     created_at: { type: Date, default: Date.now() },
     updated_at: { type: Date, default: Date.now() },
 });
@@ -41,8 +44,11 @@ userSchema.post('init', handleMigrations);
 userSchema.pre('save', initializeUser);
 userSchema.methods.isValidPassword = isValidPassword;
 userSchema.methods.isValidActivationToken = isValidActivationToken;
+userSchema.methods.isValidResetToken = isValidResetToken;
 userSchema.methods.activate = activate;
 userSchema.methods.sendActivationEmail = sendActivationEmail;
+userSchema.methods.createAndSendResetDigest = createAndSendResetDigest;
+userSchema.methods.sendResetEmail = sendResetEmail;
 
 module.exports = mongoose.model('User', userSchema);
 
@@ -97,6 +103,11 @@ function isValidPassword(password, callback) {
     return bcrypt.compareSync(password, user.password);
 }
 
+function isValidResetToken(token, callback) {
+    var user = this;
+    return user.reset_digest && bcrypt.compareSync(token, user.reset_digest);
+}
+
 function activate() {
     var user = this;
     user.activated = true;
@@ -107,7 +118,26 @@ function activate() {
 function sendActivationEmail(token) {
     var user = this;
     console.log('The activation link for ' + user.name +
-        ' is /api/users/activate_user/' + user._id + '/' + token);
+        ' is /#/users/activate/' + user._id + '/' + token);
+}
+
+function createAndSendResetDigest() {
+    var user = this;
+    generateToken().then(function(token) {
+        digest(token, 8).then(function(hash) {
+            user.reset_digest = hash;
+            user.reset_sent_at = Date.now();
+            user.save(function(err, user) {
+                user.sendResetEmail(token);
+            });
+        });
+    });
+}
+
+function sendResetEmail(token) {
+    var user = this;
+    console.log('The reset link for ' + user.name +
+        ' is /#/password_resets/' + user._id + '/' + token);
 }
 
 function generateToken() {

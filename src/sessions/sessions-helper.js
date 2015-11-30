@@ -16,6 +16,7 @@ function requireLogin(req, res, next) {
 /** Checks that the request for a user resource comes from that user. */
 function requireCorrectUser(req, res, next) {
     var sess = req.session;
+    
 	requireLogin(req, res, function() {
 		if (req.params.id == sess.user._id) {
 			next();
