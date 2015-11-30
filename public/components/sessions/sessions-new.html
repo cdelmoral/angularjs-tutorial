@@ -20,6 +20,7 @@
 
       <div class="form-group" ng-class="{'has-error': at.login.needsAttention(login.password)}">
         <label for="password" class="control-label">Password</label>
+        <a href="#/password_resets">(forgot password)</a>
         <input id="password" name="password" class="form-control"
                type="password" placeholder="Password" required
                ng-model="ctrl.user.password" ng-minlength="6" ng-maxlength="255"
