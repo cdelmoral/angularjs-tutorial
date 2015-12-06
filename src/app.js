@@ -6,6 +6,7 @@ var path = require('path');
 var cors = require('cors');
 
 var users = require(path.join(__dirname, '/users/users-route'));
+var microposts = require(path.join(__dirname, '/microposts/micropost-routes'));
 var sessions = require(path.join(__dirname, '/sessions/sessions-route'));
 var passwordResets = require(path.join(__dirname, '/password-resets/password-resets-routes'));
 
@@ -40,6 +41,7 @@ app.use('/api', function(req, res, next) {
 });
 
 app.use('/api/users', users);
+app.use('/api/microposts', microposts);
 app.use('/api/sessions', sessions);
 app.use('/api/password_resets', passwordResets);
 

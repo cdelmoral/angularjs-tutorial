@@ -1,7 +1,7 @@
 exports.handleError = handleError;
 
-function handleError(next, err) {
+function handleError(errorFn, err) {
     if (err) {
-        return next(err);
+        return errorFn(err);
     }
 }
