@@ -6,6 +6,7 @@ var mongoose = require('mongoose');
 var Micropost = require('./micropost-model');
 
 router.get('/user_page/:userId', getMicropostPageForUser);
+router.get('/count/:userId', getMicropostCountForUser);
 
 module.exports = router;
 
@@ -20,5 +21,14 @@ function getMicropostPageForUser(req, res, next) {
                 .then(function(count) {
                     res.json({ count: count, microposts: microposts });
                 });
+        });
+}
+
+function getMicropostCountForUser(req, res, nest) {
+    var userId = req.params.userId;
+
+    Micropost.getMicropostsCountForUser(userId)
+        .then(function(count) {
+            res.json({ count: count });
         });
 }

@@ -1,12 +1,10 @@
 exports.requireLogin = requireLogin;
 exports.requireCorrectUser = requireCorrectUser;
-exports.createSessionForUser = createSessionForUser;
 
 /** Checks that the user is logged in. */
 function requireLogin(req, res, next) {
     var sess = req.session;
-    
-    if (sess.user && sess.user._id) {
+    if (sess.user_id) {
         next();
     } else {
         res.status(401).send('Unauthorized');
@@ -18,15 +16,10 @@ function requireCorrectUser(req, res, next) {
     var sess = req.session;
     
 	requireLogin(req, res, function() {
-		if (req.params.id == sess.user._id) {
+		if (req.params.id == sess.user_id) {
 			next();
 		} else {
 			res.status(403).send('Forbidden');
 		}
 	});
-}
-
-function createSessionForUser(user, session) {
-    session.user = { name: user.name, email: user.email, _id: user._id, admin: user.admin };
-    return { name: user.name, email: user.email, id: user._id, admin: user.admin };
 }

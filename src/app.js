@@ -28,11 +28,13 @@ app.use(cors());
 
 app.use('/api', function(req, res, next) {
     var sess = req.session;
-    if (sess && sess.user) {
-        User.findById(sess.user._id, function(err, user) {
-            if (user && user._id) {
-                sess.user = user;
+    if (sess.user_id) {
+        User.getUserById(sess.user_id).then(function(user) {
+            if (!user) {
+                sess.user_id = null;
             }
+            next();
+        }).catch(function() {
             next();
         });
     } else {

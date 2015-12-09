@@ -1,4 +1,6 @@
-var currentSchemaVersion = 1;
+var Micropost = require('../microposts/micropost-model');
+
+var currentSchemaVersion = 3;
 
 exports.currentSchemaVersion = currentSchemaVersion;
 exports.upgradeSchema = upgradeSchema;
@@ -15,6 +17,10 @@ function upgradeSchema(user) {
 		case 1:
 			user.activated = true;
 			user.activated_at = new Date(0);
+		case 2:
+			Micropost.getMicropostsCountForUser(user._id).then(function(count) {
+				user.microposts_count = count;
+			});
 	}
 
     user.schema_version = currentSchemaVersion;

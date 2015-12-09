@@ -2,7 +2,9 @@ var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 var crypto = require('crypto');
 
+var Micropost = require('../microposts/micropost-model');
 var validate = require('../common/validator');
+var handleError = require('../common/error-handling').handleError;
 var upgradeSchema = require('./user-migrations').upgradeSchema;
 var downgradeSchema = require('./user-migrations').downgradeSchema;
 var currentSchemaVersion = require('./user-migrations').currentSchemaVersion;
@@ -38,10 +40,20 @@ var userSchema = new mongoose.Schema({
     reset_password_at: { type: Date },
     created_at: { type: Date, default: Date.now() },
     updated_at: { type: Date, default: Date.now() },
+    microposts_count: { type: Number, default: 0 }
 });
 
 userSchema.post('init', handleMigrations);
 userSchema.pre('save', initializeUser);
+userSchema.statics.isNameAvailable = isNameAvailable;
+userSchema.statics.isEmailAvailable = isEmailAvailable;
+userSchema.statics.getUsersPage = getUsersPage;
+userSchema.statics.getUsersCount = getUsersCount;
+userSchema.statics.getUserById = getUserById;
+userSchema.statics.getUserByEmail = getUserByEmail;
+userSchema.statics.updateUserById = updateUserById;
+userSchema.statics.createNewUser = createNewUser;
+userSchema.statics.removeUserById = removeUserById;
 userSchema.methods.isValidPassword = isValidPassword;
 userSchema.methods.isValidActivationToken = isValidActivationToken;
 userSchema.methods.isValidResetToken = isValidResetToken;
@@ -49,8 +61,12 @@ userSchema.methods.activate = activate;
 userSchema.methods.sendActivationEmail = sendActivationEmail;
 userSchema.methods.createAndSendResetDigest = createAndSendResetDigest;
 userSchema.methods.sendResetEmail = sendResetEmail;
+userSchema.methods.getObject = getObject;
+userSchema.methods.createMicropost = createMicropost;
 
-module.exports = mongoose.model('User', userSchema);
+var User = mongoose.model('User', userSchema);
+
+module.exports = User;
 
 function handleMigrations(user) {
     if (!user.schema_version) {
@@ -91,6 +107,143 @@ function initializeUser(next) {
             next();
         });
     });
+}
+
+function isNameAvailable(name) {
+    var promise = new Promise(function(resolve, reject) {
+        User.count({ name: name }, function(err, count) {
+            handleError(reject, err);
+
+            resolve(count === 0);
+        });
+    });
+
+    return promise;
+}
+
+function isEmailAvailable(email) {
+    var promise = new Promise(function(resolve, reject) {
+        User.count({ email: email.toLowerCase() }, function(err, count) {
+            handleError(reject, err);
+
+            resolve(count === 0);
+        });
+    })
+
+    return promise; 
+}
+
+function getUsersPage(pageNumber, usersPerPage) {
+    var skipUsers = (pageNumber - 1) * usersPerPage;
+    var params = { limit: usersPerPage, skip: skipUsers };
+
+    var promise = new Promise(function(resolve, reject) {
+        User.find({}, null, params, function (err, users) {
+            handleError(reject, err);
+
+            var retUsers = [];
+            for (var i = 0; i < users.length; i++) {
+                retUsers.push({
+                    id: users[i]._id,
+                    name: users[i].name,
+                    email: users[i].email
+                });
+            };
+
+            resolve(retUsers);
+        });
+    });
+
+    return promise;
+}
+
+function getUsersCount() {
+    var promise = new Promise(function(resolve, reject) {
+        User.count({}, function (err, count) {
+            handleError(reject, err);
+
+            resolve(count);
+        });
+    });
+
+    return promise;    
+}
+
+function getUserById(id) {
+    var promise = new Promise(function(resolve, reject) {
+        User.findById(id, function(err, user) {
+            handleError(reject, err);
+
+            if (user) {
+                resolve(user);
+            } else {
+                reject('No user found.')
+            }
+        });
+    });
+
+    return promise;
+}
+
+function getUserByEmail(email) {
+    var promise = new Promise(function(resolve, reject) {
+        User.findOne({ email: email.toLowerCase() }, function (err, user) {
+            handleError(reject, err);
+
+            if (user) {
+                resolve(user);
+            } else {
+                reject('No user found.')
+            }
+        });
+    });
+
+    return promise;
+}
+
+function updateUserById(id, name, email, password) {
+    var update = { name: name, email: email, password: password };
+
+    var promise = new Promise(function (resolve, reject) {
+        bcrypt.genSalt(10, function(err, salt) {
+            handleError(reject, err);
+
+            digest(update.password, salt).then(function(hash) {
+                update.password = hash;
+                User.findOneAndUpdate({ _id: id }, { $set: update }, function (err, user) {
+                    handleError(reject, err);
+
+                    resolve();
+                });
+            });
+        });
+    });
+
+    return promise;
+}
+
+function removeUserById(id) {
+    var promise = new Promise(function(resolve, reject) {
+        User.findByIdAndRemove(id, function(err) {
+            handleError(reject, err);
+
+            resolve();
+        });
+    });
+
+    return promise;
+}
+
+function createNewUser(name, email, password) {
+    var promise = new Promise(function(resolve, reject) {
+        User.create({ name: name, email: email, password: password }, function (err, user) {
+            handleError(reject, err);
+
+            resolve();
+        });
+    });
+
+    return promise;
 }
 
 function isValidActivationToken(token, callback) {
@@ -140,6 +293,43 @@ function sendResetEmail(token) {
         ' is /#/password_resets/' + user._id + '/' + token);
 }
 
+function getObject() {
+    var user = this;
+    var jsonUser = user.toJSON({ versionKey: false });
+
+    jsonUser.id = jsonUser._id;
+    delete jsonUser._id;
+    delete jsonUser.password;
+    delete jsonUser.schema_version;
+    delete jsonUser.activation_digest;
+    delete jsonUser.reset_digest;
+    delete jsonUser.reset_sent_at;
+    delete jsonUser.reset_password_at;
+
+    return jsonUser;
+}
+
+function createMicropost(content) {
+    var user = this;
+
+    var promise = new Promise(function(resolve, reject) {
+        Micropost.create({ user_id: user._id, content: content }, function (err, micropost) {
+            handleError(reject, err);
+
+            console.log(micropost);
+
+            user.microposts_count = user.microposts_count + 1;
+            user.save(function(err, user) {
+                handleError(reject, err);
+                console.log(user);
+                resolve(user);
+            });
+        });
+    });
+
+    return promise;
+}
+
 function generateToken() {
     return new Promise(function(resolve, reject) {
         crypto.randomBytes(48, function(ex, buf) {
@@ -159,4 +349,14 @@ function digest(string, salt) {
             return resolve(hash);
         });
     });
+}
+
+function createSafeUser(user, count) {
+    return {
+        name: user.name,
+        email: user.email,
+        id: user._id,
+        admin: user.admin,
+        count: count
+    };
 }

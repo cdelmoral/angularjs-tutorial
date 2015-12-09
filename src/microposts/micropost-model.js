@@ -43,14 +43,12 @@ function handleMigrations(micropost) {
 
 function getMicropostsPageForUser(userId, pageNumber, micropostsPerPage) {
     var skipMicroposts = (pageNumber - 1) * micropostsPerPage;
-    var params = { limit: micropostsPerPage, skip: skipMicroposts };
+    var sort = { created_at: -1 };
+    var params = { limit: micropostsPerPage, skip: skipMicroposts, sort: sort };
 
     var promise = new Promise(function(resolve, reject) {
-        console.log('Get page');
         Micropost.find({ user_id: userId }, null, params, function(err, microposts) {
             handleError(reject, err);
-
-            console.log('Microposts: ' + microposts);
 
             var retMicroposts = [];
             for (var i = 0; i < microposts.length; i++) {
@@ -71,10 +69,8 @@ function getMicropostsPageForUser(userId, pageNumber, micropostsPerPage) {
 
 function getMicropostsCountForUser(userId) {
     var promise = new Promise(function(resolve, reject) {
-        console.log('Get count');
         Micropost.count({ user_id: userId }, function(err, count) {
             handleError(reject, err);
-            console.log('Count: ' + count);
 
             resolve(count);
         });

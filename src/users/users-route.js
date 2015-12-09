@@ -4,6 +4,7 @@ var router = express.Router();
 
 var mongoose = require('mongoose');
 var User = require('./user-model');
+var Micropost = require('../microposts/micropost-model');
 var requireLogin = require('../sessions/sessions-helper').requireLogin;
 var requireCorrectUser = require('../sessions/sessions-helper').requireCorrectUser;
 var createSessionForUser = require('../sessions/sessions-helper').createSessionForUser;
@@ -14,6 +15,7 @@ router.get('/index_page', requireLogin, getIndexPage);
 router.get('/:id', requireLogin, getUserById);
 router.put('/activate/:id/:token', activateUser);
 router.put('/:id', requireCorrectUser, updateUser);
+router.put('/new_micropost/:id', requireCorrectUser, createMicropost);
 router.post('/', createUser);
 router.delete('/:id', requireLogin, deleteUser);
 
@@ -22,40 +24,30 @@ module.exports = router;
 /* Check if the username is not already being used. */
 function validName(req, res, next) {
     var sess = req.session;
-    var query = req.query;
+    var name = req.query.name;
 
-    if (sess.user && sess.user.name === query.name) {
+    if (sess.user && sess.user.name === name) {
         res.json({ valid: true });
-    } else if (query.name) {
-        User.count({ name: query.name }, function(err, count) {
-            if (err) {
-                return next(err);
-            }
-
-            res.json({valid: count === 0});
-        });
-    } else {
-        res.json({ valid: false });
+    } else if (name) {
+        User.isNameAvailable(name)
+            .then(function(available) {
+                res.json({ valid: available });
+            });
     }
 }
 
 /* Check if the email is not already being used. */
 function validEmail(req, res, next) {
     var sess = req.session;
-    var query = req.query;
+    var email = req.query.email;
 
-    if (sess.user && sess.user.email === query.email) {
+    if (sess.user && sess.user.email === email) {
         res.json({ valid: true });
-    } else if (query.email) {
-        User.count({ email: query.email.toLowerCase() }, function(err, count) {
-            if (err) {
-                return next(err);
-            }
-
-            res.json({valid: count === 0});
-        });
-    } else {
-        res.json({ valid: false });
+    } else if (email) {
+        User.isEmailAvailable(email)
+            .then(function(available) {
+                res.json({ valid: available });
+            });
     }
 }
 
@@ -66,62 +58,32 @@ function validEmail(req, res, next) {
 function getIndexPage(req, res, next) {
     var pageNumber = req.query.pageNumber || 1;
     var usersPerPage = req.query.usersPerPage || 25;
-    var skipUsers = (pageNumber - 1) * usersPerPage;
-    var params = { limit: usersPerPage, skip: skipUsers };
-    User.find({}, '_id name email schema_version', params, function (err, users) {
-        if (err) {
-            return next(err);
-        }
-
-        var retUsers = [];
-        for (var i = 0; i < users.length; i++) {
-            retUsers.push({
-                id: users[i]._id,
-                name: users[i].name,
-                email: users[i].email
-            });
-        };
-
-        User.count({}, function (err, count) {
-            if (err) {
-                return next(err);
-            }
-
-            res.json({ count: count, users: retUsers });
+    
+    User.getUsersPage(pageNumber, usersPerPage)
+        .then(function(users) {
+            User.getUsersCount()
+                .then(function(count) {
+                    res.json({ count: count, users: users });
+                });
         });
-    });
 }
 
 /** Get user by id. */
 function getUserById(req, res, next) {
-    User.findById(req.params.id, function(err, user) {
-        if (err) {
-            return next(err);
-        }
-
-        res.json({
-            name: user.name,
-            email: user.email,
-            id: user._id,
-            admin: user.admin
-        });
+    User.getUserById(req.params.id).then(function(user) {
+        res.json(user.getObject());
     });
 }
 
 /** Activates user. */
 function activateUser(req, res, next) {
-    User.findById(req.params.id, function(err, user) {
-        if (err) {
-            return next(err);
-        }
-
+    User.getUserById(req.params.id).then(function(user) {
         if (!user.activated && user.isValidActivationToken(req.params.token)) {
             user.activate();
-            var jsonRes = {
+            var response = {
                 user: createSessionForUser(user, req.session),
                 message: 'The account has been activated.'
-            };
-            res.json(jsonRes);
+            }
         } else {
             res.status(400).send('Invalid activation link.');
         }
@@ -130,56 +92,43 @@ function activateUser(req, res, next) {
 
 /** Update user by id. */
 function updateUser(req, res, next) {
-    User.findById(req.params.id, function(err, user) {
-        if (err) {
-            return next(err);
-        }
+    var name = req.body.name;
+    var email = req.body.email;
+    var password = req.body.password;
 
-        user.name = req.body.name;
-        user.email = req.body.email;
-        user.password = req.body.password;
-
-        user.save(function(err, user) {
-            if (err) {
-                return next(err);
-            }
-
-            res.json({
-                name: user.name,
-                email: user.email,
-                id: user._id
-            });
-        })
+    User.updateUserById(req.params.id, name, email, password).then(function() {
+        res.status(200).send('User was updated.');
+    }).catch(function(err) {
+        res.status(500).send(err);
     });
 }
 
 /** Delete user by id. */
 function deleteUser(req, res, next) {
-    User.findByIdAndRemove(req.params.id, function(err) {
-        if (err) {
-            return next(err);
-        }
-
-        res.status(200).send('User deleted');
-    })
+    User.removeUserById(req.params.id).then(function() {
+        res.status(200).send('User was deleted.')
+    }).catch(function(err) {
+        res.status(500).send(err);
+    });
 }
 
 /** Create new user. */
 function createUser(req, res, next) {
-    var newUser = {
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password
-    };
-
-    User.create(newUser, function (err, user) {
-        if (err) {
-            return next(err);
-        }
-
-        res.json({
-            id: user._id
+    User.createNewUser(req.body.name, req.body.email, req.body.password)
+        .then(function() {
+            res.status(200).send('User was created.');
+        }).catch(function(err) {
+            res.status(500).send(err);
         });
-    });
 }
 
+function createMicropost(req, res, next) {
+    User.getUserById(req.params.id).then(function(user) {
+        return user.createMicropost(req.body.content);
+    }).then(function(user) {
+        res.json(user.getObject());
+    }).catch(function(err) {
+        console.log(err);
+        res.status(500).send(err);
+    });
+}

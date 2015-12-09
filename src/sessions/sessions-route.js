@@ -4,6 +4,7 @@ var router = express.Router();
 
 var mongoose = require('mongoose');
 var User = require('../users/user-model');
+var Micropost = require('../microposts/micropost-model')
 
 var createSessionForUser = require('./sessions-helper').createSessionForUser;
 
@@ -15,14 +16,13 @@ module.exports = router;
 
 /** Authenticates a user. */
 function authenticateUser(req, res, next) {
-    User.findOne({ email: req.body.email.toLowerCase() }, function (err, user) {
-        if (err) {
-            return next(err);
-        }
-        
-        if (user && user.isValidPassword(req.body.password)) {
+    var sess = req.session;
+
+    User.getUserByEmail(req.body.email).then(function(user) {
+        if (user.isValidPassword(req.body.password)) {
             if (user.activated) {
-                res.json(createSessionForUser(user, req.session));
+                sess.user_id = user._id;
+                res.json(user.getObject());
             } else {
                 res.status(403).send('User not yet activated');
             }
@@ -35,8 +35,13 @@ function authenticateUser(req, res, next) {
 /** Gets if the user is currently logged in. */
 function isAuthenticated(req, res, next) {
     var sess = req.session;
-    if (sess.user && sess.user._id) {
-        res.send({ id: sess.user._id, name: sess.user.name, email: sess.user.email });
+
+    if (sess.user_id) {
+        User.getUserById(sess.user_id).then(function(user) {
+            res.send(user.getObject());
+        }).catch(function() {
+            res.send({ authenticated: false });
+        })
     } else {
         res.send({ authenticated: false });
     }
@@ -45,7 +50,7 @@ function isAuthenticated(req, res, next) {
 /** Delete the current session for the currently logged in user. */
 function endSession(req, res, next) {
     var sess = req.session;
-    if (sess.user && sess.user._id) {
+    if (sess.user_id) {
         sess.destroy(function(err) {
             if (err) {
                 res.status(500).send();
