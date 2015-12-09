@@ -1,4 +1,37 @@
-<div class="center jumbotron">
+<div class="row" ng-if="ctrl.userLoggedIn">
+  <aside class="col-md-4">
+    <section class="user_info">
+      <h1>{{ctrl.currentUser.name}}</h1>
+      <span><a ng-href="#/users/{{ctrl.currentUser.id}}">view my profile</a></span>
+      <span>{{ctrl.pluralize(ctrl.currentUser.microposts_count, "micropost")}}</span>
+    </section>
+
+    <section class="micropost_form">
+      <form name="micropost" at-submit="ctrl.createMicropost()" novalidate>
+        <div class="field">
+          <div class="form-group" ng-class="{'has-error': at.micropost.needsAttention(micropost.content)}">
+            <label for="content" class="control-label">New micropost</label>
+            <textarea id="content" name="content" class="form-control"
+                      placeholder="Compose new micropost..." required
+                      ng-model="ctrl.micropostContent" ng-maxlength="140"
+                      ng-model-options="{ updateOn: 'default blur', debouce: { default: 0, blur: 0 } }">
+            </textarea>
+          </div>
+
+          <div class="help-error" role="alert" ng-messages="micropost.content.$error"
+               ng-if="at.micropost.needsAttention(micropost.content)">
+            <div ng-message="required">Your micropost needs some content</div>
+            <div ng-message="maxlength">Your micropost cannot exceed 140 characters</div>
+          </div>
+
+          <input type="submit" class="btn btn-primary" value="Post">
+        </div>
+      </form>
+    </section>
+  </aside>
+</div>
+
+<div class="center jumbotron" ng-if="!ctrl.userLoggedIn">
   <h1>Welcome to the Sample App</h1>
 
   <h2>
@@ -7,6 +40,5 @@
     sample application.
   </h2>
 
-
-  <a href="#/sign-up" class="btn btn-lg btn-primary" ng-if="!ctrl.userLoggedIn">Sign up now!</a>
+  <a href="#/sign-up" class="btn btn-lg btn-primary">Sign up now!</a>
 </div>

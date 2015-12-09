@@ -1,0 +1,7 @@
+<span class="user">
+  <a ng-href="#/users/{{ user.id }}">{{ user.name }}</a>
+</span>
+<span class="content">{{ micropost.content }}</span>
+<span class="timestamp">
+  Posted {{ ctrl.timeAgoInWords(micropost.created_at) }}.
+</span>
