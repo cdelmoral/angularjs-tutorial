@@ -8,7 +8,7 @@
                 <label for="name" class="control-label">Name</label>
                 <input id="name" name="name" class="form-control"
                        type="text" placeholder="Name" autofocus="true" required
-                       ng-model="ctrl.user.name" ng-maxlength="50"
+                       ng-model="ctrl.username" ng-maxlength="50"
                        ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }"
                        at-validate-unique="ctrl.isNameUnique(value)">
             </div>
@@ -24,7 +24,7 @@
                 <label for="email" class="control-label">Email</label>
                 <input id="email" name="email" class="form-control"
                        type="email" placeholder="Email" required
-                       ng-model="ctrl.user.email" ng-maxlength="255"
+                       ng-model="ctrl.email" ng-maxlength="255"
                        ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }"
                        at-validate-unique="ctrl.isEmailUnique(value)">
             </div>
@@ -41,7 +41,7 @@
                 <label for="password" class="control-label">Password</label>
                 <input id="password" name="password" class="form-control"
                        type="password" placeholder="Password" required
-                       ng-model="ctrl.user.password" ng-minlength="6" ng-maxlength="255"
+                       ng-model="ctrl.password" ng-minlength="6" ng-maxlength="255"
                        ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }">
             </div>
 
@@ -56,7 +56,7 @@
                 <label for="password_confirmation" class="control-label">Confirmation</label>
                 <input id="password_confirmation" name="password_confirmation" class="form-control"
                        type="password" placeholder="Confirm password"
-                       ng-model="ctrl.confirmation" at-confirm-password="ctrl.user.password"
+                       ng-model="ctrl.confirmation" at-confirm-password="ctrl.password"
                        ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }">
             </div>
 
