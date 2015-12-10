@@ -26,14 +26,9 @@ function validName(req, res, next) {
     var sess = req.session;
     var name = req.query.name;
 
-    if (sess.user && sess.user.name === name) {
-        res.json({ valid: true });
-    } else if (name) {
-        User.isNameAvailable(name)
-            .then(function(available) {
-                res.json({ valid: available });
-            });
-    }
+    User.isNameAvailable(name, sess.user_id).then(function(available) {
+        res.json({ valid: available });
+    });
 }
 
 /* Check if the email is not already being used. */
@@ -41,14 +36,9 @@ function validEmail(req, res, next) {
     var sess = req.session;
     var email = req.query.email;
 
-    if (sess.user && sess.user.email === email) {
-        res.json({ valid: true });
-    } else if (email) {
-        User.isEmailAvailable(email)
-            .then(function(available) {
-                res.json({ valid: available });
-            });
-    }
+    User.isEmailAvailable(email, sess.user_id).then(function(available) {
+        res.json({ valid: available });
+    });
 }
 
 /**
@@ -96,8 +86,8 @@ function updateUser(req, res, next) {
     var email = req.body.email;
     var password = req.body.password;
 
-    User.updateUserById(req.params.id, name, email, password).then(function() {
-        res.status(200).send('User was updated.');
+    User.updateUserById(req.params.id, name, email, password).then(function(user) {
+        res.json({ message: 'User was updated.', user: user.getObject() });
     }).catch(function(err) {
         res.status(500).send(err);
     });

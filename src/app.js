@@ -33,6 +33,7 @@ app.use('/api', function(req, res, next) {
             if (!user) {
                 sess.user_id = null;
             }
+
             next();
         }).catch(function() {
             next();

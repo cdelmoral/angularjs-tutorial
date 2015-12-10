@@ -109,24 +109,24 @@ function initializeUser(next) {
     });
 }
 
-function isNameAvailable(name) {
+function isNameAvailable(name, id) {
     var promise = new Promise(function(resolve, reject) {
-        User.count({ name: name }, function(err, count) {
+        User.findOne({ name: name }, function(err, user) {
             handleError(reject, err);
 
-            resolve(count === 0);
+            resolve(user === null || user.id === id);
         });
     });
 
     return promise;
 }
 
-function isEmailAvailable(email) {
+function isEmailAvailable(email, id) {
     var promise = new Promise(function(resolve, reject) {
-        User.count({ email: email.toLowerCase() }, function(err, count) {
+        User.findOne({ email: email.toLowerCase() }, function(err, user) {
             handleError(reject, err);
 
-            resolve(count === 0);
+            resolve(user === null || user.id === id);
         });
     })
 
@@ -210,10 +210,10 @@ function updateUserById(id, name, email, password) {
 
             digest(update.password, salt).then(function(hash) {
                 update.password = hash;
-                User.findOneAndUpdate({ _id: id }, { $set: update }, function (err, user) {
+                User.findOneAndUpdate({ _id: id }, { $set: update }, { new: true }, function (err, user) {
                     handleError(reject, err);
 
-                    resolve();
+                    resolve(user);
                 });
             });
         });

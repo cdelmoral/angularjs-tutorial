@@ -21,7 +21,7 @@ function authenticateUser(req, res, next) {
     User.getUserByEmail(req.body.email).then(function(user) {
         if (user.isValidPassword(req.body.password)) {
             if (user.activated) {
-                sess.user_id = user._id;
+                sess.user_id = user.id;
                 res.json(user.getObject());
             } else {
                 res.status(403).send('User not yet activated');
