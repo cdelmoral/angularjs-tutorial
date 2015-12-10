@@ -35,7 +35,8 @@ module.exports = function(grunt) {
                 options: {
                     port: 8000,
                     script: 'bin/www',
-                    node_env: 'development'
+                    node_env: 'development',
+                    debug: true
                 }
             },
             test: {
