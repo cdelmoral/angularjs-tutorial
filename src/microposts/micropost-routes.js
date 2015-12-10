@@ -13,9 +13,9 @@ module.exports = router;
 function getMicropostPageForUser(req, res, next) {
     var userId = req.params.userId;
     var pageNumber = req.query.pageNumber || 1;
-    var micropostsPerPage = req.query.micropostsPerPage || 25;
+    var itemsPerPage = req.query.itemsPerPage || 25;
 
-    Micropost.getMicropostsPageForUser(userId, pageNumber, micropostsPerPage)
+    Micropost.getMicropostsPageForUser(userId, pageNumber, itemsPerPage)
         .then(function(microposts) {
             Micropost.getMicropostsCountForUser(userId)
                 .then(function(count) {
