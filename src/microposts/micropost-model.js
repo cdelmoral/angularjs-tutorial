@@ -1,27 +1,13 @@
 var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
 
-var validate = require('../common/validator');
+var micropostSchema = require('./micropost-schema');
 var handleError = require('../common/error-handling').handleError;
 var upgradeSchema = require('./micropost-migrations').upgradeSchema;
 var downgradeSchema = require('./micropost-migrations').downgradeSchema;
 var currentSchemaVersion = require('./micropost-migrations').currentSchemaVersion;
 
-var micropostSchema = new mongoose.Schema({
-    content: {
-        type: String,
-        required: true,
-        validate: [
-            validate({ validator: 'isNotWhiteSpace'}),
-            validate({ validator: 'isLength', arguments: [0, 140]})
-        ]
-    },
-    user_id: { type: Schema.ObjectId, required: true, index: true },
-    created_at: { type: Date, default: Date.now(), index: true },
-    updated_at: { type: Date, default: Date.now() },
-});
-
 micropostSchema.post('init', handleMigrations);
+
 micropostSchema.statics.getMicropostsPageForUser = getMicropostsPageForUser;
 micropostSchema.statics.getMicropostsCountForUser = getMicropostsCountForUser;
 
