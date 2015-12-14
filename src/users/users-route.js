@@ -70,10 +70,13 @@ function activateUser(req, res, next) {
     User.getUserById(req.params.id).then(function(user) {
         if (!user.activated && user.isValidActivationToken(req.params.token)) {
             user.activate();
+            req.session.user_id = user.id;
+            var jsonUser = user.getObject();
             var response = {
-                user: createSessionForUser(user, req.session),
+                user: jsonUser,
                 message: 'The account has been activated.'
-            }
+            };
+            res.json(response);
         } else {
             res.status(400).send('Invalid activation link.');
         }
@@ -118,7 +121,6 @@ function createMicropost(req, res, next) {
     }).then(function(user) {
         res.json(user.getObject());
     }).catch(function(err) {
-        console.log(err);
         res.status(500).send(err);
     });
 }
