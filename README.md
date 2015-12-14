@@ -1,3 +1,5 @@
+[ ![Codeship Status for cdelmoral/angularjs-tutorial](https://codeship.com/projects/b34583b0-84ca-0133-c39f-260819c0cb46/status?branch=master)](https://codeship.com/projects/122078)
+
 # AngularJS Tutorial: sample application (server)
 
 This is the sample application (server side) for the
