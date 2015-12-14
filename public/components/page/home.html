@@ -19,7 +19,7 @@
           </div>
 
           <div class="help-error" role="alert" ng-messages="micropost.content.$error"
-               ng-if="at.micropost.needsAttention(micropost.content)">
+               ng-show="at.micropost.needsAttention(micropost.content)">
             <div ng-message="required">Your micropost needs some content</div>
             <div ng-message="maxlength">Your micropost cannot exceed 140 characters</div>
           </div>
