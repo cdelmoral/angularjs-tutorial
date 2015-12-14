@@ -103,7 +103,8 @@ function isEmailAvailable(email, id) {
 
 function getUsersPage(pageNumber, usersPerPage) {
     var skipUsers = (pageNumber - 1) * usersPerPage;
-    var params = { limit: usersPerPage, skip: skipUsers };
+    var sort = { created_at: 1 };
+    var params = { limit: usersPerPage, skip: skipUsers, sort: sort };
 
     var promise = new Promise(function(resolve, reject) {
         User.find({}, null, params, function (err, users) {
