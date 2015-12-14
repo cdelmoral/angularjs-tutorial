@@ -7,6 +7,7 @@ var downgradeSchema = require('./micropost-migrations').downgradeSchema;
 var currentSchemaVersion = require('./micropost-migrations').currentSchemaVersion;
 
 micropostSchema.post('init', handleMigrations);
+micropostSchema.pre('save', initialize);
 
 micropostSchema.statics.getMicropostsPageForUser = getMicropostsPageForUser;
 micropostSchema.statics.getMicropostsCountForUser = getMicropostsCountForUser;
@@ -25,6 +26,21 @@ function handleMigrations(micropost) {
     } else if (micropost.schema_version > currentSchemaVersion) {
         downgradeSchema(micropost);
     }
+}
+
+function initialize(next) {
+    var micropost = this;
+
+    console.log(micropost);
+
+    if (micropost.created_at === undefined) {
+        var now = Date.now();
+
+        micropost.created_at = now;
+        micropost.updated_at = now;
+    }
+
+    next();
 }
 
 function getMicropostsPageForUser(userId, pageNumber, micropostsPerPage) {

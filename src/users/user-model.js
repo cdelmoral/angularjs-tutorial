@@ -284,12 +284,9 @@ function createMicropost(content) {
         Micropost.create({ user_id: user._id, content: content }, function (err, micropost) {
             handleError(reject, err);
 
-            console.log(micropost);
-
             user.microposts_count = user.microposts_count + 1;
             user.save(function(err, user) {
                 handleError(reject, err);
-                console.log(user);
                 resolve(user);
             });
         });
@@ -317,14 +314,4 @@ function digest(string, salt) {
             return resolve(hash);
         });
     });
-}
-
-function createSafeUser(user, count) {
-    return {
-        name: user.name,
-        email: user.email,
-        id: user._id,
-        admin: user.admin,
-        count: count
-    };
 }

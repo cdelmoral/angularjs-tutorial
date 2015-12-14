@@ -14,8 +14,8 @@ var micropostSchema = new mongoose.Schema({
         ]
     },
     user_id: { type: ObjectId, required: true, index: true },
-    created_at: { type: Date, default: Date.now(), index: true },
-    updated_at: { type: Date, default: Date.now() },
+    created_at: { type: Date, index: true },
+    updated_at: { type: Date },
 });
 
 module.exports = micropostSchema;
