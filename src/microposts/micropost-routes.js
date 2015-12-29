@@ -4,8 +4,10 @@ var router = express.Router();
 
 var mongoose = require('mongoose');
 var Micropost = require('./micropost-model');
+var requireCorrectUser = require('../sessions/sessions-helper').requireCorrectUser;
 
 router.get('/user_page/:userId', getMicropostPageForUser);
+router.get('/feed/:userId/', requireCorrectUser, getMicropostFeedPageForUser);
 router.get('/count/:userId', getMicropostCountForUser);
 
 module.exports = router;
@@ -21,6 +23,22 @@ function getMicropostPageForUser(req, res, next) {
                 .then(function(count) {
                     res.json({ count: count, microposts: microposts });
                 });
+        });
+}
+
+function getMicropostFeedPageForUser(req, res, next) {
+    var userId = req.params.userId;
+    var pageNumber = req.query.pageNumber || 1;
+    var itemsPerPage = req.query.itemsPerPage || 25;
+
+    Micropost.getMicropostFeedPageForUser(userId, pageNumber, itemsPerPage)
+        .then(function(microposts) {
+            Micropost.getMicropostFeedCountForUser(userId)
+                .then(function(count) {
+                    res.json({ count: count, microposts: microposts });
+                });
+        }).catch(function(err) {
+            console.log(err);
         });
 }
 

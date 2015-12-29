@@ -10,7 +10,11 @@ micropostSchema.post('init', handleMigrations);
 micropostSchema.pre('save', initialize);
 
 micropostSchema.statics.getMicropostsPageForUser = getMicropostsPageForUser;
+micropostSchema.statics.getMicropostFeedPageForUser = getMicropostFeedPageForUser;
 micropostSchema.statics.getMicropostsCountForUser = getMicropostsCountForUser;
+micropostSchema.statics.getMicropostFeedCountForUser = getMicropostFeedCountForUser;
+
+micropostSchema.methods.getObject = getObject;
 
 var Micropost = mongoose.model('Micropost', micropostSchema);
 
@@ -60,7 +64,7 @@ function getMicropostsPageForUser(userId, pageNumber, micropostsPerPage) {
                     content: micropost.content,
                     created_at: micropost.created_at
                 });
-            };
+            }
 
             resolve(retMicroposts);
         });
@@ -79,4 +83,49 @@ function getMicropostsCountForUser(userId) {
     });
 
     return promise;
+}
+
+function getMicropostFeedPageForUser(userId, pageNumber, itemsPerPage) {
+    var skipItems = (pageNumber - 1) * itemsPerPage;
+    var sort = { created_at: -1 };
+    var params = { limit: itemsPerPage, skip: skipItems, sort: sort };
+
+    var promise = new Promise(function(resolve, reject) {
+        Micropost.find({ user_id: userId }, null, params, function(err, microposts) {
+            handleError(reject, err);
+
+            var retMicroposts = [];
+            for (var i = 0; i < microposts.length; i++) {
+                var micropost = microposts[i];
+
+                retMicroposts.push(micropost.getObject());
+            }
+
+            resolve(retMicroposts);
+        });
+    });
+
+    return promise;
+}
+
+function getMicropostFeedCountForUser(userId) {
+    var promise = new Promise(function(resolve, reject) {
+        Micropost.count({ user_id: userId }, function(err, count) {
+            handleError(reject, err);
+
+            resolve(count);
+        });
+    });
+
+    return promise;
+}
+
+function getObject() {
+    var micropost = this;
+    var object = micropost.toJSON({ versionKey: false });
+
+    delete object._id;
+    delete object.schema_version;
+
+    return object;
 }

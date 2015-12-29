@@ -29,6 +29,20 @@
       </form>
     </section>
   </aside>
+
+  <div class="col-md-8">
+    <h3>Micropost Feed</h3>
+
+    <ol class="microposts">
+      <li id="micropost-{{ micropost.id }}"
+          dir-paginate="micropost in ctrl.microposts | itemsPerPage: ctrl.pagination.pageItems"
+          total-items="ctrl.pagination.total" current-page="ctrl.pagination.page">
+        <at-micropost micropost="micropost" user="ctrl.user"/>
+      </li>
+    </ol>
+    <dir-pagination-controls on-page-change="ctrl.getMicropostFeedPage(newPageNumber)">
+    </dir-pagination-controls>
+  </div>
 </div>
 
 <div class="center jumbotron" ng-if="!ctrl.userLoggedIn">
