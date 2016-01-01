@@ -14,8 +14,8 @@
     </dir-pagination-controls>
     <ol class="microposts">
       <li id="micropost-{{ micropost.id }}"
-          dir-paginate="micropost in ctrl.microposts | itemsPerPage: ctrl.pagination.pageItems"
-          total-items="ctrl.pagination.total" current-page="ctrl.pagination.page">
+          dir-paginate="micropost in ctrl.micropostPage.microposts | itemsPerPage: ctrl.micropostPage.itemsPerPage"
+          total-items="ctrl.micropostPage.totalItems" current-page="ctrl.micropostPage.page">
         <at-micropost micropost="micropost" user="ctrl.user"/>
       </li>
     </ol>

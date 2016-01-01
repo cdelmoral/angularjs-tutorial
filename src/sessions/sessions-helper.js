@@ -1,26 +1,28 @@
-exports.requireLogin = requireLogin;
-exports.requireCorrectUser = requireCorrectUser;
+var SessionHelper = function() {};
 
-/** Checks that the user is logged in. */
-function requireLogin(req, res, next) {
+SessionHelper.currentUser = null;
+
+SessionHelper.requireLogin = function(req, res, next) {
     var sess = req.session;
-    if (sess.user_id) {
+    var currentUser = SessionHelper.currentUser;
+
+    if (currentUser) {
         next();
     } else {
         res.status(401).send('Unauthorized');
     }
-}
+};
 
-/** Checks that the request for a user resource comes from that user. */
-function requireCorrectUser(req, res, next) {
+SessionHelper.requireCorrectUser = function(req, res, next) {
     var sess = req.session;
-    var id = req.params.id || req.params.userId;
     
-	requireLogin(req, res, function() {
-		if (id == sess.user_id) {
-			next();
-		} else {
-			res.status(403).send('Forbidden');
-		}
-	});
-}
+    SessionHelper.requireLogin(req, res, function() {
+        if (SessionHelper.currentUser.id === sess.user_id) {
+            next();
+        } else {
+            res.status(403).send('Forbidden');
+        }
+    });
+};
+
+module.exports = SessionHelper;

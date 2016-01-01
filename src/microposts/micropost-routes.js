@@ -21,7 +21,7 @@ function getMicropostPageForUser(req, res, next) {
         .then(function(microposts) {
             Micropost.getMicropostsCountForUser(userId)
                 .then(function(count) {
-                    res.json({ count: count, microposts: microposts });
+                    res.json({ count: count, microposts: Micropost.getObjects(microposts) });
                 });
         });
 }
@@ -42,7 +42,7 @@ function getMicropostFeedPageForUser(req, res, next) {
         });
 }
 
-function getMicropostCountForUser(req, res, nest) {
+function getMicropostCountForUser(req, res, next) {
     var userId = req.params.userId;
 
     Micropost.getMicropostsCountForUser(userId)

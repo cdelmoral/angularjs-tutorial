@@ -4,4 +4,7 @@
 <span class="content">{{ micropost.content }}</span>
 <span class="timestamp">
   Posted {{ ctrl.timeAgoInWords(micropost.created_at) }}.
+  <a href="" ng-if="ctrl.isCurrentUser()" ng-click="ctrl.deleteMicropost()" at-confirm="ctrl.CONFIRM">
+    delete
+  </a>
 </span>

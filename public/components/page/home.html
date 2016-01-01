@@ -37,7 +37,7 @@
       <li id="micropost-{{ micropost.id }}"
           dir-paginate="micropost in ctrl.microposts | itemsPerPage: ctrl.pagination.pageItems"
           total-items="ctrl.pagination.total" current-page="ctrl.pagination.page">
-        <at-micropost micropost="micropost" user="ctrl.user"/>
+        <at-micropost micropost="micropost" user="ctrl.currentUser"/>
       </li>
     </ol>
     <dir-pagination-controls on-page-change="ctrl.getMicropostFeedPage(newPageNumber)">

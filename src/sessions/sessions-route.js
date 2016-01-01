@@ -4,9 +4,9 @@ var router = express.Router();
 
 var mongoose = require('mongoose');
 var User = require('../users/user-model');
-var Micropost = require('../microposts/micropost-model')
+var Micropost = require('../microposts/micropost-model');
 
-var createSessionForUser = require('./sessions-helper').createSessionForUser;
+var SessionHelper = require('./sessions-helper');
 
 router.get('/authenticated', isAuthenticated);
 router.post('/', authenticateUser);
@@ -41,7 +41,7 @@ function isAuthenticated(req, res, next) {
             res.send(user.getObject());
         }).catch(function() {
             res.send({ authenticated: false });
-        })
+        });
     } else {
         res.send({ authenticated: false });
     }
@@ -55,6 +55,7 @@ function endSession(req, res, next) {
             if (err) {
                 res.status(500).send();
             } else {
+                SessionHelper.currentUser = null;
                 res.status(200).send();
             }
         });

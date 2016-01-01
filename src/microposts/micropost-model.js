@@ -13,6 +13,7 @@ micropostSchema.statics.getMicropostsPageForUser = getMicropostsPageForUser;
 micropostSchema.statics.getMicropostFeedPageForUser = getMicropostFeedPageForUser;
 micropostSchema.statics.getMicropostsCountForUser = getMicropostsCountForUser;
 micropostSchema.statics.getMicropostFeedCountForUser = getMicropostFeedCountForUser;
+micropostSchema.statics.getObjects = getObjects;
 
 micropostSchema.methods.getObject = getObject;
 
@@ -56,17 +57,7 @@ function getMicropostsPageForUser(userId, pageNumber, micropostsPerPage) {
         Micropost.find({ user_id: userId }, null, params, function(err, microposts) {
             handleError(reject, err);
 
-            var retMicroposts = [];
-            for (var i = 0; i < microposts.length; i++) {
-                var micropost = microposts[i];
-
-                retMicroposts.push({
-                    content: micropost.content,
-                    created_at: micropost.created_at
-                });
-            }
-
-            resolve(retMicroposts);
+            resolve(microposts);
         });
     });
 
@@ -120,10 +111,21 @@ function getMicropostFeedCountForUser(userId) {
     return promise;
 }
 
+function getObjects(microposts) {
+    var objects = [];
+
+    for (var i = 0; i < microposts.length; i++) {
+        objects.push(microposts[i].getObject());
+    }
+
+    return objects;
+}
+
 function getObject() {
     var micropost = this;
     var object = micropost.toJSON({ versionKey: false });
 
+    object.id = object._id;
     delete object._id;
     delete object.schema_version;
 

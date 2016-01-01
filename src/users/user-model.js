@@ -3,6 +3,7 @@ var bcrypt = require('bcrypt');
 var crypto = require('crypto');
 
 var Micropost = require('../microposts/micropost-model');
+var SessionHelper = require('../sessions/sessions-helper');
 var userSchema = require('./user-schema');
 var handleError = require('../common/error-handling').handleError;
 var upgradeSchema = require('./user-migrations').upgradeSchema;
@@ -31,6 +32,24 @@ userSchema.methods.createAndSendResetDigest = createAndSendResetDigest;
 userSchema.methods.sendResetEmail = sendResetEmail;
 userSchema.methods.getObject = getObject;
 userSchema.methods.createMicropost = createMicropost;
+
+userSchema.methods.deleteMicropostById = function (micropostId) {
+    var user = this;
+
+    var promise = new Promise(function(resolve, reject) {
+        Micropost.findOneAndRemove({ _id: micropostId }, function(err, micropost) {
+            handleError(reject, err);
+
+            user.update({ $inc: { microposts_count: -1 } }, function(err, micropost) {
+                handleError(reject, err);
+
+                resolve();
+            });
+        });
+    });
+
+    return promise;
+};
 
 var User = mongoose.model('User', userSchema);
 
@@ -96,7 +115,7 @@ function isEmailAvailable(email, id) {
 
             resolve(user === null || user.id === id);
         });
-    })
+    });
 
     return promise; 
 }
@@ -117,7 +136,7 @@ function getUsersPage(pageNumber, usersPerPage) {
                     name: users[i].name,
                     email: users[i].email
                 });
-            };
+            }
 
             resolve(retUsers);
         });
@@ -146,7 +165,7 @@ function getUserById(id) {
             if (user) {
                 resolve(user);
             } else {
-                reject('No user found.')
+                reject('No user found.');
             }
         });
     });
@@ -162,7 +181,7 @@ function getUserByEmail(email) {
             if (user) {
                 resolve(user);
             } else {
-                reject('No user found.')
+                reject('No user found.');
             }
         });
     });
@@ -301,7 +320,7 @@ function generateToken() {
         crypto.randomBytes(48, function(ex, buf) {
             var token = buf.toString('hex');
             return resolve(token);
-        })
+        });
     });
 }
 

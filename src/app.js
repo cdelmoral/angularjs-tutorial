@@ -10,6 +10,8 @@ var microposts = require(path.join(__dirname, '/microposts/micropost-routes'));
 var sessions = require(path.join(__dirname, '/sessions/sessions-route'));
 var passwordResets = require(path.join(__dirname, '/password-resets/password-resets-routes'));
 
+var SessionHelper = require(path.join(__dirname, '/sessions/sessions-helper'));
+
 var app = express();
 
 var User = require(path.join(__dirname, '/users/user-model'));
@@ -32,6 +34,8 @@ app.use('/api', function(req, res, next) {
         User.getUserById(sess.user_id).then(function(user) {
             if (!user) {
                 sess.user_id = null;
+            } else {
+                SessionHelper.currentUser = user;
             }
 
             next();

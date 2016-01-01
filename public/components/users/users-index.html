@@ -3,10 +3,10 @@
 <dir-pagination-controls on-page-change="ctrl.getUsersPage(newPageNumber)"></dir-pagination-controls>
 
 <ul class="users">
-  <li dir-paginate="user in ctrl.users | itemsPerPage: ctrl.usersPerPage" total-items="ctrl.totalUsers"
-      current-page="ctrl.pagination.current">
+  <li dir-paginate="user in ctrl.users | itemsPerPage: ctrl.pagination.itemsPerPage"
+      total-items="ctrl.pagination.totalItems" current-page="ctrl.pagination.page">
     <a ng-href="#/users/{{user.id}}">{{user.name}}</a> ({{user.email}})
-    <span ng-if="ctrl.userIsAdmin()">
+    <span ng-if="ctrl.currentUserIsAdmin()">
        | <a href="" ng-click="ctrl.deleteUser(user)" at-confirm="ctrl.CONFIRM">delete</a>
     </span>
   </li>

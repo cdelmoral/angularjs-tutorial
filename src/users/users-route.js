@@ -5,6 +5,7 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var User = require('./user-model');
 var Micropost = require('../microposts/micropost-model');
+var SessionHelper = require('../sessions/sessions-helper');
 var requireLogin = require('../sessions/sessions-helper').requireLogin;
 var requireCorrectUser = require('../sessions/sessions-helper').requireCorrectUser;
 var createSessionForUser = require('../sessions/sessions-helper').createSessionForUser;
@@ -18,6 +19,7 @@ router.put('/:id', requireCorrectUser, updateUser);
 router.put('/new_micropost/:id', requireCorrectUser, createMicropost);
 router.post('/', createUser);
 router.delete('/:id', requireLogin, deleteUser);
+router.delete('/:id/:micropost_id', requireCorrectUser, deleteMicropost);
 
 module.exports = router;
 
@@ -99,7 +101,7 @@ function updateUser(req, res, next) {
 /** Delete user by id. */
 function deleteUser(req, res, next) {
     User.removeUserById(req.params.id).then(function() {
-        res.status(200).send('User was deleted.')
+        res.status(200).send('User was deleted.');
     }).catch(function(err) {
         res.status(500).send(err);
     });
@@ -109,7 +111,7 @@ function deleteUser(req, res, next) {
 function createUser(req, res, next) {
     User.createNewUser(req.body.name, req.body.email, req.body.password)
         .then(function() {
-            res.status(200).send('User was created.');
+            res.json({ message: 'Check your email to activate your account before you can log in.' });
         }).catch(function(err) {
             res.status(500).send(err);
         });
@@ -123,4 +125,13 @@ function createMicropost(req, res, next) {
     }).catch(function(err) {
         res.status(500).send(err);
     });
+}
+
+function deleteMicropost(req, res, next) {
+    SessionHelper.currentUser.deleteMicropostById(req.params.micropost_id)
+        .then(function() {
+            res.json({ message: 'The micropost was deleted.' });
+        }).catch(function(err) {
+            console.log(err);
+        });
 }
