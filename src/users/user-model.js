@@ -10,7 +10,7 @@ var UserActivationException = require('./user-activation-exception');
 var UserPasswordResetException = require('./user-password-reset-exception');
 
 UserSchema.statics.isUnique = function(option, id) {
-    return User.findOne(option).then(function(user) {
+    return User.findOneAsync(option).then(function(user) {
         return (user === null || user.id === id);
     });
 };
@@ -20,7 +20,7 @@ UserSchema.statics.getUsersPage = function(pageNumber, usersPerPage) {
     var sort = { created_at: 1 };
     var params = { limit: usersPerPage, skip: skipUsers, sort: sort };
 
-    return User.find({}, null, params).then(function(users) {
+    return User.findAsync({}, null, params).then(function(users) {
         return users;
     });
 };
@@ -34,13 +34,13 @@ UserSchema.statics.getObjects = function(users) {
 };
 
 UserSchema.statics.getUsersCount = function() {
-    return User.count({}).then(function(count) {
+    return User.countAsync({}).then(function(count) {
         return count;
     });
 };
 
 UserSchema.statics.getUserById = function(id) {
-    return User.findById(id).then(function(user) {
+    return User.findByIdAsync(id).then(function(user) {
         if (!user) {
             throw new UserNotFoundException('User not found.');
         }
@@ -49,7 +49,7 @@ UserSchema.statics.getUserById = function(id) {
 };
 
 UserSchema.statics.getUserByEmail = function(email) {
-    return User.findOne({ email: email.toLowerCase() }).then(function(user) {
+    return User.findOneAsync({ email: email.toLowerCase() }).then(function(user) {
         if (!user) {
             throw new UserNotFoundException('User not found.');
         }
@@ -65,7 +65,7 @@ UserSchema.statics.updateUserById = function(id, name, email, password) {
             return bcrypt.hashAsync(update.password, salt);
         }).then(function(hash) {
             update.password = hash;
-            return User.findOneAndUpdate({ _id: id }, { $set: update }, { new: true });
+            return User.findOneAndUpdateAsync({ _id: id }, { $set: update }, { new: true });
         }).then(function(user) {
             return user;
         });
@@ -76,7 +76,7 @@ UserSchema.statics.createNewUser = function(name, email, password) {
 };
 
 UserSchema.statics.removeUserById = function(id) {
-    return User.findByIdAndRemove(id);
+    return User.findByIdAndRemoveAsync(id);
 };
 
 UserSchema.methods.isValidPassword = function(password) {
@@ -98,7 +98,7 @@ UserSchema.methods.activate = function(token) {
             }
             user.activated = true;
             user.activated_at = Date.now();
-            return user.save();
+            return user.saveAsync();
         });
 };
 
@@ -121,7 +121,7 @@ UserSchema.methods.resetPassword = function(token, newPassword) {
         user.password = newPassword;
         user.reset_digest = null;
         user.reset_password_at = Date.now();
-        return user.save();
+        return user.saveAsync();
     });
 };
 
@@ -139,7 +139,7 @@ UserSchema.methods.createAndSendResetDigest = function() {
         return bcrypt.hashAsync(token, 8).then(function(hash) {
             user.reset_digest = hash;
             user.reset_sent_at = Date.now();
-            return user.save();
+            return user.saveAsync();
         }).then(function(user) {
             user.sendResetEmail(token);
         });
@@ -171,14 +171,14 @@ UserSchema.methods.getObject = function() {
 UserSchema.methods.createMicropost = function(content) {
     var user = this;
     return Micropost.createAsync({ user_id: user._id, content: content }).then(function(micropost) {
-        return User.findOneAndUpdate({ _id: user.id }, { $inc: { microposts_count: 1 } });
+        return User.findOneAndUpdateAsync({ _id: user.id }, { $inc: { microposts_count: 1 } });
     });
 };
 
 UserSchema.methods.deleteMicropostById = function (micropostId) {
     var user = this;
-    return Micropost.findOneAndRemove({ _id: micropostId }).then(function(micropost){
-        return User.findOneAndUpdate({ _id: user.id }, { $inc: { microposts_count: -1 } });
+    return Micropost.findOneAndRemoveAsync({ _id: micropostId }).then(function(micropost){
+        return User.findOneAndUpdateAsync({ _id: user.id }, { $inc: { microposts_count: -1 } });
     });
 };
 
