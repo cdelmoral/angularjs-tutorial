@@ -2,16 +2,17 @@ var express = require('express');
 var session = require('express-session');
 var router = express.Router();
 
-var mongoose = require('mongoose');
 var User = require('./user-model');
 var Micropost = require('../microposts/micropost-model');
 var SessionHelper = require('../sessions/sessions-helper');
+var UserNotFoundException = require('./user-not-found-exception');
+var UserActivationException = require('./user-activation-exception');
+
 var requireLogin = require('../sessions/sessions-helper').requireLogin;
 var requireCorrectUser = require('../sessions/sessions-helper').requireCorrectUser;
 var createSessionForUser = require('../sessions/sessions-helper').createSessionForUser;
 
-router.get('/valid_name', validName);
-router.get('/valid_email', validEmail);
+router.get('/is_unique', isUnique);
 router.get('/index_page', requireLogin, getIndexPage);
 router.get('/:id', requireLogin, getUserById);
 router.put('/activate/:id/:token', activateUser);
@@ -24,23 +25,12 @@ router.delete('/:id/:micropost_id', requireCorrectUser, deleteMicropost);
 module.exports = router;
 
 /* Check if the username is not already being used. */
-function validName(req, res, next) {
+function isUnique(req, res, next) {
     var sess = req.session;
-    var name = req.query.name;
 
-    User.isNameAvailable(name, sess.user_id).then(function(available) {
+    User.isUnique(req.query, sess.user_id).then(function(available) {
         res.json({ valid: available });
-    });
-}
-
-/* Check if the email is not already being used. */
-function validEmail(req, res, next) {
-    var sess = req.session;
-    var email = req.query.email;
-
-    User.isEmailAvailable(email, sess.user_id).then(function(available) {
-        res.json({ valid: available });
-    });
+    }).catch(console.log.bind(console));
 }
 
 /**
@@ -50,39 +40,21 @@ function validEmail(req, res, next) {
 function getIndexPage(req, res, next) {
     var pageNumber = req.query.pageNumber || 1;
     var usersPerPage = req.query.usersPerPage || 25;
-    
-    User.getUsersPage(pageNumber, usersPerPage)
-        .then(function(users) {
-            User.getUsersCount()
-                .then(function(count) {
-                    res.json({ count: count, users: users });
-                });
+
+    User.getUsersPage(pageNumber, usersPerPage).then(function(users) {
+        return User.getUsersCount().then(function(count) {
+            res.json({ count: count, users: User.getObjects(users) });
         });
+    }).catch(console.log.bind(console));
 }
 
 /** Get user by id. */
 function getUserById(req, res, next) {
     User.getUserById(req.params.id).then(function(user) {
         res.json(user.getObject());
-    });
-}
-
-/** Activates user. */
-function activateUser(req, res, next) {
-    User.getUserById(req.params.id).then(function(user) {
-        if (!user.activated && user.isValidActivationToken(req.params.token)) {
-            user.activate();
-            req.session.user_id = user.id;
-            var jsonUser = user.getObject();
-            var response = {
-                user: jsonUser,
-                message: 'The account has been activated.'
-            };
-            res.json(response);
-        } else {
-            res.status(400).send('Invalid activation link.');
-        }
-    });
+    }).catch(UserNotFoundException, function(message) {
+        res.status(404).send(message.cause);
+    }).catch(console.log.bind(console));
 }
 
 /** Update user by id. */
@@ -93,45 +65,45 @@ function updateUser(req, res, next) {
 
     User.updateUserById(req.params.id, name, email, password).then(function(user) {
         res.json({ message: 'User was updated.', user: user.getObject() });
-    }).catch(function(err) {
-        res.status(500).send(err);
-    });
+    }).catch(console.log.bind(console));
+}
+
+/** Create new user. */
+function createUser(req, res, next) {
+    User.createNewUser(req.body.name, req.body.email, req.body.password).then(function(message) {
+        res.json({
+            message: 'Check your email to activate your account before you can log in.'
+        });
+    }).catch(console.log.bind(console));
 }
 
 /** Delete user by id. */
 function deleteUser(req, res, next) {
     User.removeUserById(req.params.id).then(function() {
         res.status(200).send('User was deleted.');
-    }).catch(function(err) {
-        res.status(500).send(err);
-    });
+    }).catch(console.log.bind(console));
 }
 
-/** Create new user. */
-function createUser(req, res, next) {
-    User.createNewUser(req.body.name, req.body.email, req.body.password)
-        .then(function() {
-            res.json({ message: 'Check your email to activate your account before you can log in.' });
-        }).catch(function(err) {
-            res.status(500).send(err);
+/** Activates user. */
+function activateUser(req, res, next) {
+    User.getUserById(req.params.id).then(function(user) {
+        return user.activate(req.params.token).then(function(user) {
+            req.session.user_id = user.id;
+            res.json({ user: user.getObject(), message: 'The account has been activated.' });
         });
+    }).catch(UserActivationException, function(message) {
+        res.status(400).send('Invalid activation link.');
+    }).catch(console.log.bind(console));
 }
 
 function createMicropost(req, res, next) {
-    User.getUserById(req.params.id).then(function(user) {
-        return user.createMicropost(req.body.content);
-    }).then(function(user) {
+    SessionHelper.currentUser.createMicropost(req.body.content).then(function(user) {
         res.json(user.getObject());
-    }).catch(function(err) {
-        res.status(500).send(err);
-    });
+    }).catch(console.log.bind(console));
 }
 
 function deleteMicropost(req, res, next) {
-    SessionHelper.currentUser.deleteMicropostById(req.params.micropost_id)
-        .then(function() {
-            res.json({ message: 'The micropost was deleted.' });
-        }).catch(function(err) {
-            console.log(err);
-        });
+    SessionHelper.currentUser.deleteMicropostById(req.params.micropost_id).then(function() {
+        res.json({ message: 'The micropost was deleted.' });
+    }).catch(console.log.bind(console));
 }

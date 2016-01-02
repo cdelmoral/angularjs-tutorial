@@ -5,8 +5,8 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var User = require('../users/user-model');
 var Micropost = require('../microposts/micropost-model');
-
 var SessionHelper = require('./sessions-helper');
+var UserNotFoundException = require('../users/user-not-found-exception');
 
 router.get('/authenticated', isAuthenticated);
 router.post('/', authenticateUser);
@@ -19,17 +19,21 @@ function authenticateUser(req, res, next) {
     var sess = req.session;
 
     User.getUserByEmail(req.body.email).then(function(user) {
-        if (user.isValidPassword(req.body.password)) {
-            if (user.activated) {
-                sess.user_id = user.id;
-                res.json(user.getObject());
+        return user.isValidPassword(req.body.password).then(function(isValidPassword) {
+            if (isValidPassword) {
+                if (user.activated) {
+                    sess.user_id = user.id;
+                    res.json(user.getObject());
+                } else {
+                    res.status(403).send('User not yet activated');
+                }
             } else {
-                res.status(403).send('User not yet activated');
+                res.status(401).send('Invalid credentials');
             }
-        } else {
-            res.status(401).send('Invalid credentials');
-        }
-    });
+        });
+    }).catch(UserNotFoundException, function(message) {
+        res.status(401).send('Invalid credentials');
+    }).catch(console.log.bind(console));
 }
 
 /** Gets if the user is currently logged in. */

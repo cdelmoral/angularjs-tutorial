@@ -3,8 +3,19 @@ var Micropost = require('../microposts/micropost-model');
 var currentSchemaVersion = 3;
 
 exports.currentSchemaVersion = currentSchemaVersion;
-exports.upgradeSchema = upgradeSchema;
-exports.downgradeSchema = downgradeSchema;
+exports.handleMigrations = handleMigrations;
+
+function handleMigrations(user) {
+    if (!user.schema_version) {
+        user.schema_version = 0;
+    }
+
+    if (user.schema_version < currentSchemaVersion) {
+        upgradeSchema(user);
+    } else if (user.schema_version > currentSchemaVersion) {
+        downgradeSchema(user);
+    }
+}
 
 /**
  * Handles upgrade shcema migrations.

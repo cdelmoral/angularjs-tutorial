@@ -1,3 +1,4 @@
+var Promise = require('bluebird');
 var mongoose = require('mongoose');
 
 var micropostSchema = require('./micropost-schema');
@@ -17,7 +18,7 @@ micropostSchema.statics.getObjects = getObjects;
 
 micropostSchema.methods.getObject = getObject;
 
-var Micropost = mongoose.model('Micropost', micropostSchema);
+var Micropost = Promise.promisifyAll(mongoose.model('Micropost', micropostSchema));
 
 module.exports = Micropost;
 

@@ -14,8 +14,6 @@ var SessionHelper = require(path.join(__dirname, '/sessions/sessions-helper'));
 
 var app = express();
 
-var User = require(path.join(__dirname, '/users/user-model'));
-
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -28,24 +26,7 @@ app.use(session({
 
 app.use(cors());
 
-app.use('/api', function(req, res, next) {
-    var sess = req.session;
-    if (sess.user_id) {
-        User.getUserById(sess.user_id).then(function(user) {
-            if (!user) {
-                sess.user_id = null;
-            } else {
-                SessionHelper.currentUser = user;
-            }
-
-            next();
-        }).catch(function() {
-            next();
-        });
-    } else {
-        next();
-    }
-});
+app.use('/api', SessionHelper.checkSession);
 
 app.use('/api/users', users);
 app.use('/api/microposts', microposts);

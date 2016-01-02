@@ -1,287 +1,158 @@
+var Promise = require('bluebird');
 var mongoose = require('mongoose');
-var bcrypt = require('bcrypt');
-var crypto = require('crypto');
+var bcrypt = Promise.promisifyAll(require('bcrypt'));
+var crypto = Promise.promisifyAll(require('crypto'));
 
 var Micropost = require('../microposts/micropost-model');
-var SessionHelper = require('../sessions/sessions-helper');
-var userSchema = require('./user-schema');
-var handleError = require('../common/error-handling').handleError;
-var upgradeSchema = require('./user-migrations').upgradeSchema;
-var downgradeSchema = require('./user-migrations').downgradeSchema;
-var currentSchemaVersion = require('./user-migrations').currentSchemaVersion;
+var UserSchema = require('./user-schema');
+var UserNotFoundException = require('./user-not-found-exception');
+var UserActivationException = require('./user-activation-exception');
+var UserPasswordResetException = require('./user-password-reset-exception');
 
-userSchema.pre('save', initializeUser);
-userSchema.post('init', handleMigrations);
-
-userSchema.statics.isNameAvailable = isNameAvailable;
-userSchema.statics.isEmailAvailable = isEmailAvailable;
-userSchema.statics.getUsersPage = getUsersPage;
-userSchema.statics.getUsersCount = getUsersCount;
-userSchema.statics.getUserById = getUserById;
-userSchema.statics.getUserByEmail = getUserByEmail;
-userSchema.statics.updateUserById = updateUserById;
-userSchema.statics.createNewUser = createNewUser;
-userSchema.statics.removeUserById = removeUserById;
-
-userSchema.methods.isValidPassword = isValidPassword;
-userSchema.methods.isValidActivationToken = isValidActivationToken;
-userSchema.methods.isValidResetToken = isValidResetToken;
-userSchema.methods.activate = activate;
-userSchema.methods.sendActivationEmail = sendActivationEmail;
-userSchema.methods.createAndSendResetDigest = createAndSendResetDigest;
-userSchema.methods.sendResetEmail = sendResetEmail;
-userSchema.methods.getObject = getObject;
-userSchema.methods.createMicropost = createMicropost;
-
-userSchema.methods.deleteMicropostById = function (micropostId) {
-    var user = this;
-
-    var promise = new Promise(function(resolve, reject) {
-        Micropost.findOneAndRemove({ _id: micropostId }, function(err, micropost) {
-            handleError(reject, err);
-
-            user.update({ $inc: { microposts_count: -1 } }, function(err, micropost) {
-                handleError(reject, err);
-
-                resolve();
-            });
-        });
+UserSchema.statics.isUnique = function(option, id) {
+    return User.findOne(option).then(function(user) {
+        return (user === null || user.id === id);
     });
-
-    return promise;
 };
 
-var User = mongoose.model('User', userSchema);
-
-module.exports = User;
-
-function handleMigrations(user) {
-    if (!user.schema_version) {
-        user.schema_version = 0;
-    }
-
-    if (user.schema_version < currentSchemaVersion) {
-        upgradeSchema(user);
-    } else if (user.schema_version > currentSchemaVersion) {
-        downgradeSchema(user);
-    }
-}
-
-function initializeUser(next) {
-    var user = this;
-
-    user.schema_version = currentSchemaVersion;
-    user.email = user.email.toLowerCase();
-
-    if (!user.isModified('password')) {
-        return next();
-    }
-
-    generateToken().then(function(token) {
-        digest(token, 8).then(function(hash) {
-            user.activation_digest = hash;
-            user.sendActivationEmail(token);
-        });
-    });
-
-    bcrypt.genSalt(10, function(err, salt) {
-        if (err) {
-            return next(err);
-        }
-
-        digest(user.password, salt).then(function(hash) {
-            user.password = hash;
-            next();
-        });
-    });
-}
-
-function isNameAvailable(name, id) {
-    var promise = new Promise(function(resolve, reject) {
-        User.findOne({ name: name }, function(err, user) {
-            handleError(reject, err);
-
-            resolve(user === null || user.id === id);
-        });
-    });
-
-    return promise;
-}
-
-function isEmailAvailable(email, id) {
-    var promise = new Promise(function(resolve, reject) {
-        User.findOne({ email: email.toLowerCase() }, function(err, user) {
-            handleError(reject, err);
-
-            resolve(user === null || user.id === id);
-        });
-    });
-
-    return promise; 
-}
-
-function getUsersPage(pageNumber, usersPerPage) {
+UserSchema.statics.getUsersPage = function(pageNumber, usersPerPage) {
     var skipUsers = (pageNumber - 1) * usersPerPage;
     var sort = { created_at: 1 };
     var params = { limit: usersPerPage, skip: skipUsers, sort: sort };
 
-    var promise = new Promise(function(resolve, reject) {
-        User.find({}, null, params, function (err, users) {
-            handleError(reject, err);
-
-            var retUsers = [];
-            for (var i = 0; i < users.length; i++) {
-                retUsers.push({
-                    id: users[i]._id,
-                    name: users[i].name,
-                    email: users[i].email
-                });
-            }
-
-            resolve(retUsers);
-        });
+    return User.find({}, null, params).then(function(users) {
+        return users;
     });
+};
 
-    return promise;
-}
+UserSchema.statics.getObjects = function(users) {
+    var objects = [];
+    for (var i = 0; i < users.length; i++) {
+        objects.push(users[i].getObject());
+    }
+    return objects;
+};
 
-function getUsersCount() {
-    var promise = new Promise(function(resolve, reject) {
-        User.count({}, function (err, count) {
-            handleError(reject, err);
-
-            resolve(count);
-        });
+UserSchema.statics.getUsersCount = function() {
+    return User.count({}).then(function(count) {
+        return count;
     });
+};
 
-    return promise;    
-}
-
-function getUserById(id) {
-    var promise = new Promise(function(resolve, reject) {
-        User.findById(id, function(err, user) {
-            handleError(reject, err);
-
-            if (user) {
-                resolve(user);
-            } else {
-                reject('No user found.');
-            }
-        });
+UserSchema.statics.getUserById = function(id) {
+    return User.findById(id).then(function(user) {
+        if (!user) {
+            throw new UserNotFoundException('User not found.');
+        }
+        return user;
     });
+};
 
-    return promise;
-}
-
-function getUserByEmail(email) {
-    var promise = new Promise(function(resolve, reject) {
-        User.findOne({ email: email.toLowerCase() }, function (err, user) {
-            handleError(reject, err);
-
-            if (user) {
-                resolve(user);
-            } else {
-                reject('No user found.');
-            }
-        });
+UserSchema.statics.getUserByEmail = function(email) {
+    return User.findOne({ email: email.toLowerCase() }).then(function(user) {
+        if (!user) {
+            throw new UserNotFoundException('User not found.');
+        }
+        return user;
     });
+};
 
-    return promise;
-}
-
-function updateUserById(id, name, email, password) {
+UserSchema.statics.updateUserById = function(id, name, email, password) {
     var update = { name: name, email: email, password: password };
 
-    var promise = new Promise(function (resolve, reject) {
-        bcrypt.genSalt(10, function(err, salt) {
-            handleError(reject, err);
-
-            digest(update.password, salt).then(function(hash) {
-                update.password = hash;
-                User.findOneAndUpdate({ _id: id }, { $set: update }, { new: true }, function (err, user) {
-                    handleError(reject, err);
-
-                    resolve(user);
-                });
-            });
+    return bcrypt.genSaltAsync(10)
+        .then(function(salt) {
+            return bcrypt.hashAsync(update.password, salt);
+        }).then(function(hash) {
+            update.password = hash;
+            return User.findOneAndUpdate({ _id: id }, { $set: update }, { new: true });
+        }).then(function(user) {
+            return user;
         });
-    });
+};
 
-    return promise;
-}
+UserSchema.statics.createNewUser = function(name, email, password) {
+    return User.createAsync({ name: name, email: email, password: password });
+};
 
-function removeUserById(id) {
-    var promise = new Promise(function(resolve, reject) {
-        User.findByIdAndRemove(id, function(err) {
-            handleError(reject, err);
+UserSchema.statics.removeUserById = function(id) {
+    return User.findByIdAndRemove(id);
+};
 
-            resolve();
+UserSchema.methods.isValidPassword = function(password) {
+    var user = this;
+    return bcrypt.compareAsync(password, user.password);
+};
+
+UserSchema.methods.activate = function(token) {
+    var user = this;
+    return Promise.resolve()
+        .then(function() {
+            if (user.activated) {
+                throw new UserActivationException('User is already activated.');
+            }
+            return bcrypt.compareAsync(token, user.activation_digest);
+        }).then(function(isValid) {
+            if (!isValid) {
+                throw new UserActivationException('Invalid activation token.');
+            }
+            user.activated = true;
+            user.activated_at = Date.now();
+            return user.save();
         });
+};
+
+UserSchema.methods.isValidResetToken = function(token, callback) {
+    var user = this;
+    return Promise.resolve().then(function() {
+        if (!user.reset_digest) {
+            throw new UserPasswordResetException('User does not have reset digest.');
+        }
+        return bcrypt.compareAsync(token, user.reset_digest);
     });
+};
 
-    return promise;
-}
-
-function createNewUser(name, email, password) {
-    var promise = new Promise(function(resolve, reject) {
-        User.create({ name: name, email: email, password: password }, function (err, user) {
-            handleError(reject, err);
-
-            resolve();
-        });
+UserSchema.methods.resetPassword = function(token, newPassword) {
+    var user = this;
+    return user.isValidResetToken(token).then(function(isValid) {
+        if (!isValid) {
+            throw new UserPasswordResetException('Invalid reset token.');
+        }
+        user.password = newPassword;
+        user.reset_digest = null;
+        user.reset_password_at = Date.now();
+        return user.save();
     });
+};
 
-    return promise;
-}
-
-function isValidActivationToken(token, callback) {
-    var user = this;
-    return bcrypt.compareSync(token, user.activation_digest);
-}
-
-function isValidPassword(password, callback) {
-    var user = this;
-    return bcrypt.compareSync(password, user.password);
-}
-
-function isValidResetToken(token, callback) {
-    var user = this;
-    return user.reset_digest && bcrypt.compareSync(token, user.reset_digest);
-}
-
-function activate() {
-    var user = this;
-    user.activated = true;
-    user.activated_at = Date.now();
-    user.save();
-}
-
-function sendActivationEmail(token) {
+UserSchema.methods.sendActivationEmail = function(token) {
     var user = this;
     console.log('The activation link for ' + user.name +
         ' is /#/users/activate/' + user._id + '/' + token);
-}
+};
 
-function createAndSendResetDigest() {
+UserSchema.methods.createAndSendResetDigest = function() {
     var user = this;
-    generateToken().then(function(token) {
-        digest(token, 8).then(function(hash) {
+    return crypto.randomBytesAsync(48).then(function(buf) {
+        return buf.toString('hex');
+    }).then(function(token) {
+        return bcrypt.hashAsync(token, 8).then(function(hash) {
             user.reset_digest = hash;
             user.reset_sent_at = Date.now();
-            user.save(function(err, user) {
-                user.sendResetEmail(token);
-            });
+            return user.save();
+        }).then(function(user) {
+            user.sendResetEmail(token);
         });
     });
-}
+};
 
-function sendResetEmail(token) {
+UserSchema.methods.sendResetEmail = function(token) {
     var user = this;
     console.log('The reset link for ' + user.name +
         ' is /#/password_resets/' + user._id + '/' + token);
-}
+};
 
-function getObject() {
+UserSchema.methods.getObject = function() {
     var user = this;
     var jsonUser = user.toJSON({ versionKey: false });
 
@@ -295,43 +166,22 @@ function getObject() {
     delete jsonUser.reset_password_at;
 
     return jsonUser;
-}
+};
 
-function createMicropost(content) {
+UserSchema.methods.createMicropost = function(content) {
     var user = this;
-
-    var promise = new Promise(function(resolve, reject) {
-        Micropost.create({ user_id: user._id, content: content }, function (err, micropost) {
-            handleError(reject, err);
-
-            user.microposts_count = user.microposts_count + 1;
-            user.save(function(err, user) {
-                handleError(reject, err);
-                resolve(user);
-            });
-        });
+    return Micropost.createAsync({ user_id: user._id, content: content }).then(function(micropost) {
+        return User.findOneAndUpdate({ _id: user.id }, { $inc: { microposts_count: 1 } });
     });
+};
 
-    return promise;
-}
-
-function generateToken() {
-    return new Promise(function(resolve, reject) {
-        crypto.randomBytes(48, function(ex, buf) {
-            var token = buf.toString('hex');
-            return resolve(token);
-        });
+UserSchema.methods.deleteMicropostById = function (micropostId) {
+    var user = this;
+    return Micropost.findOneAndRemove({ _id: micropostId }).then(function(micropost){
+        return User.findOneAndUpdate({ _id: user.id }, { $inc: { microposts_count: -1 } });
     });
-}
+};
 
-function digest(string, salt) {
-    return new Promise(function(resolve, reject) {
-        bcrypt.hash(string, salt, function(err, hash) {
-            if (err) {
-                return reject(err);
-            }
+var User = Promise.promisifyAll(mongoose.model('User', UserSchema));
 
-            return resolve(hash);
-        });
-    });
-}
+module.exports = User;
