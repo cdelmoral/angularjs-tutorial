@@ -4,8 +4,6 @@ var bcrypt = require('bcrypt');
 var validate = require('../common/validator');
 var handleMigrations = require('./user-migrations').handleMigrations;
 var currentSchemaVersion = require('./user-migrations').currentSchemaVersion;
-var generateToken = require('../common/crypto').generateToken;
-var digest = require('../common/crypto').digest;
 
 var userSchema = new mongoose.Schema({
     name: {
