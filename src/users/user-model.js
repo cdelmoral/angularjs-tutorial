@@ -58,21 +58,32 @@ UserSchema.statics.getUserByEmail = function(email) {
 };
 
 UserSchema.statics.updateUserById = function(id, name, email, password) {
-    var update = { name: name, email: email, password: password };
-
-    return bcrypt.genSaltAsync(10)
-        .then(function(salt) {
-            return bcrypt.hashAsync(update.password, salt);
-        }).then(function(hash) {
-            update.password = hash;
-            return User.findOneAndUpdateAsync({ _id: id }, { $set: update }, { new: true });
-        }).then(function(user) {
-            return user;
-        });
+    var update = { name: name, email: email.toLowerCase() };
+    return bcrypt.genSaltAsync(10).then(function(salt) {
+        return bcrypt.hashAsync(password, salt);
+    }).then(function(hash) {
+        update.password = hash;
+        return User.findOneAndUpdateAsync({ _id: id }, { $set: update }, { new: true });
+    });
 };
 
 UserSchema.statics.createNewUser = function(name, email, password) {
-    return User.createAsync({ name: name, email: email, password: password });
+    return bcrypt.genSaltAsync(10).then(function(salt) {
+        return bcrypt.hashAsync(password, salt);
+    }).then(function(hash) {
+        var user = { name: name, email: email.toLowerCase(), password: hash };
+        return crypto.randomBytesAsync(48).then(function(buf) {
+            return buf.toString('hex');
+        }).then(function(token) {
+            return bcrypt.hashAsync(token, 8).then(function(hash) {
+                user.activation_digest = hash;
+            }).then(function() {
+                return User.createAsync(user);
+            }).then(function(user) {
+                user.sendActivationEmail(token);
+            });
+        });
+    });
 };
 
 UserSchema.statics.removeUserById = function(id) {
@@ -96,9 +107,8 @@ UserSchema.methods.activate = function(token) {
             if (!isValid) {
                 throw new UserActivationException('Invalid activation token.');
             }
-            user.activated = true;
-            user.activated_at = Date.now();
-            return user.saveAsync();
+            var update = { activated: true, activated_at: Date.now(), activation_digest: null };
+            return User.findOneAndUpdateAsync({ _id: user.id }, { $set: update }, { new: true });
         });
 };
 
@@ -118,10 +128,12 @@ UserSchema.methods.resetPassword = function(token, newPassword) {
         if (!isValid) {
             throw new UserPasswordResetException('Invalid reset token.');
         }
-        user.password = newPassword;
-        user.reset_digest = null;
-        user.reset_password_at = Date.now();
-        return user.saveAsync();
+        return bcrypt.genSaltAsync(10).then(function(salt) {
+            return bcrypt.hashAsync(newPassword, salt);
+        }).then(function(hash) {
+            var update = { password: hash, reset_digest: null, reset_password_at: Date.now() };
+            return User.findOneAndUpdateAsync({ _id: user.id }, { $set: update }, { new: true });
+        });
     });
 };
 
