@@ -1,8 +1,19 @@
 var currentSchemaVersion = 0;
 
 exports.currentSchemaVersion = currentSchemaVersion;
-exports.upgradeSchema = upgradeSchema;
-exports.downgradeSchema = downgradeSchema;
+exports.handleMigrations = handleMigrations;
+
+function handleMigrations(micropost) {
+    if (!micropost.schema_version) {
+        micropost.schema_version = 0;
+    }
+
+    if (micropost.schema_version < currentSchemaVersion) {
+        upgradeSchema(micropost);
+    } else if (micropost.schema_version > currentSchemaVersion) {
+        downgradeSchema(micropost);
+    }
+}
 
 /**
  * Handles upgrade shcema migrations.

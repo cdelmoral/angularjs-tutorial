@@ -3,6 +3,7 @@ var ObjectId = mongoose.Schema.ObjectId;
 
 var validate = require('../common/validator');
 var currentSchemaVersion = require('./micropost-migrations').currentSchemaVersion;
+var handleMigrations = require('./micropost-migrations').handleMigrations;
 
 var micropostSchema = new mongoose.Schema({
     content: {
@@ -18,4 +19,20 @@ var micropostSchema = new mongoose.Schema({
     updated_at: { type: Date },
 });
 
+micropostSchema.post('init', handleMigrations);
+micropostSchema.pre('save', initialize);
+
 module.exports = micropostSchema;
+
+function initialize(next) {
+    var micropost = this;
+
+    if (micropost.created_at === undefined) {
+        var now = Date.now();
+
+        micropost.created_at = now;
+        micropost.updated_at = now;
+    }
+
+    next();
+}
