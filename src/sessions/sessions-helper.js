@@ -1,14 +1,10 @@
-var User = require('../users/user-model');
+var Promise = require('bluebird');
 
 var SessionHelper = function() {};
 
-SessionHelper.currentUser = null;
-
 SessionHelper.requireLogin = function(req, res, next) {
-    var sess = req.session;
-    var currentUser = SessionHelper.currentUser;
-
-    if (currentUser) {
+    console.log('requireLogin');
+    if (req.currentUser) {
         next();
     } else {
         res.status(401).send('Unauthorized');
@@ -16,10 +12,8 @@ SessionHelper.requireLogin = function(req, res, next) {
 };
 
 SessionHelper.requireCorrectUser = function(req, res, next) {
-    var sess = req.session;
-    
     SessionHelper.requireLogin(req, res, function() {
-        if (SessionHelper.currentUser.id === sess.user_id) {
+        if (req.user.id === req.currentUser.id) {
             next();
         } else {
             res.status(403).send('Forbidden');
@@ -27,23 +21,15 @@ SessionHelper.requireCorrectUser = function(req, res, next) {
     });
 };
 
-SessionHelper.checkSession = function(req, res, next) {
-    var sess = req.session;
-    if (sess.user_id) {
-        User.getUserById(sess.user_id).then(function(user) {
-            if (!user) {
-                sess.user_id = null;
-            } else {
-                SessionHelper.currentUser = user;
-            }
+SessionHelper.createSessionsForUser = function(user, req) {
+    req.currentUser = user;
+    req.session.user_id = user.id;
+};
 
-            next();
-        }).catch(function() {
-            next();
-        });
-    } else {
-        next();
-    }
+SessionHelper.destroySession = function(req) {
+    return Promise.promisifyAll(req.session).destroyAsync().then(function() {
+        req.currentUser = null;
+    });
 };
 
 module.exports = SessionHelper;
