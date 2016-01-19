@@ -22,24 +22,24 @@ function handleMigrations(user) {
  * @param  {Object} object representing the outdated user
  */
 function upgradeSchema(user) {
-	switch (user.schema_version) {
-		case 0:
-			user.admin = false;
-		case 1:
-			user.activated = true;
-			user.activated_at = new Date(0);
-		case 2:
-			Micropost.getMicropostsCountForUser(user._id).then(function(count) {
-				user.microposts_count = count;
-			});
-	}
+	// switch (user.schema_version) {
+	// 	case 0:
+	// 		user.admin = false;
+	// 	case 1:
+	// 		user.activated = true;
+	// 		user.activated_at = new Date(0);
+	// 	case 2:
+	// 		Micropost.getMicropostsCountForUser(user._id).then(function(count) {
+	// 			user.microposts_count = count;
+	// 		});
+	// }
 
-    user.schema_version = currentSchemaVersion;
-    user.save();
+ //    user.schema_version = currentSchemaVersion;
+ //    user.save();
 }
 
 /** Handles downgrade schema migrations */
 function downgradeSchema(user) {
-    user.schema_version = currentSchemaVersion;
-    user.save();
+    // user.schema_version = currentSchemaVersion;
+    // user.save();
 }

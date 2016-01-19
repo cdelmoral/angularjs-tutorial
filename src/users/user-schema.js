@@ -1,5 +1,4 @@
 var mongoose = require('mongoose');
-var bcrypt = require('bcrypt');
 
 var validate = require('../common/validator');
 var handleMigrations = require('./user-migrations').handleMigrations;

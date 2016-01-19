@@ -8,6 +8,7 @@ var UserSchema = require('./user-schema');
 var UserNotFoundException = require('./user-not-found-exception');
 var UserActivationException = require('./user-activation-exception');
 var UserPasswordResetException = require('./user-password-reset-exception');
+var UserCredentialsException = require('./user-credentials-exception');
 
 UserSchema.statics.isUnique = function(option, id) {
     return User.findOneAsync(option).then(function(user) {
@@ -19,10 +20,7 @@ UserSchema.statics.getUsersPage = function(pageNumber, usersPerPage) {
     var skipUsers = (pageNumber - 1) * usersPerPage;
     var sort = { created_at: 1 };
     var params = { limit: usersPerPage, skip: skipUsers, sort: sort };
-
-    return User.findAsync({}, null, params).then(function(users) {
-        return users;
-    });
+    return User.findAsync({}, null, params);
 };
 
 UserSchema.statics.getObjects = function(users) {
@@ -34,9 +32,7 @@ UserSchema.statics.getObjects = function(users) {
 };
 
 UserSchema.statics.getUsersCount = function() {
-    return User.countAsync({}).then(function(count) {
-        return count;
-    });
+    return User.countAsync({});
 };
 
 UserSchema.statics.getUserById = function(id) {
@@ -54,6 +50,20 @@ UserSchema.statics.getUserByEmail = function(email) {
             throw new UserNotFoundException('User not found.');
         }
         return user;
+    });
+};
+
+UserSchema.statics.getAuthenticatedUserByEmail = function(email, password) {
+    return User.getUserByEmail(email).then(function(user) {
+        if (user.activated) {
+            return bcrypt.compareAsync(password, user.password).then(function(valid) {
+                if (valid) {
+                    return user;
+                }
+                throw new UserCredentialsException('Invalid credentials.');
+            });
+        }
+        throw new UserActivationException('User has not been activated yet.');
     });
 };
 
