@@ -2,7 +2,6 @@ var Promise = require('bluebird');
 var mongoose = require('mongoose');
 
 var micropostSchema = require('./micropost-schema');
-var handleError = require('../common/error-handling').handleError;
 
 micropostSchema.statics.getMicropostsPageForUser = function(userId, pageNumber, micropostsPerPage) {
     var skipMicroposts = (pageNumber - 1) * micropostsPerPage;
