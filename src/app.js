@@ -6,9 +6,6 @@ var path = require('path');
 var cors = require('cors');
 
 var routes = require(path.join(__dirname, '/routes'));
-var passwordResets = require(path.join(__dirname, '/password-resets/password-resets-routes'));
-
-var SessionHelper = require(path.join(__dirname, '/sessions/sessions-helper'));
 
 var app = express();
 
@@ -25,6 +22,5 @@ app.use(session({
 app.use(cors());
 
 app.use('/api', routes);
-app.use('/api/password_resets', passwordResets);
 
 module.exports = app;

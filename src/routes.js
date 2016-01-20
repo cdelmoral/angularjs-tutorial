@@ -1,10 +1,9 @@
 var express = require('express');
 var router = express.Router();
-var User = require('./users/user-model');
 var UsersController = require('./users/users-controller');
 var MicropostsController = require('./microposts/microposts-controller');
 var SessionsController = require('./sessions/sessions-controller');
-var UserNotFoundException = require('./users/user-not-found-exception');
+var PasswordResetsController = require('./password-resets/password-resets-controller');
 var requireLogin = require('./sessions/sessions-helper').requireLogin;
 var requireCorrectUser = require('./sessions/sessions-helper').requireCorrectUser;
 
@@ -28,5 +27,9 @@ router.get('/microposts/count/:user_id', MicropostsController.getMicropostCountF
 router.get('/sessions/authenticated', SessionsController.isAuthenticated);
 router.post('/sessions/', SessionsController.authenticateUser);
 router.delete('/sessions/logout', SessionsController.endSession);
+
+router.get('/password_resets/valid_token', PasswordResetsController.validateToken);
+router.post('password_resets/', PasswordResetsController.createPasswordReset);
+router.put('password_resets/:id/:token', PasswordResetsController.updatePassword);
 
 module.exports = router;
