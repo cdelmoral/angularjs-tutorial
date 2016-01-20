@@ -3,7 +3,6 @@ var Promise = require('bluebird');
 var SessionHelper = function() {};
 
 SessionHelper.requireLogin = function(req, res, next) {
-    console.log('requireLogin');
     if (req.currentUser) {
         next();
     } else {
