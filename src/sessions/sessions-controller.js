@@ -7,7 +7,7 @@ var UserCredentialsException = require('../users/user-credentials-exception');
 var SessionsController = function(){};
 
 SessionsController.findUserSession = function(req, res, next) {
-    User.findById(req.session.user_id).then(function(user) {
+    User.getUserById(req.session.user_id).then(function(user) {
         req.currentUser = user;
         next();
         return null;
