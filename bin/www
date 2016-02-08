@@ -17,7 +17,7 @@ var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, '/../node_modules/angularjs-tutoria-ui/dist')));
+    app.use(express.static(path.join(__dirname, '/../node_modules/angularjs-tutorial-ui/dist')));
 } else if (process.env.NODE_ENV === "development") {
     app.use('/bower_components', express.static(path.join(process.env.UI_PROJECT_PATH, '/bower_components')));
     app.use(express.static(path.join(process.env.UI_PROJECT_PATH, '/.dev')));
