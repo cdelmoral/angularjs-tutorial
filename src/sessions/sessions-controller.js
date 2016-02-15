@@ -14,6 +14,7 @@ SessionsController.findUserSession = function(req, res, next) {
   }).catch(UserNotFoundException, function() {
     req.currentUser = null;
     next();
+    return null;
   }).catch(console.log.bind(console));
 };
 
@@ -35,8 +36,10 @@ SessionsController.authenticateUser = function(req, res, next) {
 SessionsController.isAuthenticated = function(req, res, next) {
   return User.getUserById(req.session.user_id).then(function(user) {
     res.send(user.getObject());
+    return null;
   }).catch(UserNotFoundException, function(message) {
     res.send({ authenticated: false });
+    return null;
   }).catch(console.log.bind(console));
 };
 
