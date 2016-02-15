@@ -1,6 +1,3 @@
-var mongoose = require('mongoose');
-var conn = mongoose.connect('mongodb://localhost/angularjs_tutorial');
-
 var User = require('../../src/users/user-model');
 var should = require('should');
 var validator = require('validator');
@@ -16,40 +13,10 @@ describe('User model', function() {
         user.password = 'password';
     });
 
-    // describe('with fresh database', function() {
-    //     beforeEach(function() {
-    //         conn.connection.db.dropDatabase();
-    //     });
-
-    //     it('should be valid', function(done) {
-    //         user.save(function(err) {
-    //             expect(err).toBe(null, 'There should not be any errors');
-    //             done();
-    //         });
-    //     });
-
-    //     describe('when email is not unique', function() {
-    //         this.timeout(5000);
-    //         var duplicateUser = new User();
-    //         duplicateUser.name = 'Test User';
-    //         duplicateUser.email = 'test@test.com';
-    //         it('should throw error', function(done) {
-    //             user.save(function(err) {
-    //                 console.log();
-    //                 duplicateUser.save(function(err) {
-    //                     console.log();
-    //                     expect(err).toNotBe(null, 'There should be a dupication error');
-    //                     done();
-    //                 });
-    //             });
-    //         });
-    //     });
-    // });
-
     it('should not be valid with null name', function(done) {
         user.name = null;
         user.validate(function(err) {
-            should(err).not.undefined();
+            should.exist(err);
             done();
         });
     });
@@ -57,7 +24,7 @@ describe('User model', function() {
     it('should not be valid with empty name', function(done) {
         user.name = '     ';
         user.validate(function(err) {
-            should(err).not.undefined();
+            should.exist(err);
             done();
         });
     });
@@ -65,7 +32,7 @@ describe('User model', function() {
     it('should not be valid when name is too long', function(done) {
         user.name = Array(52).join('a');
         user.validate(function(err) {
-            should(err).not.undefined();
+            should.exist(err);
             done();
         });
     });
@@ -73,7 +40,7 @@ describe('User model', function() {
     it('should not be valid with null email', function(done) {
         user.email = null;
         user.validate(function(err) {
-            should(err).not.undefined();
+            should.exist(err);
             done();
         });
     });
@@ -81,7 +48,7 @@ describe('User model', function() {
     it('should not be valid with empty email', function(done) {
         user.email = '     ';
         user.validate(function(err) {
-            should(err).not.undefined();
+            should.exist(err);
             done();
         });
     });
@@ -89,7 +56,7 @@ describe('User model', function() {
     it('should not be valid when email is too long', function(done) {
         user.email = Array(255).join('a') + '@example.com';
         user.validate(function(err) {
-            should(err).not.undefined();
+            should.exist(err);
             done();
         });
     });
@@ -107,7 +74,7 @@ describe('User model', function() {
             it('should be valid', function(done) {
                 user.email = email;
                 user.validate(function(err) {
-                    should(err).undefined();
+                    should.not.exist(err);
                     done();
                 });
             });
@@ -127,7 +94,7 @@ describe('User model', function() {
             it('should not be valid', function(done) {
                 user.email = email;
                 user.validate(function(err) {
-                    should(err).not.undefined();
+                    should.exist(err);
                     done();
                 });
             });

@@ -44,7 +44,7 @@ UsersController.update = function(req, res, next) {
     var name = req.body.name;
     var email = req.body.email;
     var password = req.body.password;
-    return User.updateUserById(req.params.id, name, email, password).then(function(user) {
+    return req.user.update(name, email, password).then(function(user) {
         res.json({ message: 'User was updated.', user: user.getObject() });
     }).catch(console.log.bind(console));
 };

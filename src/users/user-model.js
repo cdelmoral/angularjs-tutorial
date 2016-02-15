@@ -67,16 +67,6 @@ UserSchema.statics.getAuthenticatedUserByEmail = function(email, password) {
     });
 };
 
-UserSchema.statics.updateUserById = function(id, name, email, password) {
-    var update = { name: name, email: email.toLowerCase() };
-    return bcrypt.genSaltAsync(10).then(function(salt) {
-        return bcrypt.hashAsync(password, salt);
-    }).then(function(hash) {
-        update.password = hash;
-        return User.findOneAndUpdateAsync({ _id: id }, { $set: update }, { new: true });
-    });
-};
-
 UserSchema.statics.createNewUser = function(name, email, password) {
     return bcrypt.genSaltAsync(10).then(function(salt) {
         return bcrypt.hashAsync(password, salt);
@@ -103,6 +93,17 @@ UserSchema.statics.removeUserById = function(id) {
 UserSchema.methods.isValidPassword = function(password) {
     var user = this;
     return bcrypt.compareAsync(password, user.password);
+};
+
+UserSchema.methods.update = function(name, email, password) {
+    var user = this;
+    var update = { name: name, email: email.toLowerCase() };
+    return bcrypt.genSaltAsync(10).then(function(salt) {
+        return bcrypt.hashAsync(password, salt);
+    }).then(function(hash) {
+        update.password = hash;
+        return User.findOneAndUpdateAsync({ _id: user.id }, { $set: update }, { new: true });
+    });
 };
 
 UserSchema.methods.activate = function(token) {
