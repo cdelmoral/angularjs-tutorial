@@ -48,7 +48,8 @@ module.exports = function(grunt) {
         options: {
           reporter: 'spec',
           require: 'should',
-          ui: 'bdd'
+          ui: 'bdd',
+          timeout: 10000
         },
         src: ['test/**/*.js']
       }

@@ -1,16 +1,59 @@
 var User = require('../../src/users/user-model');
 var should = require('should');
 var validator = require('validator');
+var mongoose = require('mongoose');
+
+var user;
+
+before(function(done) {
+  mongoose.connect("mongodb://localhost/angularjs_tutorial", function(err) {
+    done(err);
+  });
+});
+
+beforeEach(function(done) {
+  user = new User({ name: 'Carlos', email: 'carlos@test.com', password: 'password' });
+  User.ensureIndexes(function(err) {
+    done(err);
+  });
+});
+
+afterEach(function(done) {
+  mongoose.connection.db.dropDatabase(function(err) {
+    done(err);
+  });
+});
 
 describe('User model', function() {
+  describe('with valid parameters', function() {
+    it('should save in the database', function(done) {
+      user.save(function(err) {
+        should.not.exist(err);
+        done();
+      });
+    });
+  });
 
-  var user;
+  describe('with existing user', function() {
+    beforeEach(function(done) {
+      user.save(done);
+    });
 
-  beforeEach(function() {
-    user = new User();
-    user.name = 'User Name';
-    user.email = 'test@test.com';
-    user.password = 'password';
+    it('should not be valid with not unique name', function(done) {
+      other = new User({ name: 'Carlos', email: 'other@test.com', password: 'password' });
+      other.save(function(err) {
+        should.exist(err);
+        done();
+      });
+    });
+
+    it('should not be valid with not unique email', function(done) {
+      other = new User({ name: 'Victor', email: 'carlos@test.com', password: 'password' });
+      other.save(function(err) {
+        should.exist(err);
+        done();
+      });
+    });
   });
 
   it('should not be valid with null name', function(done) {
