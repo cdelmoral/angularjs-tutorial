@@ -35,7 +35,8 @@ var userSchema = new mongoose.Schema({
   reset_password_at: { type: Date },
   created_at: { type: Date, default: Date.now() },
   updated_at: { type: Date, default: Date.now() },
-  microposts_count: { type: Number, default: 0 }
+  microposts_count: { type: Number, default: 0 },
+  gravatar_id: { type: String }
 });
 
 userSchema.post('init', handleMigrations);

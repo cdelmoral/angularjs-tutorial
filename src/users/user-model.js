@@ -71,7 +71,8 @@ UserSchema.statics.createNewUser = function(name, email, password) {
   return bcrypt.genSaltAsync(10).then(function(salt) {
     return bcrypt.hashAsync(password, salt);
   }).then(function(hash) {
-    var user = { name: name, email: email.toLowerCase(), password: hash };
+    var gravatarId = crypto.createHash('md5').update(email).digest("hex");
+    var user = { name: name, email: email.toLowerCase(), password: hash, gravatar_id: gravatarId };
     return crypto.randomBytesAsync(48).then(function(buf) {
       return buf.toString('hex');
     }).then(function(token) {
