@@ -10,6 +10,13 @@ var UserActivationException = require('./user-activation-exception');
 var UserPasswordResetException = require('./user-password-reset-exception');
 var UserCredentialsException = require('./user-credentials-exception');
 
+UserSchema.pre('save', function(next) {
+  var user = this;
+  var gravatarId = crypto.createHash('md5').update(user.email).digest("hex");
+  user.gravatar_id = gravatarId;
+  next();
+});
+
 UserSchema.statics.isUnique = function(option, id) {
   return User.findOneAsync(option).then(function(user) {
     return (user === null || user.id === id);
@@ -71,8 +78,7 @@ UserSchema.statics.createNewUser = function(name, email, password) {
   return bcrypt.genSaltAsync(10).then(function(salt) {
     return bcrypt.hashAsync(password, salt);
   }).then(function(hash) {
-    var gravatarId = crypto.createHash('md5').update(email).digest("hex");
-    var user = { name: name, email: email.toLowerCase(), password: hash, gravatar_id: gravatarId };
+    var user = { name: name, email: email.toLowerCase(), password: hash };
     return crypto.randomBytesAsync(48).then(function(buf) {
       return buf.toString('hex');
     }).then(function(token) {
