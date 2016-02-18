@@ -6,9 +6,8 @@ var UserActivationException = require('./user-activation-exception');
 var UsersController = function() {};
 
 UsersController.findUser = function(req, res, next, id) {
-  return User.getUserById(id).then(function(user) {
+  User.getUserById(id).then(function(user) {
     req.user = user;
-  }).then(function() {
     next();
     return null;
   }).catch(function() {
