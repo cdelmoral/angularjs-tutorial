@@ -41,4 +41,18 @@ var userSchema = new mongoose.Schema({
 
 userSchema.post('init', handleMigrations);
 
+userSchema.options.toObject = {
+  transform: function(doc, ret, options) {
+    ret.id = ret._id;
+    delete ret.__v;
+    delete ret._id;
+    delete ret.password;
+    delete ret.schema_version;
+    delete ret.activation_digest;
+    delete ret.reset_digest;
+    delete ret.reset_sent_at;
+    delete ret.reset_password_at;
+  }
+};
+
 module.exports = userSchema;

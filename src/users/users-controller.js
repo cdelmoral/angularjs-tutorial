@@ -16,6 +16,11 @@ UsersController.findUser = function(req, res, next, id) {
   });
 };
 
+/** Get user by id. */
+UsersController.show = function(req, res, next) {
+  res.json(req.user.toObject());
+};
+
 /* Check if the username is not already being used. */
 UsersController.isUnique = function(req, res, next) {
   var sess = req.session;
@@ -34,18 +39,13 @@ UsersController.index = function(req, res, next) {
   }).catch(console.log.bind(console));
 };
 
-/** Get user by id. */
-UsersController.show = function(req, res, next) {
-  res.json(req.user.getObject());
-};
-
 /** Update user by id. */
 UsersController.update = function(req, res, next) {
   var name = req.body.name;
   var email = req.body.email;
   var password = req.body.password;
   return req.user.update(name, email, password).then(function(user) {
-    res.json({ message: 'User was updated.', user: user.getObject() });
+    res.json({ message: 'User was updated.', user: user.toObject() });
   }).catch(console.log.bind(console));
 };
 
@@ -69,7 +69,7 @@ UsersController.deleteUser = function(req, res, next) {
 UsersController.activate = function(req, res, next) {
   req.user.activate(req.params.token).then(function(user) {
     req.session.user_id = user.id;
-    res.json({ user: user.getObject(), message: 'The account has been activated.' });
+    res.json({ user: user.toObject(), message: 'The account has been activated.' });
   }).catch(UserActivationException, function(message) {
     res.status(400).send('Invalid activation link.');
   }).catch(console.log.bind(console));
@@ -77,7 +77,7 @@ UsersController.activate = function(req, res, next) {
 
 UsersController.createMicropost = function(req, res, next) {
   return req.user.createMicropost(req.body.content).then(function(user) {
-    res.json(user.getObject());
+    res.json(user.toObject());
   }).catch(console.log.bind(console));
 };
 

@@ -22,7 +22,7 @@ SessionsController.findUserSession = function(req, res, next) {
 SessionsController.authenticateUser = function(req, res, next) {
   return User.getAuthenticatedUserByEmail(req.body.email, req.body.password).then(function(user) {
       SessionHelper.createSessionsForUser(user, req);
-      res.json(user.getObject());
+      res.json(user.toObject());
   }).catch(UserNotFoundException, function(message) {
     res.status(401).send('Invalid credentials');
   }).catch(UserActivationException, function(message) {
@@ -35,7 +35,7 @@ SessionsController.authenticateUser = function(req, res, next) {
 /** Gets if the user is currently logged in. */
 SessionsController.isAuthenticated = function(req, res, next) {
   return User.getUserById(req.session.user_id).then(function(user) {
-    res.send(user.getObject());
+    res.send(user.toObject());
     return null;
   }).catch(UserNotFoundException, function(message) {
     res.send({ authenticated: false });

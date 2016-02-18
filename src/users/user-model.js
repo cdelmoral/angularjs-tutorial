@@ -26,7 +26,7 @@ UserSchema.statics.getUsersPage = function(pageNumber, usersPerPage) {
 UserSchema.statics.getObjects = function(users) {
   var objects = [];
   for (var i = 0; i < users.length; i++) {
-    objects.push(users[i].getObject());
+    objects.push(users[i].toObject());
   }
   return objects;
 };
@@ -174,22 +174,6 @@ UserSchema.methods.sendResetEmail = function(token) {
   var user = this;
   console.log('The reset link for ' + user.name +
     ' is /#/password_resets/' + user._id + '/' + token);
-};
-
-UserSchema.methods.getObject = function() {
-  var user = this;
-  var jsonUser = user.toJSON({ versionKey: false });
-
-  jsonUser.id = jsonUser._id;
-  delete jsonUser._id;
-  delete jsonUser.password;
-  delete jsonUser.schema_version;
-  delete jsonUser.activation_digest;
-  delete jsonUser.reset_digest;
-  delete jsonUser.reset_sent_at;
-  delete jsonUser.reset_password_at;
-
-  return jsonUser;
 };
 
 UserSchema.methods.createMicropost = function(content) {
