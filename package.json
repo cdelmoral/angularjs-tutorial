@@ -19,9 +19,9 @@
   "homepage": "https://github.com/cdelmoral/angularjs-tutorial#readme",
   "scripts": {
     "start": "node bin/www",
-    "start_mongodb_test": "scripts/start_mongodb_test.sh",
-    "start_mongodb_dev": "scripts/start_mongodb_dev.sh",
-    "stop_mongodb": "scripts/stop_mongodb.sh"
+    "mongo": "scripts/start_mongodb_dev.sh",
+    "mongo_test": "scripts/start_mongodb_test.sh",
+    "stop_mongo": "scripts/stop_mongodb.sh"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
