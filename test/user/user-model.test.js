@@ -6,7 +6,7 @@ var mongoose = require('mongoose');
 var user;
 
 before(function(done) {
-  mongoose.connect("mongodb://localhost/angularjs_tutorial", function(err) {
+  mongoose.connect("mongodb://localhost/angularjs_tutorial_test", function(err) {
     done(err);
   });
 });
