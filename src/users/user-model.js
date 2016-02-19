@@ -10,37 +10,35 @@ var UserActivationException = require('./user-activation-exception');
 var UserPasswordResetException = require('./user-password-reset-exception');
 var UserCredentialsException = require('./user-credentials-exception');
 
+/** Lowercases email and creates gravatar id from it. */
 UserSchema.pre('save', function(next) {
   var user = this;
-  var gravatarId = crypto.createHash('md5').update(user.email).digest("hex");
-  user.gravatar_id = gravatarId;
+  if (user.isModified('email')) {
+    user.email = user.email.toLowerCase();
+    user.gravatar_id = crypto.createHash('md5').update(user.email).digest('hex');
+  }
   next();
 });
 
-UserSchema.statics.isUnique = function(option, id) {
-  return User.findOneAsync(option).then(function(user) {
-    return (user === null || user.id === id);
-  });
-};
-
-UserSchema.statics.getUsersPage = function(pageNumber, usersPerPage) {
-  var skipUsers = (pageNumber - 1) * usersPerPage;
-  var sort = { created_at: 1 };
-  var params = { limit: usersPerPage, skip: skipUsers, sort: sort };
-  return User.findAsync({}, null, params);
-};
-
-UserSchema.statics.getObjects = function(users) {
-  var objects = [];
-  for (var i = 0; i < users.length; i++) {
-    objects.push(users[i].toObject());
+/** Hashes password. */
+UserSchema.pre('save', function(next) {
+  var user = this;
+  if (user.isModified('password')) {
+    user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(10));
   }
-  return objects;
-};
+  next();
+});
 
-UserSchema.statics.getUsersCount = function() {
-  return User.countAsync({});
-};
+/** Generate and send activation token for created users. */
+UserSchema.pre('save', function(next) {
+  var user = this;
+  if (user.isNew) {
+    var token = crypto.randomBytes(48).toString('hex');
+    user.activation_digest = bcrypt.hashSync(token, 8);
+    user.sendActivationEmail(token);
+  }
+  next();
+});
 
 UserSchema.statics.getUserById = function(id) {
   return User.findByIdAsync(id).then(function(user) {
@@ -74,43 +72,9 @@ UserSchema.statics.getAuthenticatedUserByEmail = function(email, password) {
   });
 };
 
-UserSchema.statics.createNewUser = function(name, email, password) {
-  return bcrypt.genSaltAsync(10).then(function(salt) {
-    return bcrypt.hashAsync(password, salt);
-  }).then(function(hash) {
-    var user = { name: name, email: email.toLowerCase(), password: hash };
-    return crypto.randomBytesAsync(48).then(function(buf) {
-      return buf.toString('hex');
-    }).then(function(token) {
-      return bcrypt.hashAsync(token, 8).then(function(hash) {
-        user.activation_digest = hash;
-      }).then(function() {
-        return User.createAsync(user);
-      }).then(function(user) {
-        user.sendActivationEmail(token);
-      });
-    });
-  });
-};
-
-UserSchema.statics.removeUserById = function(id) {
-  return User.findByIdAndRemoveAsync(id);
-};
-
 UserSchema.methods.isValidPassword = function(password) {
   var user = this;
   return bcrypt.compareAsync(password, user.password);
-};
-
-UserSchema.methods.update = function(name, email, password) {
-  var user = this;
-  var update = { name: name, email: email.toLowerCase() };
-  return bcrypt.genSaltAsync(10).then(function(salt) {
-    return bcrypt.hashAsync(password, salt);
-  }).then(function(hash) {
-    update.password = hash;
-    return User.findOneAndUpdateAsync({ _id: user.id }, { $set: update }, { new: true });
-  });
 };
 
 UserSchema.methods.activate = function(token) {
