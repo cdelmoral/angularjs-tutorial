@@ -8,16 +8,16 @@ var requireLogin = require('./sessions/sessions-helper').requireLogin;
 var requireCorrectUser = require('./sessions/sessions-helper').requireCorrectUser;
 
 router.all('*', SessionsController.findUserSession);
-router.param('user_id', UsersController.findUser);
+router.param('user_id', UsersController.find);
 
-router.get('/users/is_unique', UsersController.isUnique);
+router.get('/users/is_unique', UsersController.unique);
 router.get('/users/index_page', requireLogin, UsersController.index);
 router.get('/users/:user_id', requireLogin, UsersController.show);
-router.post('/users/', UsersController.createUser);
+router.post('/users/', UsersController.create);
 router.put('/users/activate/:user_id/:token', UsersController.activate);
 router.put('/users/:user_id', requireCorrectUser, UsersController.update);
 router.put('/users/new_micropost/:user_id', requireCorrectUser, UsersController.createMicropost);
-router.delete('/users/:id', requireLogin, UsersController.deleteUser);
+router.delete('/users/:user_id', requireLogin, UsersController.delete);
 router.delete('/users/:id/:micropost_id', requireCorrectUser, UsersController.deleteMicropost);
 
 router.get('/microposts/user_page/:user_id', MicropostsController.getMicropostPageForUser);
