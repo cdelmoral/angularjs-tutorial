@@ -58,20 +58,6 @@ UserSchema.statics.getUserByEmail = function(email) {
   });
 };
 
-UserSchema.statics.getAuthenticatedUserByEmail = function(email, password) {
-  return User.getUserByEmail(email).then(function(user) {
-    if (user.activated) {
-      return bcrypt.compareAsync(password, user.password).then(function(valid) {
-        if (valid) {
-          return user;
-        }
-        throw new UserCredentialsException('Invalid credentials.');
-      });
-    }
-    throw new UserActivationException('User has not been activated yet.');
-  });
-};
-
 UserSchema.methods.isValidPassword = function(password) {
   var user = this;
   return bcrypt.compareAsync(password, user.password);
