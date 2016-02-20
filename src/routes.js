@@ -25,7 +25,7 @@ router.get('/microposts/feed/:user_id/', requireCorrectUser, MicropostsControlle
 router.get('/microposts/count/:user_id', MicropostsController.getMicropostCountForUser);
 
 router.get('/sessions/authenticated', SessionsController.isAuthenticated);
-router.post('/sessions/', SessionsController.authenticateUser);
+router.post('/sessions/', SessionsController.create);
 router.delete('/sessions/logout', SessionsController.endSession);
 
 router.get('/password_resets/valid_token', PasswordResetsController.validateToken);

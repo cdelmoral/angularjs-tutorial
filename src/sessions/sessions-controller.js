@@ -7,28 +7,27 @@ var UserCredentialsException = require('../users/user-credentials-exception');
 var SessionsController = function(){};
 
 SessionsController.findUserSession = function(req, res, next) {
-  User.getUserById(req.session.user_id).then(function(user) {
+  User.findByIdAsync(req.session.user_id).then(function(user) {
     req.currentUser = user;
-    next();
-    return null;
-  }).catch(UserNotFoundException, function() {
-    req.currentUser = null;
     next();
     return null;
   }).catch(console.log.bind(console));
 };
 
 /** Authenticates a user. */
-SessionsController.authenticateUser = function(req, res, next) {
-  return User.getAuthenticatedUserByEmail(req.body.email, req.body.password).then(function(user) {
-      SessionHelper.createSessionsForUser(user, req);
-      res.json(user.toObject());
-  }).catch(UserNotFoundException, function(message) {
-    res.status(401).send('Invalid credentials');
-  }).catch(UserActivationException, function(message) {
-    res.status(401).send('User not yet activated');
-  }).catch(UserCredentialsException, function(message) {
-    res.status(401).send('Invalid credentials');
+SessionsController.create = function(req, res, next) {
+  User.findOneAsync({ email: req.body.email.toLowerCase() }).then(function(user) {
+    req.user = user;
+    return user && user.isValidPassword(req.body.password);
+  }).then(function(valid) {
+    if (valid && req.user.activated) {
+      SessionHelper.createSessionsForUser(req.user, req);
+      res.json(req.user.toObject());
+    } else if (valid) {
+      res.status(401).send('User not yet activated');
+    } else {
+      res.status(401).send('Invalid credentials');
+    }
   }).catch(console.log.bind(console));
 };
 
