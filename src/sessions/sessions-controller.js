@@ -18,7 +18,7 @@ SessionsController.findUserSession = function(req, res, next) {
 SessionsController.create = function(req, res, next) {
   User.findOneAsync({ email: req.body.email.toLowerCase() }).then(function(user) {
     req.user = user;
-    return user && user.isValidPassword(req.body.password);
+    return user && user.authenticate(req.body.password);
   }).then(function(valid) {
     if (valid && req.user.activated) {
       SessionHelper.createSessionsForUser(req.user, req);

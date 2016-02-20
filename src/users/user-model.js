@@ -58,7 +58,7 @@ UserSchema.statics.getUserByEmail = function(email) {
   });
 };
 
-UserSchema.methods.isValidPassword = function(password) {
+UserSchema.methods.authenticate = function(password) {
   var user = this;
   return bcrypt.compareAsync(password, user.password);
 };
