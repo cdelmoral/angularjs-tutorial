@@ -6,7 +6,7 @@ var UserCredentialsException = require('../users/user-credentials-exception');
 
 var SessionsController = function(){};
 
-SessionsController.findUserSession = function(req, res, next) {
+SessionsController.find = function(req, res, next) {
   User.findByIdAsync(req.session.user_id).then(function(user) {
     req.currentUser = user;
     next();
@@ -43,7 +43,7 @@ SessionsController.isAuthenticated = function(req, res, next) {
 };
 
 /** Delete the current session for the currently logged in user. */
-SessionsController.endSession = function(req, res, next) {
+SessionsController.destroy = function(req, res, next) {
   return SessionHelper.destroySession(req).then(function() {
     res.status(200).send();
   }).catch(function(message) {

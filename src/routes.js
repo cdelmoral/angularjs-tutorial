@@ -7,7 +7,7 @@ var PasswordResetsController = require('./password-resets/password-resets-contro
 var requireLogin = require('./sessions/sessions-helper').requireLogin;
 var requireCorrectUser = require('./sessions/sessions-helper').requireCorrectUser;
 
-router.all('*', SessionsController.findUserSession);
+router.all('*', SessionsController.find);
 router.param('user_id', UsersController.find);
 
 router.get('/users/is_unique', UsersController.unique);
@@ -16,8 +16,9 @@ router.get('/users/:user_id', requireLogin, UsersController.show);
 router.post('/users/', UsersController.create);
 router.put('/users/activate/:user_id/:token', UsersController.activate);
 router.put('/users/:user_id', requireCorrectUser, UsersController.update);
+router.delete('/users/:user_id', requireLogin, UsersController.destroy);
+
 router.put('/users/new_micropost/:user_id', requireCorrectUser, UsersController.createMicropost);
-router.delete('/users/:user_id', requireLogin, UsersController.delete);
 router.delete('/users/:id/:micropost_id', requireCorrectUser, UsersController.deleteMicropost);
 
 router.get('/microposts/user_page/:user_id', MicropostsController.getMicropostPageForUser);
@@ -26,7 +27,7 @@ router.get('/microposts/count/:user_id', MicropostsController.getMicropostCountF
 
 router.get('/sessions/authenticated', SessionsController.isAuthenticated);
 router.post('/sessions/', SessionsController.create);
-router.delete('/sessions/logout', SessionsController.endSession);
+router.delete('/sessions/logout', SessionsController.destroy);
 
 router.get('/password_resets/valid_token', PasswordResetsController.validateToken);
 router.post('password_resets/', PasswordResetsController.createPasswordReset);

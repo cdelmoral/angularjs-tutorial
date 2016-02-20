@@ -68,7 +68,7 @@ UsersController.unique = function(req, res, next) {
 };
 
 /** Delete user by id. */
-UsersController.delete = function(req, res, next) {
+UsersController.destroy = function(req, res, next) {
   req.user.remove().then(function(user) {
     res.status(200).send('User was deleted.');
   }).catch(console.log.bind(console));
