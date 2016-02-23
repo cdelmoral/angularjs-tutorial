@@ -8,3 +8,4 @@ node_modules
 // WebStorm IDE
 /.idea
 logs
+npm-debug.log

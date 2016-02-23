@@ -14,9 +14,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(session({
-    secret: process.env.SECRET,
-    resave: false,
-    saveUninitialized: true
+  secret: process.env.SECRET,
+  resave: false,
+  saveUninitialized: true
 }));
 
 app.use(cors());
