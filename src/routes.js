@@ -25,12 +25,12 @@ router.get('/microposts/user_page/:user_id', MicropostsController.getMicropostPa
 router.get('/microposts/feed/:user_id/', requireCorrectUser, MicropostsController.getMicropostFeedPageForUser);
 router.get('/microposts/count/:user_id', MicropostsController.getMicropostCountForUser);
 
-router.get('/sessions/authenticated', SessionsController.isAuthenticated);
+router.get('/sessions/authenticated', SessionsController.authenticated);
 router.post('/sessions/', SessionsController.create);
 router.delete('/sessions/logout', SessionsController.destroy);
 
-router.get('/password_resets/valid_token', PasswordResetsController.validateToken);
-router.post('password_resets/', PasswordResetsController.createPasswordReset);
-router.put('password_resets/:id/:token', PasswordResetsController.updatePassword);
+router.get('/password_resets/valid_token', PasswordResetsController.valid);
+router.post('/password_resets/', PasswordResetsController.create);
+router.put('/password_resets/:id/:token', PasswordResetsController.update);
 
 module.exports = router;

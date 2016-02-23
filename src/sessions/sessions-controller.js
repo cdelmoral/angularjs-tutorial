@@ -1,8 +1,5 @@
 var User = require('../users/user-model');
 var SessionHelper = require('./sessions-helper');
-var UserNotFoundException = require('../users/user-not-found-exception');
-var UserActivationException = require('../users/user-activation-exception');
-var UserCredentialsException = require('../users/user-credentials-exception');
 
 var SessionsController = function(){};
 
@@ -18,7 +15,7 @@ SessionsController.find = function(req, res, next) {
 SessionsController.create = function(req, res, next) {
   User.findOneAsync({ email: req.body.email.toLowerCase() }).then(function(user) {
     req.user = user;
-    return user && user.authenticate(req.body.password);
+    return user && user.authenticated(req.body.password, 'password');
   }).then(function(valid) {
     if (valid && req.user.activated) {
       SessionHelper.createSessionsForUser(req.user, req);
@@ -32,13 +29,13 @@ SessionsController.create = function(req, res, next) {
 };
 
 /** Gets if the user is currently logged in. */
-SessionsController.isAuthenticated = function(req, res, next) {
-  return User.getUserById(req.session.user_id).then(function(user) {
-    res.send(user.toObject());
-    return null;
-  }).catch(UserNotFoundException, function(message) {
-    res.send({ authenticated: false });
-    return null;
+SessionsController.authenticated = function(req, res, next) {
+  User.findByIdAsync(req.session.user_id).then(function(user) {
+    if (user) {
+      res.send(user.toObject());
+    } else {
+      res.send({ authenticated: false });
+    }
   }).catch(console.log.bind(console));
 };
 

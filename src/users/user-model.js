@@ -5,10 +5,7 @@ var crypto = Promise.promisifyAll(require('crypto'));
 
 var Micropost = require('../microposts/micropost-model');
 var UserSchema = require('./user-schema');
-var UserNotFoundException = require('./user-not-found-exception');
 var UserActivationException = require('./user-activation-exception');
-var UserPasswordResetException = require('./user-password-reset-exception');
-var UserCredentialsException = require('./user-credentials-exception');
 
 /** Lowercases email and creates gravatar id from it. */
 UserSchema.pre('save', function(next) {
@@ -40,27 +37,9 @@ UserSchema.pre('save', function(next) {
   next();
 });
 
-UserSchema.statics.getUserById = function(id) {
-  return User.findByIdAsync(id).then(function(user) {
-    if (!user) {
-      throw new UserNotFoundException('User not found.');
-    }
-    return user;
-  });
-};
-
-UserSchema.statics.getUserByEmail = function(email) {
-  return User.findOneAsync({ email: email.toLowerCase() }).then(function(user) {
-    if (!user) {
-      throw new UserNotFoundException('User not found.');
-    }
-    return user;
-  });
-};
-
-UserSchema.methods.authenticate = function(password) {
+UserSchema.methods.authenticated = function(password, field) {
   var user = this;
-  return bcrypt.compareAsync(password, user.password);
+  return bcrypt.compareAsync(password, user[field]);
 };
 
 UserSchema.methods.activate = function(token) {
@@ -80,28 +59,25 @@ UserSchema.methods.activate = function(token) {
     });
 };
 
-UserSchema.methods.isValidResetToken = function(token, callback) {
-  var user = this;
-  return Promise.resolve().then(function() {
-    if (!user.reset_digest) {
-      throw new UserPasswordResetException('User does not have reset digest.');
-    }
-    return bcrypt.compareAsync(token, user.reset_digest);
+UserSchema.statics.createToken = function() {
+  return crypto.randomBytesAsync(48).then(function(buf) {
+    return buf.toString('hex');
   });
 };
 
-UserSchema.methods.resetPassword = function(token, newPassword) {
+UserSchema.statics.digest = function(token) {
+  return bcrypt.hashAsync(token, 8);
+};
+
+UserSchema.methods.createResetDigest = function() {
   var user = this;
-  return user.isValidResetToken(token).then(function(isValid) {
-    if (!isValid) {
-      throw new UserPasswordResetException('Invalid reset token.');
-    }
-    return bcrypt.genSaltAsync(10).then(function(salt) {
-      return bcrypt.hashAsync(newPassword, salt);
-    }).then(function(hash) {
-      var update = { password: hash, reset_digest: null, reset_password_at: Date.now() };
-      return User.findOneAndUpdateAsync({ _id: user.id }, { $set: update }, { new: true });
-    });
+  return User.createToken().then(function(token) {
+    user.reset_token = token;
+    return User.digest(token);
+  }).then(function(hash) {
+    user.reset_digest = hash;
+    user.reset_sent_at = Date.now();
+    return user.save();
   });
 };
 
@@ -111,25 +87,10 @@ UserSchema.methods.sendActivationEmail = function(token) {
     ' is /#/users/activate/' + user._id + '/' + token);
 };
 
-UserSchema.methods.createAndSendResetDigest = function() {
-  var user = this;
-  return crypto.randomBytesAsync(48).then(function(buf) {
-    return buf.toString('hex');
-  }).then(function(token) {
-    return bcrypt.hashAsync(token, 8).then(function(hash) {
-      user.reset_digest = hash;
-      user.reset_sent_at = Date.now();
-      return user.saveAsync();
-    }).then(function(user) {
-      user.sendResetEmail(token);
-    });
-  });
-};
-
-UserSchema.methods.sendResetEmail = function(token) {
+UserSchema.methods.sendPasswordResetEmail = function() {
   var user = this;
   console.log('The reset link for ' + user.name +
-    ' is /#/password_resets/' + user._id + '/' + token);
+    ' is /#/password_resets/' + user._id + '/' + user.reset_token);
 };
 
 UserSchema.methods.createMicropost = function(content) {

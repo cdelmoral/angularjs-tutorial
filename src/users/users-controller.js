@@ -1,6 +1,5 @@
 var User = require('./user-model');
 var SessionHelper = require('../sessions/sessions-helper');
-var UserNotFoundException = require('./user-not-found-exception');
 var UserActivationException = require('./user-activation-exception');
 
 var UsersController = function() {};
