@@ -92,16 +92,4 @@ UsersController.activate = function(req, res, next) {
   }).catch(console.log.bind(console));
 };
 
-UsersController.createMicropost = function(req, res, next) {
-  return req.user.createMicropost(req.body.content).then(function(user) {
-    res.json(user.toObject());
-  }).catch(console.log.bind(console));
-};
-
-UsersController.deleteMicropost = function(req, res, next) {
-  return SessionHelper.currentUser.deleteMicropostById(req.params.micropost_id).then(function() {
-    res.json({ message: 'The micropost was deleted.' });
-  }).catch(console.log.bind(console));
-};
-
 module.exports = UsersController;

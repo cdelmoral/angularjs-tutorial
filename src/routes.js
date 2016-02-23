@@ -9,6 +9,7 @@ var requireCorrectUser = require('./sessions/sessions-helper').requireCorrectUse
 
 router.all('*', SessionsController.find);
 router.param('user_id', UsersController.find);
+router.param('micropost_id', MicropostsController.find);
 
 router.get('/users/is_unique', UsersController.unique);
 router.get('/users/index_page', requireLogin, UsersController.index);
@@ -18,9 +19,9 @@ router.put('/users/activate/:user_id/:token', UsersController.activate);
 router.put('/users/:user_id', requireCorrectUser, UsersController.update);
 router.delete('/users/:user_id', requireLogin, UsersController.destroy);
 
-router.put('/users/new_micropost/:user_id', requireCorrectUser, UsersController.createMicropost);
-router.delete('/users/:id/:micropost_id', requireCorrectUser, UsersController.deleteMicropost);
-
+router.post('/users/:user_id/microposts', requireCorrectUser, MicropostsController.create);
+router.delete('/users/:user_id/microposts/:micropost_id', requireCorrectUser,
+  MicropostsController.destroy);
 router.get('/microposts/user_page/:user_id', MicropostsController.getMicropostPageForUser);
 router.get('/microposts/feed/:user_id/', requireCorrectUser, MicropostsController.getMicropostFeedPageForUser);
 router.get('/microposts/count/:user_id', MicropostsController.getMicropostCountForUser);

@@ -3,7 +3,6 @@ var mongoose = require('mongoose');
 var bcrypt = Promise.promisifyAll(require('bcrypt'));
 var crypto = Promise.promisifyAll(require('crypto'));
 
-var Micropost = require('../microposts/micropost-model');
 var UserSchema = require('./user-schema');
 
 UserSchema.pre('save', true, function(next, done) {
@@ -75,20 +74,6 @@ UserSchema.methods.sendPasswordResetEmail = function() {
   var user = this;
   console.log('The reset link for ' + user.name +
     ' is /#/password_resets/' + user._id + '/' + user.reset_token);
-};
-
-UserSchema.methods.createMicropost = function(content) {
-  var user = this;
-  return Micropost.createAsync({ user_id: user._id, content: content }).then(function(micropost) {
-    return User.findOneAndUpdateAsync({ _id: user.id }, { $inc: { microposts_count: 1 } });
-  });
-};
-
-UserSchema.methods.deleteMicropostById = function(micropostId) {
-  var user = this;
-  return Micropost.findOneAndRemoveAsync({ _id: micropostId }).then(function(micropost) {
-    return User.findOneAndUpdateAsync({ _id: user.id }, { $inc: { microposts_count: -1 } });
-  });
 };
 
 var User = Promise.promisifyAll(mongoose.model('User', UserSchema));
