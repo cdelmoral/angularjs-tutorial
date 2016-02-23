@@ -6,33 +6,27 @@ var crypto = Promise.promisifyAll(require('crypto'));
 var Micropost = require('../microposts/micropost-model');
 var UserSchema = require('./user-schema');
 
-/** Lowercases email and creates gravatar id from it. */
-UserSchema.pre('save', function(next) {
+UserSchema.pre('save', true, function(next, done) {
   var user = this;
-  if (user.isModified('email')) {
-    user.email = user.email.toLowerCase();
-    user.gravatar_id = crypto.createHash('md5').update(user.email).digest('hex');
-  }
-  next();
-});
+  var promises = [];
 
-/** Hashes password. */
-UserSchema.pre('save', function(next) {
-  var user = this;
-  if (user.isModified('password')) {
-    user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(10));
-  }
-  next();
-});
-
-/** Generate and send activation token for created users. */
-UserSchema.pre('save', function(next) {
-  var user = this;
   if (user.isNew) {
-    var token = crypto.randomBytes(48).toString('hex');
-    user.activation_digest = bcrypt.hashSync(token, 8);
-    user.sendActivationEmail(token);
+    promises.push(generateActivationToken(user));
   }
+
+  if (user.isModified('email')) {
+    promises.push(downcaseEmail(user));
+    promises.push(createGravatarId(user));
+  }
+
+  if (user.isModified('password')) {
+    promises.push(hashPassword(user));
+  }
+
+  Promise.all(promises).then(function(result) {
+    done();
+  });
+
   next();
 });
 
@@ -100,3 +94,33 @@ UserSchema.methods.deleteMicropostById = function(micropostId) {
 var User = Promise.promisifyAll(mongoose.model('User', UserSchema));
 
 module.exports = User;
+
+function downcaseEmail(user) {
+  return Promise.resolve().then(function() {
+    user.email = user.email.toLowerCase();
+    return;
+  });
+}
+
+function createGravatarId(user) {
+  return Promise.resolve().then(function() {
+    user.gravatar_id = crypto.createHash('md5').update(user.email.toLowerCase()).digest('hex');
+    return;
+  });
+}
+
+function hashPassword(user) {
+  return Promise.resolve().then(function() {
+    user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(10));
+    return;
+  });
+}
+
+function generateActivationToken(user) {
+  return Promise.resolve().then(function() {
+    var token = crypto.randomBytes(48).toString('hex');
+    user.activation_digest = bcrypt.hashSync(token, 8);
+    user.sendActivationEmail(token);
+    return;
+  });
+}
