@@ -1,6 +1,6 @@
 var User = require('./user-model');
 var SessionHelper = require('../sessions/sessions-helper');
-var UserActivationException = require('./user-activation-exception');
+var InvalidActivationLinkError = require('./invalid-activation-link-error');
 
 var UsersController = function() {};
 
@@ -73,13 +73,22 @@ UsersController.destroy = function(req, res, next) {
   }).catch(console.log.bind(console));
 };
 
-/** Activates user. */
+/** Activates a user. */
 UsersController.activate = function(req, res, next) {
-  req.user.activate(req.params.token).then(function(user) {
+  Promise.resolve().then(function() {
+    return req.user && !req.user.activated &&
+           req.user.authenticated(req.params.token, 'activation_digest');
+  }).then(function(valid) {
+    if (valid) {
+      return req.user.activate();
+    } else {
+      throw new InvalidActivationLinkError('Invalid activation link.');
+    }
+  }).then(function(user) {
     req.session.user_id = user.id;
     res.json({ user: user.toObject(), message: 'The account has been activated.' });
-  }).catch(UserActivationException, function(message) {
-    res.status(400).send('Invalid activation link.');
+  }).catch(InvalidActivationLinkError, function(err) {
+    res.status(400).send(err.message);
   }).catch(console.log.bind(console));
 };
 

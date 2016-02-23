@@ -5,7 +5,6 @@ var crypto = Promise.promisifyAll(require('crypto'));
 
 var Micropost = require('../microposts/micropost-model');
 var UserSchema = require('./user-schema');
-var UserActivationException = require('./user-activation-exception');
 
 /** Lowercases email and creates gravatar id from it. */
 UserSchema.pre('save', function(next) {
@@ -44,19 +43,10 @@ UserSchema.methods.authenticated = function(password, field) {
 
 UserSchema.methods.activate = function(token) {
   var user = this;
-  return Promise.resolve()
-    .then(function() {
-      if (user.activated) {
-        throw new UserActivationException('User is already activated.');
-      }
-      return bcrypt.compareAsync(token, user.activation_digest);
-    }).then(function(isValid) {
-      if (!isValid) {
-        throw new UserActivationException('Invalid activation token.');
-      }
-      var update = { activated: true, activated_at: Date.now(), activation_digest: null };
-      return User.findOneAndUpdateAsync({ _id: user.id }, { $set: update }, { new: true });
-    });
+  user.activated = true;
+  user.activated_at = Date.now();
+  user.activation_digest = null;
+  return user.save();
 };
 
 UserSchema.statics.createToken = function() {
