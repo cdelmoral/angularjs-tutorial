@@ -1,4 +1,6 @@
 var mongoose = require('mongoose');
+var bcrypt = require('bcrypt');
+var crypto = require('crypto');
 
 var validate = require('../common/validator');
 var handleMigrations = require('./user-migrations').handleMigrations;
@@ -39,6 +41,30 @@ var userSchema = new mongoose.Schema({
   gravatar_id: { type: String }
 });
 
+userSchema.pre('save', true, function(next, done) {
+  var user = this;
+  var promises = [];
+
+  if (user.isNew) {
+    promises.push(generateActivationToken(user));
+  }
+
+  if (user.isModified('email')) {
+    promises.push(downcaseEmail(user));
+    promises.push(createGravatarId(user));
+  }
+
+  if (user.isModified('password')) {
+    promises.push(hashPassword(user));
+  }
+
+  Promise.all(promises).then(function(result) {
+    done();
+  });
+
+  next();
+});
+
 userSchema.post('init', handleMigrations);
 
 userSchema.options.toObject = {
@@ -56,3 +82,33 @@ userSchema.options.toObject = {
 };
 
 module.exports = userSchema;
+
+function downcaseEmail(user) {
+  return Promise.resolve().then(function() {
+    user.email = user.email.toLowerCase();
+    return;
+  });
+}
+
+function createGravatarId(user) {
+  return Promise.resolve().then(function() {
+    user.gravatar_id = crypto.createHash('md5').update(user.email.toLowerCase()).digest('hex');
+    return;
+  });
+}
+
+function hashPassword(user) {
+  return Promise.resolve().then(function() {
+    user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(10));
+    return;
+  });
+}
+
+function generateActivationToken(user) {
+  return Promise.resolve().then(function() {
+    var token = crypto.randomBytes(48).toString('hex');
+    user.activation_digest = bcrypt.hashSync(token, 8);
+    user.sendActivationEmail(token);
+    return;
+  });
+}
