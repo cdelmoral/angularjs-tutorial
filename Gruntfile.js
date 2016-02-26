@@ -23,7 +23,10 @@ module.exports = function(grunt) {
       }
     },
 
-    env: { dev: { src: '.env.json' } },
+    env: {
+      dev: { src: '.env.dev.json' },
+      test: { src: '.env.test.json' }
+    },
 
     express: {
       dev: {
@@ -62,5 +65,5 @@ module.exports = function(grunt) {
     'watch:express'
   ]);
 
-  grunt.registerTask('test', ['mochaTest']);
+  grunt.registerTask('test', ['env:test', 'mochaTest']);
 };
