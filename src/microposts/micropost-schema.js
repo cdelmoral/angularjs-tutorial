@@ -22,12 +22,21 @@ var micropostSchema = new mongoose.Schema({
 micropostSchema.post('init', handleMigrations);
 micropostSchema.pre('save', initialize);
 
+micropostSchema.options.toObject = {
+  transform: function(doc, ret, options) {
+    ret.id = ret._id;
+    delete ret.__v;
+    delete ret._id;
+    delete ret.schema_version;
+  }
+};
+
 module.exports = micropostSchema;
 
 function initialize(next) {
   var micropost = this;
 
-  if (micropost.created_at === undefined) {
+  if (micropost.isNew) {
     var now = Date.now();
 
     micropost.created_at = now;

@@ -28,30 +28,29 @@ MicropostsController.destroy = function(req, res, next) {
   }).catch(console.log.bind(console));
 };
 
-MicropostsController.getMicropostPageForUser = function(req, res, next) {
-  var userId = req.params.user_id;
-  var pageNumber = req.query.pageNumber || 1;
-  var itemsPerPage = req.query.itemsPerPage || 25;
-  return Micropost.getMicropostsPageForUser(userId, pageNumber, itemsPerPage).then(function(microposts) {
-    return Micropost.getMicropostsCountForUser(userId).then(function(count) {
-      res.json({ count: count, microposts: Micropost.getObjects(microposts) });
+MicropostsController.index = function(req, res, next) {
+  var skip = (req.query.pageNumber - 1) * req.query.itemsPerPage;
+  var sort = { created_at: -1 };
+  var params = { limit: req.query.itemsPerPage, skip: skip, sort: sort };
+
+  var micropostsPromise = Micropost.findAsync({ user_id: req.user._id }, null, params)
+    .then(function(microposts) {
+      var objects = [];
+      for (var i = 0; i < microposts.length; i++) {
+        objects.push(microposts[i].toObject());
+      }
+      return objects;
     });
+
+  var countPromise = Micropost.countAsync({ user_id: req.user._id });
+
+  Promise.all([micropostsPromise, countPromise]).then(function(results) {
+    res.json({ count: results[1], microposts: results[0] });
   }).catch(console.log.bind(console));
 };
 
-MicropostsController.getMicropostFeedPageForUser = function(req, res, next) {
-  var userId = req.params.user_id;
-  var pageNumber = req.query.pageNumber || 1;
-  var itemsPerPage = req.query.itemsPerPage || 25;
-  return Micropost.getMicropostFeedPageForUser(userId, pageNumber, itemsPerPage).then(function(microposts) {
-    return Micropost.getMicropostFeedCountForUser(userId).then(function(count) {
-      res.json({ count: count, microposts: microposts });
-    });
-  }).catch(console.log.bind(console));
-};
-
-MicropostsController.getMicropostCountForUser = function(req, res, next) {
-  return Micropost.getMicropostsCountForUser(req.params.user_id).then(function(count) {
+MicropostsController.count = function(req, res, next) {
+  Micropost.countAsync({ user_id: req.user._id }).then(function(count) {
     res.json({ count: count });
   }).catch(console.log.bind(console));
 };

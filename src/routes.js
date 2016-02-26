@@ -22,9 +22,9 @@ router.delete('/users/:user_id', requireLogin, UsersController.destroy);
 router.post('/users/:user_id/microposts', requireCorrectUser, MicropostsController.create);
 router.delete('/users/:user_id/microposts/:micropost_id', requireCorrectUser,
   MicropostsController.destroy);
-router.get('/microposts/user_page/:user_id', MicropostsController.getMicropostPageForUser);
-router.get('/microposts/feed/:user_id/', requireCorrectUser, MicropostsController.getMicropostFeedPageForUser);
-router.get('/microposts/count/:user_id', MicropostsController.getMicropostCountForUser);
+router.get('/microposts/user_page/:user_id', MicropostsController.index);
+router.get('/microposts/feed/:user_id/', requireCorrectUser, MicropostsController.index);
+router.get('/microposts/count/:user_id', MicropostsController.count);
 
 router.get('/sessions/authenticated', SessionsController.authenticated);
 router.post('/sessions/', SessionsController.create);
