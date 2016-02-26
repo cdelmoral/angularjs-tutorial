@@ -6,7 +6,7 @@ var EmailTemplate = require('email-templates').EmailTemplate;
 
 var UserMailer = function() {};
 
-var templateDir = path.join(__dirname, '..', 'templates', 'account-activation');
+var templateDir = path.join(__dirname, 'user-account-activation');
 var accountActivation = new EmailTemplate(templateDir);
 
 UserMailer.sendActivationEmail = function(user) {
