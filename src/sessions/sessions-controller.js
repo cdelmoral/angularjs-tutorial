@@ -1,11 +1,16 @@
 var User = require('../users/user-model');
-var SessionHelper = require('./sessions-helper');
+
+var login = require('./sessions-helper').login;
+var logout = require('./sessions-helper').logout;
 
 var SessionsController = function(){};
 
 SessionsController.find = function(req, res, next) {
   User.findByIdAsync(req.session.user_id).then(function(user) {
-    req.currentUser = user;
+    if (user) {
+      login(req, user);
+    }
+
     next();
     return null;
   }).catch(console.log.bind(console));
@@ -18,7 +23,7 @@ SessionsController.create = function(req, res, next) {
     return user && user.authenticated(req.body.password, 'password');
   }).then(function(valid) {
     if (valid && req.user.activated) {
-      SessionHelper.createSessionsForUser(req.user, req);
+      login(req, req.user);
       res.json(req.user.toObject());
     } else if (valid) {
       res.status(401).send('User not yet activated');
@@ -41,7 +46,7 @@ SessionsController.authenticated = function(req, res, next) {
 
 /** Delete the current session for the currently logged in user. */
 SessionsController.destroy = function(req, res, next) {
-  return SessionHelper.destroySession(req).then(function() {
+  SessionHelper.logout(req).then(function() {
     res.status(200).send();
   }).catch(function(message) {
     res.status(500).send();

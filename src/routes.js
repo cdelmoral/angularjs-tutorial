@@ -1,29 +1,31 @@
 var express = require('express');
 var router = express.Router();
+
 var UsersController = require('./users/users-controller');
 var MicropostsController = require('./microposts/microposts-controller');
 var SessionsController = require('./sessions/sessions-controller');
 var PasswordResetsController = require('./password-resets/password-resets-controller');
-var requireLogin = require('./sessions/sessions-helper').requireLogin;
-var requireCorrectUser = require('./sessions/sessions-helper').requireCorrectUser;
+
+var loggedIn = require('./sessions/sessions-helper').loggedIn;
+var correctUser = require('./sessions/sessions-helper').correctUser;
 
 router.all('*', SessionsController.find);
 router.param('user_id', UsersController.find);
 router.param('micropost_id', MicropostsController.find);
 
 router.get('/users/is_unique', UsersController.unique);
-router.get('/users/index_page', requireLogin, UsersController.index);
-router.get('/users/:user_id', requireLogin, UsersController.show);
+router.get('/users/index_page', loggedIn, UsersController.index);
+router.get('/users/:user_id', loggedIn, UsersController.show);
 router.post('/users/', UsersController.create);
 router.put('/users/activate/:user_id/:token', UsersController.activate);
-router.put('/users/:user_id', requireCorrectUser, UsersController.update);
-router.delete('/users/:user_id', requireLogin, UsersController.destroy);
+router.put('/users/:user_id', correctUser, UsersController.update);
+router.delete('/users/:user_id', loggedIn, UsersController.destroy);
 
-router.post('/users/:user_id/microposts', requireCorrectUser, MicropostsController.create);
-router.delete('/users/:user_id/microposts/:micropost_id', requireCorrectUser,
+router.post('/users/:user_id/microposts', correctUser, MicropostsController.create);
+router.delete('/users/:user_id/microposts/:micropost_id', correctUser,
   MicropostsController.destroy);
 router.get('/microposts/user_page/:user_id', MicropostsController.index);
-router.get('/microposts/feed/:user_id/', requireCorrectUser, MicropostsController.index);
+router.get('/microposts/feed/:user_id/', correctUser, MicropostsController.index);
 router.get('/microposts/count/:user_id', MicropostsController.count);
 
 router.get('/sessions/authenticated', SessionsController.authenticated);

@@ -2,7 +2,7 @@ var Promise = require('bluebird');
 
 var SessionHelper = function() {};
 
-SessionHelper.requireLogin = function(req, res, next) {
+SessionHelper.loggedIn = function(req, res, next) {
   if (req.currentUser) {
     next();
   } else {
@@ -10,8 +10,8 @@ SessionHelper.requireLogin = function(req, res, next) {
   }
 };
 
-SessionHelper.requireCorrectUser = function(req, res, next) {
-  SessionHelper.requireLogin(req, res, function() {
+SessionHelper.correctUser = function(req, res, next) {
+  SessionHelper.loggedIn(req, res, function() {
     if (req.user.id === req.currentUser.id) {
       next();
     } else {
@@ -20,14 +20,15 @@ SessionHelper.requireCorrectUser = function(req, res, next) {
   });
 };
 
-SessionHelper.createSessionsForUser = function(user, req) {
+SessionHelper.login = function(req, user) {
   req.currentUser = user;
   req.session.user_id = user.id;
 };
 
-SessionHelper.destroySession = function(req) {
+SessionHelper.logout = function(req) {
   return Promise.promisifyAll(req.session).destroyAsync().then(function() {
     req.currentUser = null;
+    return;
   });
 };
 
