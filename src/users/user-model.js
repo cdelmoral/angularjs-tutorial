@@ -4,6 +4,7 @@ var bcrypt = Promise.promisifyAll(require('bcrypt'));
 var crypto = Promise.promisifyAll(require('crypto'));
 
 var UserSchema = require('./user-schema');
+var Mailer = require('../mailers/mailer');
 
 UserSchema.pre('save', true, function(next, done) {
   var user = this;
@@ -66,6 +67,7 @@ UserSchema.methods.createResetDigest = function() {
 
 UserSchema.methods.sendActivationEmail = function(token) {
   var user = this;
+  Mailer.sendMail(user);
   console.log('The activation link for ' + user.name +
     ' is /#/users/activate/' + user._id + '/' + token);
 };

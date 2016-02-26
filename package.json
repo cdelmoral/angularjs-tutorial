@@ -47,6 +47,7 @@
     "mongoose": "^4.1.1",
     "mongoose-validator": "^1.2.3",
     "morgan": "^1.6.1",
+    "nodemailer": "^2.2.1",
     "validator": "^4.0.2"
   }
 }
