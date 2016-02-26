@@ -4,6 +4,7 @@ var bcrypt = Promise.promisifyAll(require('bcrypt'));
 var crypto = Promise.promisifyAll(require('crypto'));
 
 var UserSchema = require('./user-schema');
+var UserMailer = require('./user-mailer');
 
 UserSchema.statics.createToken = function() {
   return crypto.randomBytesAsync(48).then(function(buf) {
@@ -40,10 +41,11 @@ UserSchema.methods.createResetDigest = function() {
   });
 };
 
-UserSchema.methods.sendActivationEmail = function(token) {
+UserSchema.methods.sendActivationEmail = function() {
   var user = this;
+  UserMailer.sendActivationEmail(user);
   console.log('The activation link for ' + user.name +
-    ' is /#/users/activate/' + user._id + '/' + token);
+    ' is /#/users/activate/' + user._id + '/' + user.token);
 };
 
 UserSchema.methods.sendPasswordResetEmail = function() {

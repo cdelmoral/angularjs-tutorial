@@ -106,9 +106,9 @@ function hashPassword(user) {
 
 function generateActivationToken(user) {
   return Promise.resolve().then(function() {
-    var token = crypto.randomBytes(48).toString('hex');
-    user.activation_digest = bcrypt.hashSync(token, 8);
-    user.sendActivationEmail(token);
+    user.token = crypto.randomBytes(48).toString('hex');
+    user.activation_digest = bcrypt.hashSync(user.token, 8);
+    user.sendActivationEmail();
     return;
   });
 }

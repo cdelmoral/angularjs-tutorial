@@ -1,11 +1,12 @@
-node_modules
-/.db
-.env.json
-
-// Upload ui artifacts to git for now
-// public
-
 // WebStorm IDE
 /.idea
+
+// Debug, logs, packages, database...
 logs
 npm-debug.log
+node_modules
+/.db
+
+// Environment variables
+.env.dev.json
+.env.test.json
