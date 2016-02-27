@@ -1,4 +1,5 @@
 var User = require('../users/user-model');
+var SessionsHelper = require('./sessions-helper');
 
 var login = require('./sessions-helper').login;
 var logout = require('./sessions-helper').logout;
@@ -46,7 +47,7 @@ SessionsController.authenticated = function(req, res, next) {
 
 /** Delete the current session for the currently logged in user. */
 SessionsController.destroy = function(req, res, next) {
-  SessionHelper.logout(req).then(function() {
+  SessionsHelper.logout(req).then(function() {
     res.status(200).send();
   }).catch(function(message) {
     res.status(500).send();
