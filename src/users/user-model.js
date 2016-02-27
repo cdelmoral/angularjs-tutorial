@@ -44,8 +44,6 @@ UserSchema.methods.createResetDigest = function() {
 UserSchema.methods.sendActivationEmail = function() {
   var user = this;
   UserMailer.sendActivationEmail(user);
-  console.log('The activation link for ' + user.name +
-    ' is /#/users/activate/' + user._id + '/' + user.token);
 };
 
 UserSchema.methods.sendPasswordResetEmail = function() {
