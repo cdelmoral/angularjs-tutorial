@@ -6,13 +6,31 @@ var EmailTemplate = require('email-templates').EmailTemplate;
 
 var UserMailer = function() {};
 
-var templateDir = path.join(__dirname, 'user-account-activation');
-var accountActivation = new EmailTemplate(templateDir);
+var accountActivation = new EmailTemplate(path.join(__dirname, 'user-account-activation'));
+var passwordReset = new EmailTemplate(path.join(__dirname, 'user-password-reset'));
 
 UserMailer.sendActivationEmail = function(user) {
   user.activation_link = process.env.HOST + '/#/users/activate/' + user.id + '/' + user.token;
+  sendEmail(accountActivation, user);
+};
 
-  accountActivation.render(user, function(err, result) {
+UserMailer.sendPasswordResetEmail = function(user) {
+  user.password_reset_link = process.env.HOST + '/#/password_resets/' + user._id + '/' +
+    user.reset_token;
+  sendEmail(passwordReset, user);
+};
+
+module.exports = UserMailer;
+
+function transportCallback(error, info) {
+  if (error) {
+      return console.log(error);
+  }
+  console.log('Message sent: ' + info.response);
+}
+
+function sendEmail(template, user) {
+  template.render(user, function(err, result) {
     if (err) {
       return console.log(err);
     }
@@ -24,13 +42,4 @@ UserMailer.sendActivationEmail = function(user) {
       html: result.html
     }, transportCallback);
   });
-};
-
-function transportCallback(error, info) {
-  if (error) {
-      return console.log(error);
-  }
-  console.log('Message sent: ' + info.response);
 }
-
-module.exports = UserMailer;

@@ -48,8 +48,7 @@ UserSchema.methods.sendActivationEmail = function() {
 
 UserSchema.methods.sendPasswordResetEmail = function() {
   var user = this;
-  console.log('The reset link for ' + user.name +
-    ' is /#/password_resets/' + user._id + '/' + user.reset_token);
+  UserMailer.sendPasswordResetEmail(user);
 };
 
 var User = Promise.promisifyAll(mongoose.model('User', UserSchema));
