@@ -1,5 +1,6 @@
 var User = require('../users/user-model');
 var SessionsHelper = require('./sessions-helper');
+var Logger = require('../logger/logger');
 
 var login = require('./sessions-helper').login;
 var logout = require('./sessions-helper').logout;
@@ -14,7 +15,7 @@ SessionsController.find = function(req, res, next) {
 
     next();
     return null;
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 /** Authenticates a user. */
@@ -31,7 +32,7 @@ SessionsController.create = function(req, res, next) {
     } else {
       res.status(401).send('Invalid credentials');
     }
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 /** Gets if the user is currently logged in. */
@@ -42,7 +43,7 @@ SessionsController.authenticated = function(req, res, next) {
     } else {
       res.send({ authenticated: false });
     }
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 /** Delete the current session for the currently logged in user. */

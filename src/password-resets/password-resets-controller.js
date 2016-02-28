@@ -3,6 +3,7 @@ var router = express.Router();
 
 var User = require('../users/user-model');
 var InvalidPasswordResetLinkError = require('./invalid-password-reset-error');
+var Logger = require('../logger/logger');
 
 var PasswordResetsController = function() {};
 
@@ -16,7 +17,7 @@ PasswordResetsController.valid = function(req, res, next) {
     } else {
       res.status(400).send('Invalid reset link.');
     }
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 /** Creates a new password reset. */
@@ -33,7 +34,7 @@ PasswordResetsController.create = function(req, res, next) {
     res.status(200).json({
       message: 'An email was sent with instructions to reset your password.'
     });
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 PasswordResetsController.update = function(req, res, next) {
@@ -50,9 +51,8 @@ PasswordResetsController.update = function(req, res, next) {
   }).then(function(user) {
     res.status(200).json({ message: 'Use your new password to log in.' });
   }).catch(InvalidPasswordResetLinkError, function(error) {
-    console.log(error);
     res.status(400).send('Invalid reset link.');
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 module.exports = PasswordResetsController;

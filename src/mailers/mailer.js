@@ -10,7 +10,6 @@ if (process.env.NODE_ENV === 'development') {
   maildev.listen();
 
   maildev.on('new', function(email){
-    console.log('Received new email at %s:%s', process.env.MAILGUN_DOMAIN, process.env.MAILGUN_PORT);
     open('http://localhost:1080/#');
   });
 

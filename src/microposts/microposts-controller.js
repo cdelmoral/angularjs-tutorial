@@ -1,4 +1,5 @@
 var Micropost = require('./micropost-model');
+var Logger = require('../logger/logger');
 
 var MicropostsController = function() {};
 
@@ -7,7 +8,7 @@ MicropostsController.find = function(req, res, next, id) {
     req.micropost = micropost;
     next();
     return;
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 MicropostsController.create = function(req, res, next) {
@@ -16,7 +17,7 @@ MicropostsController.create = function(req, res, next) {
     return req.user.save();
   }).then(function(user) {
     res.json(user.toObject());
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 MicropostsController.destroy = function(req, res, next) {
@@ -25,7 +26,7 @@ MicropostsController.destroy = function(req, res, next) {
     return req.user.save();
   }).then(function(user) {
     res.status(200).send('Micropost was deleted.');
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 MicropostsController.index = function(req, res, next) {
@@ -46,13 +47,13 @@ MicropostsController.index = function(req, res, next) {
 
   Promise.all([micropostsPromise, countPromise]).then(function(results) {
     res.json({ count: results[1], microposts: results[0] });
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 MicropostsController.count = function(req, res, next) {
   Micropost.countAsync({ user_id: req.user._id }).then(function(count) {
     res.json({ count: count });
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 module.exports = MicropostsController;

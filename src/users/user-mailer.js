@@ -2,6 +2,7 @@
 var path = require('path');
 
 var Mailer = require('../mailers/mailer');
+var Logger = require('../logger/logger');
 var EmailTemplate = require('email-templates').EmailTemplate;
 
 var UserMailer = function() {};
@@ -26,13 +27,12 @@ function transportCallback(error, info) {
   if (error) {
       return console.log(error);
   }
-  console.log('Message sent: ' + info.response);
 }
 
 function sendEmail(template, user) {
   template.render(user, function(err, result) {
     if (err) {
-      return console.log(err);
+      return Logger.logError(err);
     }
 
     Mailer.transport.sendMail({

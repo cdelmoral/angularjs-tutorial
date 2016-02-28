@@ -1,4 +1,5 @@
 var User = require('./user-model');
+var Logger = require('../logger/logger');
 var SessionHelper = require('../sessions/sessions-helper');
 var InvalidActivationLinkError = require('./invalid-activation-link-error');
 
@@ -9,7 +10,7 @@ UsersController.find = function(req, res, next, id) {
     req.user = user;
     next();
     return null;
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 /** Get user by id. */
@@ -33,7 +34,7 @@ UsersController.index = function(req, res, next) {
 
   Promise.all([usersPromise, User.countAsync({})]).then(function(results) {
     res.json({ count: results[1], users: results[0] });
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 /** Update name, email and password for user. */
@@ -45,7 +46,7 @@ UsersController.update = function(req, res, next) {
     req.user.save(function(err, user) {
       res.json({ message: 'User was update.', user: user.toObject() });
     });
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 /** Create new user. */
@@ -56,21 +57,21 @@ UsersController.create = function(req, res, next) {
     password: req.body.password
   }).then(function() {
     res.json({ message: 'Check your email to activate your account before you can log in.' });
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 /* Check if the username is not already being used. */
 UsersController.unique = function(req, res, next) {
   User.findOneAsync(req.query).then(function(user) {
     res.json({ valid: user === null || req.currentUser && user.equals(req.currentUser) });
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 /** Delete user by id. */
 UsersController.destroy = function(req, res, next) {
   req.user.remove().then(function(user) {
     res.status(200).send('User was deleted.');
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 /** Activates a user. */
@@ -89,7 +90,7 @@ UsersController.activate = function(req, res, next) {
     res.json({ user: user.toObject(), message: 'The account has been activated.' });
   }).catch(InvalidActivationLinkError, function(err) {
     res.status(400).send(err.message);
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 module.exports = UsersController;
