@@ -4,20 +4,14 @@ var validator = require('validator');
 
 var user;
 
-beforeEach(function(done) {
-  user = new User({ name: 'Carlos', email: 'carlos@test.com', password: 'password' });
-  User.ensureIndexes(function(err) {
-    done(err);
-  });
-});
-
 describe('User model', function() {
+  beforeEach(function() {
+    user = new User({ name: 'Carlos', email: 'carlos@test.com', password: 'password' });
+  });
+
   describe('with valid parameters', function() {
-    it('should save in the database', function(done) {
-      user.save(function(err) {
-        should.not.exist(err);
-        done();
-      });
+    it('should save in the database', function() {
+      user.save().should.be.fulfilled();
     });
   });
 
@@ -26,69 +20,45 @@ describe('User model', function() {
       user.save(done);
     });
 
-    it('should not be valid with not unique name', function(done) {
+    it('should not be valid with not unique name', function() {
       other = new User({ name: 'Carlos', email: 'other@test.com', password: 'password' });
-      other.save(function(err) {
-        should.exist(err);
-        done();
-      });
+      other.save().should.be.rejected();
     });
 
-    it('should not be valid with not unique email', function(done) {
+    it('should not be valid with not unique email', function() {
       other = new User({ name: 'Victor', email: 'carlos@test.com', password: 'password' });
-      other.save(function(err) {
-        should.exist(err);
-        done();
-      });
+      other.save().should.be.rejected();
     });
   });
 
-  it('should not be valid with null name', function(done) {
+  it('should not be valid with null name', function() {
     user.name = null;
-    user.validate(function(err) {
-      should.exist(err);
-      done();
-    });
+    user.validate().should.be.rejected();
   });
 
-  it('should not be valid with empty name', function(done) {
+  it('should not be valid with empty name', function() {
     user.name = '     ';
-    user.validate(function(err) {
-      should.exist(err);
-      done();
-    });
+    user.validate().should.be.rejected();
   });
 
-  it('should not be valid when name is too long', function(done) {
+  it('should not be valid when name is too long', function() {
     user.name = Array(52).join('a');
-    user.validate(function(err) {
-      should.exist(err);
-      done();
-    });
+    user.validate().should.be.rejected();
   });
 
-  it('should not be valid with null email', function(done) {
+  it('should not be valid with null email', function() {
     user.email = null;
-    user.validate(function(err) {
-      should.exist(err);
-      done();
-    });
+    user.validate().should.be.rejected();
   });
 
-  it('should not be valid with empty email', function(done) {
+  it('should not be valid with empty email', function() {
     user.email = '     ';
-    user.validate(function(err) {
-      should.exist(err);
-      done();
-    });
+    user.validate().should.be.rejected();
   });
 
-  it('should not be valid when email is too long', function(done) {
+  it('should not be valid when email is too long', function() {
     user.email = Array(255).join('a') + '@example.com';
-    user.validate(function(err) {
-      should.exist(err);
-      done();
-    });
+    user.validate().should.be.rejected();
   });
 
   describe('with valid emails', function() {
@@ -101,12 +71,9 @@ describe('User model', function() {
     ];
 
     validEmails.forEach(function(email) {
-      it('should be valid', function(done) {
+      it('should be valid', function() {
         user.email = email;
-        user.validate(function(err) {
-          should.not.exist(err);
-          done();
-        });
+        user.validate().should.be.fulfilled();
       });
     });
   });
@@ -121,12 +88,9 @@ describe('User model', function() {
     ];
 
     invalidEmails.forEach(function(email) {
-      it('should not be valid', function(done) {
+      it('should not be valid', function() {
         user.email = email;
-        user.validate(function(err) {
-          should.exist(err);
-          done();
-        });
+        user.validate().should.be.rejected();
       });
     });
   });
