@@ -1,25 +1,12 @@
 var User = require('../../src/users/user-model');
 var should = require('should');
 var validator = require('validator');
-var mongoose = require('mongoose');
 
 var user;
-
-before(function(done) {
-  mongoose.connect("mongodb://localhost/angularjs_tutorial_test", function(err) {
-    done(err);
-  });
-});
 
 beforeEach(function(done) {
   user = new User({ name: 'Carlos', email: 'carlos@test.com', password: 'password' });
   User.ensureIndexes(function(err) {
-    done(err);
-  });
-});
-
-afterEach(function(done) {
-  mongoose.connection.db.dropDatabase(function(err) {
     done(err);
   });
 });

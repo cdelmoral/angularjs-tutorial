@@ -10,6 +10,9 @@ var debug = require('debug')('express-test:server');
 var http = require('http');
 var mongoose = require('mongoose');
 
+/** User bluebird promises as default */
+mongoose.Promise = require('bluebird');
+
 /**
  * Get port from environment and store in Express.
  */
