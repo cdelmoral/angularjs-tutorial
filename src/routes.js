@@ -5,6 +5,7 @@ var UsersController = require('./users/users-controller');
 var MicropostsController = require('./microposts/microposts-controller');
 var SessionsController = require('./sessions/sessions-controller');
 var PasswordResetsController = require('./password-resets/password-resets-controller');
+var RelationshipsController = require('./users/relationships-controller');
 
 var loggedIn = require('./sessions/sessions-helper').loggedIn;
 var correctUser = require('./sessions/sessions-helper').correctUser;
@@ -16,10 +17,14 @@ router.param('micropost_id', MicropostsController.find);
 router.get('/users/is_unique', UsersController.unique);
 router.get('/users/index_page', loggedIn, UsersController.index);
 router.get('/users/:user_id', loggedIn, UsersController.show);
+router.get('/users/:user_id/following', loggedIn, UsersController.following);
+router.get('/users/:user_id/followers', loggedIn, UsersController.followers);
 router.post('/users/', UsersController.create);
+router.post('/users/:user_id/follow', loggedIn, RelationshipsController.create);
 router.put('/users/activate/:user_id/:token', UsersController.activate);
 router.put('/users/:user_id', correctUser, UsersController.update);
 router.delete('/users/:user_id', loggedIn, UsersController.destroy);
+router.delete('/users/:user_id/unfollow', loggedIn, RelationshipsController.destroy);
 
 router.post('/users/:user_id/microposts', correctUser, MicropostsController.create);
 router.delete('/users/:user_id/microposts/:micropost_id', correctUser,

@@ -1,4 +1,5 @@
 var User = require('./user-model');
+var Relationship = require('./relationship-model');
 var Logger = require('../logger/logger');
 var SessionHelper = require('../sessions/sessions-helper');
 var InvalidActivationLinkError = require('./invalid-activation-link-error');
@@ -25,11 +26,7 @@ UsersController.index = function(req, res, next) {
   var params = { limit: req.query.usersPerPage, skip: skipUsers, sort: sort };
 
   var usersPromise = User.findAsync({}, null, params).then(function(users) {
-    var objects = [];
-    for (var i = 0; i < users.length; i++) {
-      objects.push(users[i].toObject());
-    }
-    return objects;
+    return users.map(userToObject);
   });
 
   Promise.all([usersPromise, User.countAsync({})]).then(function(results) {
@@ -93,4 +90,50 @@ UsersController.activate = function(req, res, next) {
   }).catch(Logger.logError);
 };
 
+/** Get following index page. */
+UsersController.following = function(req, res, next) {
+  var skip = (req.query.page - 1) * req.query.limit;
+  var sort = { created_at: 1 };
+  var params = { limit: req.query.limit, skip: skip, sort: sort };
+  var filter = { follower_id: req.user._id };
+
+  var query = Relationship.find(filter, null, params).populate('followed_id');
+  var following = query.exec().then(function(rels) {
+    return rels.map(pluckFollowed);
+  });
+
+  Promise.all([following, Relationship.count(filter)]).then(function(results) {
+    res.json({ count: results[1], following: results[0] });
+  }).catch(Logger.logError);
+};
+
+/** Get followers index page. */
+UsersController.followers = function(req, res, next) {
+  var skip = (req.query.page - 1) * req.query.limit;
+  var sort = { created_at: 1 };
+  var params = { limit: req.query.limit, skip: skip, sort: sort };
+  var filter = { followed_id: req.user._id };
+
+  var query = Relationship.find(filter, null, params).populate('follower_id');
+  var followers = query.exec().then(function(rels) {
+    return rels.map(pluckFollower);
+  });
+
+  Promise.all([followers, Relationship.count(filter)]).then(function(results) {
+    res.json({ count: results[1], followers: results[0] });
+  }).catch(Logger.logError);
+};
+
 module.exports = UsersController;
+
+function userToObject(user) {
+  return user.toObject();
+}
+
+function pluckFollowed(relationship) {
+  return relationship.followed_id.toObject();
+}
+
+function pluckFollower(relationship) {
+  return relationship.follower_id.toObject();
+}
