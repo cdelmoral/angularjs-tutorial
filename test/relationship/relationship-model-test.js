@@ -11,17 +11,19 @@ describe('Relationship model', function() {
   beforeEach(function(done) {
     carlos = { name: 'Carlos', email: 'carlos@test.com', password: 'password' };
     steve = { name: 'Steve', email: 'steve@test.com', password: 'password' };
-    User.create([carlos, steve]).then(function(users) {
-      follower = users[0];
-      followed = users[1];
-      relationship = new Relationship({ follower_id: follower._id, followed_id: followed._id });
-      done();
+    Relationship.ensureIndexes().then(function() {
+      User.create([carlos, steve]).then(function(users) {
+        follower = users[0];
+        followed = users[1];
+        relationship = new Relationship({ follower_id: follower._id, followed_id: followed._id });
+        done();
+      });
     });
   });
 
   describe('with valid parameters', function() {
     it('should save in the database', function() {
-      relationship.save().should.be.fulfilled();
+      return relationship.save().should.be.fulfilled();
     });
   });
 
@@ -32,7 +34,17 @@ describe('Relationship model', function() {
 
     it('should not be valid with not unique relationship', function() {
       other = new Relationship({ follower_id: follower._id, followed_id: followed._id });
-      other.save().should.be.rejected();
+      return other.save().should.be.rejected();
     });
+  });
+
+  it('should not be valid with null follower_id', function() {
+    relationship.follower_id = null;
+    return relationship.validate().should.be.rejected();
+  });
+
+  it('should not be valid with null followed_id', function() {
+    relationship.followed_id = null;
+    return relationship.validate().should.be.rejected();
   });
 });

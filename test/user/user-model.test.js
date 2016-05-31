@@ -5,60 +5,61 @@ var validator = require('validator');
 var user;
 
 describe('User model', function() {
-  beforeEach(function() {
-    user = new User({ name: 'Carlos', email: 'carlos@test.com', password: 'password' });
-  });
-
-  describe('with valid parameters', function() {
-    it('should save in the database', function() {
-      user.save().should.be.fulfilled();
+  beforeEach(function(done) {
+    carlos = new User({ name: 'Carlos', email: 'carlos@test.com', password: 'password' });
+    victor = new User({ name: 'Victor', email: 'victor@test.com', password: 'password' });
+    User.ensureIndexes().then(function() {
+      User.create([carlos, victor]).then(function(users) {
+        done();
+      });
     });
   });
 
-  describe('with existing user', function() {
-    beforeEach(function(done) {
-      user.save(done);
+  describe('when creating users', function() {
+    it('should save valid users', function() {
+      other = new User({ name: 'Other', email: 'other@test.com', password: 'password' });
+      return other.save().should.be.fulfilled();
     });
 
     it('should not be valid with not unique name', function() {
       other = new User({ name: 'Carlos', email: 'other@test.com', password: 'password' });
-      other.save().should.be.rejected();
+      return other.save().should.be.rejected();
     });
 
     it('should not be valid with not unique email', function() {
-      other = new User({ name: 'Victor', email: 'carlos@test.com', password: 'password' });
-      other.save().should.be.rejected();
+      other = new User({ name: 'Other', email: 'carlos@test.com', password: 'password' });
+      return other.save().should.be.rejected();
     });
   });
 
   it('should not be valid with null name', function() {
-    user.name = null;
-    user.validate().should.be.rejected();
+    carlos.name = null;
+    return carlos.validate().should.be.rejected();
   });
 
   it('should not be valid with empty name', function() {
-    user.name = '     ';
-    user.validate().should.be.rejected();
+    carlos.name = '     ';
+    return carlos.validate().should.be.rejected();
   });
 
   it('should not be valid when name is too long', function() {
-    user.name = Array(52).join('a');
-    user.validate().should.be.rejected();
+    carlos.name = Array(52).join('a');
+    return carlos.validate().should.be.rejected();
   });
 
   it('should not be valid with null email', function() {
-    user.email = null;
-    user.validate().should.be.rejected();
+    carlos.email = null;
+    return carlos.validate().should.be.rejected();
   });
 
   it('should not be valid with empty email', function() {
-    user.email = '     ';
-    user.validate().should.be.rejected();
+    carlos.email = '     ';
+    return carlos.validate().should.be.rejected();
   });
 
   it('should not be valid when email is too long', function() {
-    user.email = Array(255).join('a') + '@example.com';
-    user.validate().should.be.rejected();
+    carlos.email = Array(255).join('a') + '@example.com';
+    return carlos.validate().should.be.rejected();
   });
 
   describe('with valid emails', function() {
@@ -72,8 +73,8 @@ describe('User model', function() {
 
     validEmails.forEach(function(email) {
       it('should be valid', function() {
-        user.email = email;
-        user.validate().should.be.fulfilled();
+        carlos.email = email;
+        carlos.validate().should.be.fulfilled();
       });
     });
   });
@@ -89,9 +90,23 @@ describe('User model', function() {
 
     invalidEmails.forEach(function(email) {
       it('should not be valid', function() {
-        user.email = email;
-        user.validate().should.be.rejected();
+        carlos.email = email;
+        carlos.validate().should.be.rejected();
       });
     });
+  });
+
+  it('should follow a user', function() {
+    return carlos.follow(victor).then(function() {
+      return carlos.isFollowing(victor);
+    }).should.be.fulfilledWith(true);
+  });
+
+  it('should unfollow a user', function() {
+    return carlos.follow(victor).then(function() {
+      return carlos.unfollow(victor).then(function() {
+        return carlos.isFollowing(victor);
+      });
+    }).should.be.fulfilledWith(false);
   });
 });

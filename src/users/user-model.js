@@ -5,6 +5,7 @@ var crypto = Promise.promisifyAll(require('crypto'));
 
 var UserSchema = require('./user-schema');
 var UserMailer = require('./user-mailer');
+var Relationship = require('./relationship-model');
 
 UserSchema.statics.createToken = function() {
   return crypto.randomBytesAsync(48).then(function(buf) {
@@ -51,6 +52,47 @@ UserSchema.methods.sendPasswordResetEmail = function() {
   UserMailer.sendPasswordResetEmail(user);
 };
 
+UserSchema.methods.getFollowing = function() {
+  var user = this;
+  var query = Relationship.find({ follower_id: this._id }).populate('followed_id');
+  return query.exec().then(function(rels) {
+    return rels.map(pluckFollowing);
+  });
+};
+
+UserSchema.methods.getFollowers = function() {
+  var user = this;
+  var query = Relationship.find({ followed_id: this._id }).populate('follower_id');
+  return query.exec().then(function(rels) {
+    return rels.map(pluckFollower);
+  });
+};
+
+UserSchema.methods.isFollowing = function(followed) {
+  var user = this;
+  return Relationship.find({ follower_id: user._id, followed_id: followed._id}).then(function(rels) {
+    return rels.length !== 0;
+  });
+};
+
+UserSchema.methods.follow = function(followed) {
+  var user = this;
+  return Relationship.create({ follower_id: user._id, followed_id: followed._id });
+};
+
+UserSchema.methods.unfollow = function(followed) {
+  var user = this;
+  return Relationship.remove({ follower_id: user._id, followed_id: followed._id});
+};
+
 var User = Promise.promisifyAll(mongoose.model('User', UserSchema));
 
 module.exports = User;
+
+function pluckFollowing(relationship) {
+  return relationship.followed_id;
+}
+
+function pluckFollowing(relationship) {
+  return relationship.follower_id;
+}
