@@ -19,7 +19,7 @@ app.use(session({
   saveUninitialized: true
 }));
 
-app.use(cors());
+app.use(cors({origin: process.env.CLIENT_HOST, credentials: true}));
 
 app.use('/api', routes);
 
