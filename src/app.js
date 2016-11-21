@@ -16,7 +16,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({
   secret: process.env.SECRET,
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
+  cookie: {
+    maxAge: 86400000
+  }
 }));
 
 app.use(cors({origin: process.env.CLIENT_HOST, credentials: true}));
