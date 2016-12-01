@@ -11,14 +11,14 @@ var accountActivation = new EmailTemplate(path.join(__dirname, 'user-account-act
 var passwordReset = new EmailTemplate(path.join(__dirname, 'user-password-reset'));
 
 UserMailer.sendActivationEmail = function(user) {
-  user.activation_link = process.env.HOST + '/#/users/activate/' + user.id + '/' + user.token;
-  sendEmail(accountActivation, user);
+  var activationLink = process.env.CLIENT_HOST + '/activate/' + user.id + '/' + user.token;
+  sendEmailWithLink(accountActivation, user, activationLink);
 };
 
 UserMailer.sendPasswordResetEmail = function(user) {
-  user.password_reset_link = process.env.HOST + '/#/password_resets/' + user._id + '/' +
+  var passwordResetLink = process.env.CLIENT_HOST + '/password_resets/' + user._id + '/' +
     user.reset_token;
-  sendEmail(passwordReset, user);
+  sendEmailWithLink(passwordReset, user, passwordResetLink);
 };
 
 module.exports = UserMailer;
@@ -29,8 +29,11 @@ function transportCallback(error, info) {
   }
 }
 
-function sendEmail(template, user) {
-  template.render(user, function(err, result) {
+function sendEmailWithLink(template, user, link) {
+  var params = user.toObject();
+  params.link = link;
+
+  template.render(params, function(err, result) {
     if (err) {
       return Logger.logError(err);
     }
