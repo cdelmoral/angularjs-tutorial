@@ -23,7 +23,7 @@ UsersController.show = function(req, res, next) {
 UsersController.index = function(req, res, next) {
   var skipUsers = (req.query.pageNumber - 1) * req.query.usersPerPage;
   var sort = { created_at: 1 };
-  var params = { limit: req.query.usersPerPage, skip: skipUsers, sort: sort };
+  var params = { limit: parseInt(req.query.usersPerPage), skip: skipUsers, sort: sort };
 
   var usersPromise = User.findAsync({}, null, params).then(function(users) {
     return users.map(userToObject);
