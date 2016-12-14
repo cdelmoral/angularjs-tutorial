@@ -32,7 +32,7 @@ MicropostsController.destroy = function(req, res, next) {
 MicropostsController.index = function(req, res, next) {
   var skip = (req.query.pageNumber - 1) * req.query.itemsPerPage;
   var sort = { created_at: -1 };
-  var params = { limit: req.query.itemsPerPage, skip: skip, sort: sort };
+  var params = { limit: parseInt(req.query.itemsPerPage), skip: skip, sort: sort };
 
   var micropostsPromise = Micropost.findAsync({ user_id: req.user._id }, null, params)
     .then(function(microposts) {
