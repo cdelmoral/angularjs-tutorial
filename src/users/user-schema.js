@@ -38,6 +38,8 @@ var userSchema = new mongoose.Schema({
   created_at: { type: Date, default: Date.now() },
   updated_at: { type: Date, default: Date.now() },
   microposts_count: { type: Number, default: 0 },
+  followers_count: { type: Number, default: 0 },
+  following_count: { type: Number, default: 0 },
   gravatar_id: { type: String }
 });
 

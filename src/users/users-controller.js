@@ -46,6 +46,14 @@ UsersController.update = function(req, res, next) {
   }).catch(Logger.logError);
 };
 
+UsersController.isFollowing = function(req, res, next) {
+  User.findByIdAsync(req.params.following_id).then(function(user) {
+    return user !== null && req.user.isFollowing(user);
+  }).then(function(isFollowing) {
+    res.json({ is_following: isFollowing });
+  }).catch(Logger.logError);
+}
+
 /** Create new user. */
 UsersController.create = function(req, res, next) {
   User.createAsync({

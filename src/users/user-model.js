@@ -62,12 +62,26 @@ UserSchema.methods.isFollowing = function(followed) {
 
 UserSchema.methods.follow = function(followed) {
   var user = this;
-  return Relationship.create({ follower_id: user._id, followed_id: followed._id });
+  return Relationship.create({ follower_id: user._id, followed_id: followed._id })
+    .then(function(relationship) {
+      user.following_count++;
+      return user.save();
+    }).then(function(user) {
+      followed.followers_count++;
+      return followed.save();
+    });
 };
 
 UserSchema.methods.unfollow = function(followed) {
   var user = this;
-  return Relationship.remove({ follower_id: user._id, followed_id: followed._id });
+  return Relationship.remove({ follower_id: user._id, followed_id: followed._id })
+    .then(function(relationship) {
+      user.following_count--;
+      return user.save();
+    }).then(function(user) {
+      followed.followers_count--;
+      return followed.save();
+    });
 };
 
 var User = Promise.promisifyAll(mongoose.model('User', UserSchema));
