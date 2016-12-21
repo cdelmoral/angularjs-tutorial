@@ -16,7 +16,7 @@ module.exports = function(grunt) {
     watch: {
       express: {
         files: ['src/**/*.ts', 'src/**/*.js', 'bin/www'],
-        tasks: ['ts', 'express:dev'],
+        tasks: ['copy:dist', 'ts', 'express:dev'],
         options: {
           spawn: false
         }
@@ -78,7 +78,7 @@ module.exports = function(grunt) {
             expand: true,
             cwd: 'src/',
             dest: 'dist',
-            src: ['**/*.js']
+            src: ['**/*.js', '**/*.ejs']
         },
     }
   });
