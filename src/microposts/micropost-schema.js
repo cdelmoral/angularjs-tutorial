@@ -14,7 +14,7 @@ var micropostSchema = new mongoose.Schema({
       validate({ validator: 'isLength', arguments: [0, 140] })
     ]
   },
-  user_id: { type: ObjectId, required: true, index: true },
+  user_id: { type: ObjectId, ref: 'User', required: true, index: true },
   created_at: { type: Date, index: true },
   updated_at: { type: Date },
 });

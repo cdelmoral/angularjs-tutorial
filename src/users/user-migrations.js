@@ -1,7 +1,7 @@
 var Micropost = require('../microposts/micropost-model');
 var crypto = require('crypto');
 
-var currentSchemaVersion = 4;
+var currentSchemaVersion = 5;
 
 exports.currentSchemaVersion = currentSchemaVersion;
 exports.handleMigrations = handleMigrations;
@@ -27,22 +27,25 @@ function handleMigrations(next) {
  * @param {Object} object representing the outdated user
  */
 function upgradeSchema(user) {
-  switch (user.schema_version) {
-    case 0:
-      user.admin = false;
-    case 1:
-      user.activated = true;
-      user.activated_at = new Date(0);
-    case 2:
-      Micropost.getMicropostsCountForUser(user._id).then(function(count) {
-        user.microposts_count = count;
-      });
-    case 3:
-      var gravatarId = crypto.createHash('md5').update(user.email).digest("hex");
-      user.gravatar_id = gravatarId;
-  }
-
-  user.schema_version = currentSchemaVersion;
+  // switch (user.schema_version) {
+  //   case 0:
+  //     user.admin = false;
+  //   case 1:
+  //     user.activated = true;
+  //     user.activated_at = new Date(0);
+  //   case 2:
+  //     // Micropost.getMicropostsCountForUser(user._id).then(function(count) {
+  //     //   user.microposts_count = count;
+  //     // });
+  //   case 3:
+  //     var gravatarId = crypto.createHash('md5').update(user.email).digest("hex");
+  //     user.gravatar_id = gravatarId;
+  //   case 4:
+  //     user.followers_count = 0;
+  //     user.following_count = 0;
+  // }
+  //
+  // user.schema_version = currentSchemaVersion;
 }
 
 /** Handles downgrade schema migrations */
