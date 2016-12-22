@@ -21,6 +21,8 @@ export class Routes {
         router.get('/users/:user_id', loggedIn, UsersController.show);
         router.get('/users/:user_id/following', loggedIn, UsersController.following);
         router.get('/users/:user_id/followers', loggedIn, UsersController.followers);
+        router.get('/users/:user_id/all_followers', loggedIn, UsersController.allFollowers);
+        router.get('/users/:user_id/all_following', loggedIn, UsersController.allFollowing);
         router.post('/users/', UsersController.create);
         router.get('/users/:user_id/is_following/:following_id', loggedIn, UsersController.isFollowing);
         router.post('/users/:user_id/follow', loggedIn, RelationshipsController.create);

@@ -115,6 +115,22 @@ UsersController.following = function(req, res, next) {
   }).catch(Logger.logError);
 };
 
+UsersController.allFollowers = function(req, res, next) {
+  var filter = {followed_id: req.user._id};
+  var query = Relationship.find(filter).populate('follower_id', 'name gravatar_id');
+  var followers = query.exec().then(function(rels) {
+    return res.json({followers: rels.map(pluckFollower)});
+  });
+};
+
+UsersController.allFollowing = function(req, res, next) {
+  var filter = {follower_id: req.user._id};
+  var query = Relationship.find(filter).populate('followed_id', 'name gravatar_id');
+  var following = query.exec().then(function(rels) {
+    return res.json({following: rels.map(pluckFollowed)});
+  });
+};
+
 /** Get followers index page. */
 UsersController.followers = function(req, res, next) {
   var skip = (req.query.page - 1) * req.query.limit;
