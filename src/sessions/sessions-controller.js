@@ -1,51 +1,54 @@
 var User = require('../users/user-model');
-var SessionHelper = require('./sessions-helper');
-var UserNotFoundException = require('../users/user-not-found-exception');
-var UserActivationException = require('../users/user-activation-exception');
-var UserCredentialsException = require('../users/user-credentials-exception');
+var SessionsHelper = require('./sessions-helper');
+var Logger = require('../logger/logger');
+
+var login = require('./sessions-helper').login;
+var logout = require('./sessions-helper').logout;
 
 var SessionsController = function(){};
 
-SessionsController.findUserSession = function(req, res, next) {
-  User.getUserById(req.session.user_id).then(function(user) {
-    req.currentUser = user;
+SessionsController.find = function(req, res, next) {
+  User.findByIdAsync(req.session.user_id).then(function(user) {
+    if (user) {
+      login(req, user);
+    }
+
     next();
     return null;
-  }).catch(UserNotFoundException, function() {
-    req.currentUser = null;
-    next();
-    return null;
-  }).catch(console.log.bind(console));
+  }).catch(Logger.logError);
 };
 
 /** Authenticates a user. */
-SessionsController.authenticateUser = function(req, res, next) {
-  return User.getAuthenticatedUserByEmail(req.body.email, req.body.password).then(function(user) {
-      SessionHelper.createSessionsForUser(user, req);
-      res.json(user.getObject());
-  }).catch(UserNotFoundException, function(message) {
-    res.status(401).send('Invalid credentials');
-  }).catch(UserActivationException, function(message) {
-    res.status(401).send('User not yet activated');
-  }).catch(UserCredentialsException, function(message) {
-    res.status(401).send('Invalid credentials');
-  }).catch(console.log.bind(console));
+SessionsController.create = function(req, res, next) {
+  User.findOneAsync({ email: req.body.email.toLowerCase() }).then(function(user) {
+    req.user = user;
+    return user && user.authenticated(req.body.password, 'password');
+  }).then(function(valid) {
+    if (valid && req.user.activated) {
+      login(req, req.user);
+      res.json(req.user.toObject());
+    } else if (valid) {
+      res.status(401).send('User not yet activated');
+    } else {
+      res.status(401).send('Invalid credentials');
+    }
+  }).catch(Logger.logError);
 };
 
 /** Gets if the user is currently logged in. */
-SessionsController.isAuthenticated = function(req, res, next) {
-  return User.getUserById(req.session.user_id).then(function(user) {
-    res.send(user.getObject());
-    return null;
-  }).catch(UserNotFoundException, function(message) {
-    res.send({ authenticated: false });
-    return null;
-  }).catch(console.log.bind(console));
+SessionsController.authenticated = function(req, res, next) {
+  User.findByIdAsync(req.session.user_id).then(function(user) {
+    if (user) {
+      res.send(user.toObject());
+    } else {
+      res.send({ authenticated: false });
+    }
+  }).catch(Logger.logError);
 };
 
 /** Delete the current session for the currently logged in user. */
-SessionsController.endSession = function(req, res, next) {
-  return SessionHelper.destroySession(req).then(function() {
+SessionsController.destroy = function(req, res, next) {
+  SessionsHelper.logout(req).then(function() {
     res.status(200).send();
   }).catch(function(message) {
     res.status(500).send();
