@@ -15,8 +15,8 @@ module.exports = function(grunt) {
 
     watch: {
       express: {
-        files: ['src/**/*.js', 'bin/www'],
-        tasks: ['express:dev'],
+        files: ['src/**/*.ts', 'src/**/*.js', 'bin/www'],
+        tasks: ['copy:dist', 'ts', 'express:dev'],
         options: {
           spawn: false
         }
@@ -53,10 +53,40 @@ module.exports = function(grunt) {
         },
         src: ['test/**/*.js']
       }
+    },
+
+    ts: {
+      app: {
+        files: [{
+          src: ["src/\*\*/\*.ts", "!src/.baseDir.ts"],
+          dest: "./dist"
+        }],
+        options: {
+          module: "commonjs",
+          target: "es6",
+          sourceMap: false
+        }
+      }
+    },
+
+    clean: {
+        dist: 'dist'
+    },
+
+    copy: {
+        dist: {
+            expand: true,
+            cwd: 'src/',
+            dest: 'dist',
+            src: ['**/*.js', '**/*.ejs']
+        },
     }
   });
 
   grunt.registerTask('serve', [
+    'clean:dist',
+    'copy:dist',
+    'ts',
     'env:dev',
     'express:dev',
     'watch:express'

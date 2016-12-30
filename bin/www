@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-var app = require('../src/app');
+var server = require('../dist/server');
 var express = require('express');
 var path = require('path');
 var debug = require('debug')('express-test:server');
@@ -17,21 +17,16 @@ mongoose.Promise = require('bluebird');
  * Get port from environment and store in Express.
  */
 var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
 
-if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, '/../node_modules/angularjs-tutorial-ui/dist')));
-} else if (process.env.NODE_ENV === "development") {
-    app.use('/bower_components', express.static(path.join(process.env.UI_PROJECT_PATH, '/bower_components')));
-    app.use(express.static(path.join(process.env.UI_PROJECT_PATH, '/.dev')));
-}
+var app = server.Server.bootstrap().app;
+app.set('port', port);
 
 mongoose.connect(process.env.DB_URL, mongooseCallback);
 
 function mongooseCallback(err) {
     if (err) {
         console.log('Database connection error', err);
-    } else {        
+    } else {
         console.log('Connection to database successful');
     }
 }
@@ -39,16 +34,16 @@ function mongooseCallback(err) {
 /**
  * Create HTTP server.
  */
-var server = http.createServer(app).listen(port, function() {
+var httpServer = http.createServer(app).listen(port, function() {
     console.log('Express ' + process.env.NODE_ENV + ' server listening on port ' + port);
 });
 
 /**
  * Listen on provided port, on all network interfaces.
  */
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+httpServer.listen(port);
+httpServer.on('error', onError);
+httpServer.on('listening', onListening);
 
 /**
  * Normalize a port into a number, string, or false.
@@ -98,7 +93,7 @@ function onError(error) {
  * Event listener for HTTP server "listening" event.
  */
 function onListening() {
-    var addr = server.address();
+    var addr = httpServer.address();
     var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
     debug('Listening on ' + bind);
 }

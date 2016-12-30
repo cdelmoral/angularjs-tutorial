@@ -1,6 +1,6 @@
 [ ![Codeship Status for cdelmoral/angularjs-tutorial](https://codeship.com/projects/b34583b0-84ca-0133-c39f-260819c0cb46/status?branch=master)](https://codeship.com/projects/122078)
 
-# AngularJS Tutorial: sample application (server)
+# Microposts: sample application (server)
 
 This is the sample application (server side) for the
 [*Ruby on Rails Tutorial:
@@ -13,12 +13,16 @@ Clone repository and run `npm install`. Make sure to have [mongoDB](https://www.
 
 ### Development
 
-Note that in development you will also need to clone the [angularjs-tutorial-ui](https://github.com/cdelmoral/angularjs-tutorial-ui) project. Then you need to create an `.env.json` file with the following structure:
+Create an `.env.json` file with the following structure:
+
 ```
 {
-	"DB_URL": "mongodb://path/to/database",
-	"UI_PROJECT_PATH": "/path/to/angularjs-tutorial-ui/project",
-	"SECRET": "notasecuresecret"
+	"DB_URL": "mongodb://localhost/microposts",
+	"SECRET": "notasecuresecret",
+    "MAILGUN_DOMAIN": "localhost",
+    "MAILGUN_PORT": 1025,
+    "HOST": "http://localhost:8000",
+    "CLIENT_HOST": "http://localhost:4200"
 }
 ```
 

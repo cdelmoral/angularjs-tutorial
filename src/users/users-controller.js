@@ -23,7 +23,7 @@ UsersController.show = function(req, res, next) {
 UsersController.index = function(req, res, next) {
   var skipUsers = (req.query.pageNumber - 1) * req.query.usersPerPage;
   var sort = { created_at: 1 };
-  var params = { limit: req.query.usersPerPage, skip: skipUsers, sort: sort };
+  var params = { limit: parseInt(req.query.usersPerPage), skip: skipUsers, sort: sort };
 
   var usersPromise = User.findAsync({}, null, params).then(function(users) {
     return users.map(userToObject);
@@ -45,6 +45,14 @@ UsersController.update = function(req, res, next) {
     });
   }).catch(Logger.logError);
 };
+
+UsersController.isFollowing = function(req, res, next) {
+  User.findByIdAsync(req.params.following_id).then(function(user) {
+    return user !== null && req.user.isFollowing(user);
+  }).then(function(isFollowing) {
+    res.json({ is_following: isFollowing });
+  }).catch(Logger.logError);
+}
 
 /** Create new user. */
 UsersController.create = function(req, res, next) {
@@ -105,6 +113,22 @@ UsersController.following = function(req, res, next) {
   Promise.all([following, Relationship.count(filter)]).then(function(results) {
     res.json({ count: results[1], following: results[0] });
   }).catch(Logger.logError);
+};
+
+UsersController.allFollowers = function(req, res, next) {
+  var filter = {followed_id: req.user._id};
+  var query = Relationship.find(filter).populate('follower_id', 'name gravatar_id');
+  var followers = query.exec().then(function(rels) {
+    return res.json({followers: rels.map(pluckFollower)});
+  });
+};
+
+UsersController.allFollowing = function(req, res, next) {
+  var filter = {follower_id: req.user._id};
+  var query = Relationship.find(filter).populate('followed_id', 'name gravatar_id');
+  var following = query.exec().then(function(rels) {
+    return res.json({following: rels.map(pluckFollowed)});
+  });
 };
 
 /** Get followers index page. */
