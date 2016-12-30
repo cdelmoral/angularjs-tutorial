@@ -9,14 +9,14 @@
   "main": "src/app.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cdelmoral/angularjs-tutorial.git"
+    "url": "git+https://github.com/cdelmoral/microposts.git"
   },
   "author": "cdelmoral",
   "license": "CC-BY-4.0",
   "bugs": {
-    "url": "https://github.com/cdelmoral/angularjs-tutorial/issues"
+    "url": "https://github.com/cdelmoral/microposts/issues"
   },
-  "homepage": "https://github.com/cdelmoral/angularjs-tutorial#readme",
+  "homepage": "https://github.com/cdelmoral/microposts#readme",
   "scripts": {
     "start": "node bin/www",
     "mongo": "scripts/start_mongodb_dev.sh",
