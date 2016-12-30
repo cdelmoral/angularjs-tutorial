@@ -17,14 +17,20 @@ Create an `.env.json` file with the following structure:
 ```
 {
 	"DB_URL": "mongodb://localhost/microposts",
-	"SECRET": "notasecuresecret",
+	"SECRET": "secret",
     "MAILGUN_DOMAIN": "localhost",
     "MAILGUN_PORT": 1025,
-    "HOST": "http://localhost:8000",
     "CLIENT_HOST": "http://localhost:4200"
 }
 ```
 
 ### Production
 
-In production you will only need to set up as environment variables `DB_URL` and `SECRET`.
+Create the following environment variables:
+
+- `DB_URL`: `mongodb://localhost/microposts`
+- `SECRET`: `secret`
+- `MAILGUN_DOMAIN`: `mailservice.com`
+- `MAILGUN_SMTP_SERVER`: `smtp.mailservice.com`
+- `MAILGUN_SMTP_LOGIN`: `login`
+- `MAILGUN_SMTP_PASSWORD`: `password`
