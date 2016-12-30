@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/cdelmoral/microposts#readme",
   "scripts": {
-    "start": "node bin/www",
+    "start": "grunt build; node bin/www",
     "mongo": "scripts/start_mongodb_dev.sh",
     "mongo_test": "scripts/start_mongodb_test.sh",
     "stop_mongo": "scripts/stop_mongodb.sh"

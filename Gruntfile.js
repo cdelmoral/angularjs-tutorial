@@ -92,5 +92,11 @@ module.exports = function(grunt) {
     'watch:express'
   ]);
 
+  grunt.registerTask('build', [
+    'clean:dist',
+    'copy:dist',
+    'ts'
+  ]);
+
   grunt.registerTask('test', ['mochaTest']);
 };
