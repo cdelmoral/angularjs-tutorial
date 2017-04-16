@@ -14,16 +14,16 @@ if (process.env.NODE_ENV === 'development') {
   });
 
   config = {
-    host: process.env.MAILGUN_DOMAIN,
-    port: process.env.MAILGUN_PORT,
+    host: process.env.MAIL_DOMAIN,
+    port: process.env.MAIL_PORT,
     ignoreTLS: true
   };
 } else if (process.env.NODE_ENV === 'production') {
   config = {
-    host: process.env.MAILGUN_SMTP_SERVER,
-    domain: process.env.MAILGUN_DOMAIN,
-    port: process.env.MAILGUN_PORT,
-    auth: { user: process.env.MAILGUN_SMTP_LOGIN, pass: process.env.MAILGUN_SMTP_PASSWORD }
+    host: process.env.MAIL_SMTP_SERVER,
+    domain: process.env.MAIL_DOMAIN,
+    port: process.env.MAIL_PORT,
+    auth: { user: process.env.MAIL_USERNAME, pass: process.env.MAIL_PASSWORD }
   };
 }
   
