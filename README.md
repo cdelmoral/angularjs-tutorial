@@ -16,8 +16,8 @@ Create an `.env.json` file with the following structure:
 
 ```
 {
-	"DB_URL": "mongodb://localhost/microposts",
-	"SECRET": "secret",
+    "DB_URL": "mongodb://localhost/microposts",
+    "SECRET": "secret",
     "MAILGUN_DOMAIN": "localhost",
     "MAILGUN_PORT": 1025,
     "CLIENT_HOST": "http://localhost:4200"
