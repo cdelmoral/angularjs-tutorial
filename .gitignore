@@ -10,6 +10,7 @@ node_modules
 // Environment variables
 .env.dev.json
 .env.test.json
+.env.json
 dist
 .tscache
 .baseDir.ts
