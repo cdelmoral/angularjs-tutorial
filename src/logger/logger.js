@@ -1,8 +1,8 @@
 var winston = require('winston');
 
-var logger = new (winston.Logger)({
+const logger = winston.createLogger({
   transports: [
-    new (winston.transports.Console)({timestamp: true})
+    new winston.transports.Console({ timestamp: true })
   ]
 });
 

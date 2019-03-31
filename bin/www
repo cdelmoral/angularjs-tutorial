@@ -41,7 +41,7 @@ var httpServer = http.createServer(app).listen(port, function() {
 /**
  * Listen on provided port, on all network interfaces.
  */
-httpServer.listen(port);
+// httpServer.listen(port);
 httpServer.on('error', onError);
 httpServer.on('listening', onListening);
 
