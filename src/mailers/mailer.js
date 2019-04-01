@@ -18,6 +18,8 @@ if (process.env.NODE_ENV === 'development') {
     port: process.env.MAIL_PORT,
     ignoreTLS: true
   };
+
+  console.log(config);
 } else if (process.env.NODE_ENV === 'production') {
   config = {
     host: process.env.MAIL_SMTP_SERVER,
