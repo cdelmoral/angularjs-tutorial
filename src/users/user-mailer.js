@@ -3,22 +3,29 @@ var path = require('path');
 
 var Mailer = require('../mailers/mailer');
 var Logger = require('../logger/logger');
-var EmailTemplate = require('email-templates').EmailTemplate;
+var EmailTemplate = require('email-templates');
 
 var UserMailer = function() {};
 
-var accountActivation = new EmailTemplate(path.join(__dirname, 'user-account-activation'));
-var passwordReset = new EmailTemplate(path.join(__dirname, 'user-password-reset'));
+var email = new EmailTemplate({
+  views: {
+    options: {
+      extension: 'ejs'
+    }
+  }
+});
 
 UserMailer.sendActivationEmail = function(user) {
   var activationLink = process.env.CLIENT_HOST + '/activate/' + user.id + '/' + user.token;
-  sendEmailWithLink(accountActivation, user, activationLink);
+  const templatePath = path.join(__dirname, 'user-account-activation', 'user-account-activation.text');
+  sendEmailWithLink(templatePath, 'Account Activation',  user, activationLink);
 };
 
 UserMailer.sendPasswordResetEmail = function(user) {
   var passwordResetLink = process.env.CLIENT_HOST + '/password_resets/' + user._id + '/' +
     user.reset_token;
-  sendEmailWithLink(passwordReset, user, passwordResetLink);
+  const templatePath = path.join(__dirname, 'user-password-reset', 'user-password-reset.text');
+  sendEmailWithLink(passwordReset, 'Password Reset', user, passwordResetLink);
 };
 
 module.exports = UserMailer;
@@ -29,20 +36,19 @@ function transportCallback(error, info) {
   }
 }
 
-function sendEmailWithLink(template, user, link) {
-  var params = user.toObject();
-  params.link = link;
+function sendEmailWithLink(templatePath, subject, user, link) {
+  var params = {
+    name: user.name,
+    link: link
+  };
 
-  template.render(params, function(err, result) {
-    if (err) {
-      return Logger.logError(err);
-    }
-
+  email.render(templatePath, params).then(result => {
+    console.log(result);
     Mailer.transport.sendMail({
       from: 'noreply@angularjstutorial.com',
       to: user.email,
-      subject: 'Account Activation',
-      html: result.html
+      subject: subject,
+      html: result
     }, transportCallback);
-  });
+  }).catch(Logger.logError);
 }
