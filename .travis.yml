@@ -1,33 +1,31 @@
 language: node_js
 node_js:
-  - node
+- node
 env:
-  - CXX=g++-4.8
+- CXX=g++-4.8
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r-test
+    - ubuntu-toolchain-r-test
     packages:
-      - g++-4.8
+    - g++-4.8
 before_script:
-  - npm install -g grunt
+- npm install -g grunt
 notifications:
   email:
     on_success: change
     on_failure: always
 before_deploy:
-  - grunt build
+- grunt build
 deploy:
   provider: heroku
   strategy: api
   api_key:
-    secure: c8aUXB2qtFYFQ7Bx4YD9XXzu9XG1VGxDmjSJxezS4fUisuuT4uUiXzZdNLx5QixTZhGZx3GnCZcSfEZQVER2atIsT8VqRQvI+7c1PERhrcdXtYtvvMincT7D1fJMeha3XUbg6pXzuO1tMHTut/PEJfT82H9iHmkXSe/wxZOMsBGX2siDXzFm6lns3eLSv/6A5xc7/uUUYbwbfeEheS6aZIYZJ7OX9BAZNGUEtv+onc6spPL0FHaUd7UgA7rD3/IPHfh7inSSAhsE1XUbY3wnN1OeRXkkDih8nQOYaWtUWbWc6KDtA//TWTW4VCzc01NXK4ktK25ji+Jzz7MUS9NdZIaVrwsWr28bfAGLYfj8keSE3pwTJulICl00Am4MZwRE1aA+rBKzpUTFb6QdB49exIY1RxYSjBx9jVQXoiUl6nKl3ZqwK+PU32BcU3u2HZh2ZnzZawJrYi5bzty9d8XFFROwJdxa30B3vX0g1wJkBVyMvG9Tk0YdrTCCmEr98RqZqXpvgUuf11xbzB93koxwlLAy6ZRvJVe0stm/qSwrol/Mc3Ue9YYu7cycItvPbOAe8JNGNFsmmOl2cQ7ijOnAAwQSjGLbtCfcio7hVTv/sjbmVsImCOhecMW8ELPPHhO81Vhhduut6FZaPXYOyO2Ngsmg5GimesoJ3l0hdjAj0TY=
+    secure: PnX7qTDqYO9T82glpPc22Dbcg17MlFgKJQJi1BCQI3i7dNuf7MXy7pMjuwGEd1K7ZPJ8CwDNRdLtHfZl/kCo3zhiHVhBPRqEPF68qY5fUCIzy0HONM9g0q/WamSTuJfFAIvz/MBhzSf9BgaWUD7RQR3efGKOvzLfw1wh//ki2xy6VIZgu8GI9zPxaPM7IbfhbzCQ9mcB33FRLi/oH4fN6KDfi+PbVdM9Li7+mNRe9asdIaPMFTnQoONEMlAxLv9CwkpTh5e5v2cWwyrmrZsBhf2LBE+X49K6jDocd7EosFxXXMdULOB+cq0NgagPdgEFT465xHjAIv3I2mldc8mzXjm9RFKeYX+nkkEBReAH9LCFDRG/741PSZgFRFXbHCiSaLaqbeCBrGpb42A3ik1BYECBfSJ35u/Zx90RfM4ib1mbbij9Y82GsVDjXchKOB5BgfKXmUU+VR8KbdUkQOHPTpr3yuAOxSosVCvdFzEtJOj/fcVz2DBngJ0p/KNInRJw9BpqiOyqnJxSXwrFvCRxMX/NoFUXeSWmzPQi9Lq+UNtbmdSWCAUUXLDrIPAqbCI0hZfC8Its3YiFnX+jEQRZ6DLO/O1Xv9uRukqkcgbvf8G88Rre/KSkttTJTXFL023ucvnqTXhGhvXpWd4mwljk2+7AZJNdsU8Gd9d5RM2gKJU=
   skip_cleanup: true
-  app:
-    master: microposts-staging
-    stable: microposts-prod
+  app: microposts-api
   on:
     branch:
-      - master
-      - stable
+    - master
+    - fix-ci
     repo: cdelmoral/microposts
