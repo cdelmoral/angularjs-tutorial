@@ -7,6 +7,9 @@
     "type": "git",
     "url": "git+https://github.com/cdelmoral/microposts.git"
   },
+  "engines": {
+    "node": "11.12.0"
+  },
   "author": "cdelmoral",
   "license": "CC-BY-4.0",
   "bugs": {
@@ -18,7 +21,7 @@
     "mongo": "scripts/start_mongodb_dev.sh",
     "mongo_test": "scripts/start_mongodb_test.sh",
     "stop_mongo": "scripts/stop_mongodb.sh",
-    "test": "grunt test",
+    "test": "mocha ./test/ --recursive",
     "serve": "grunt serve"
   },
   "devDependencies": {
@@ -37,7 +40,6 @@
     "grunt-contrib-watch": "1.1.0",
     "grunt-env": "^0.4.4",
     "grunt-express-server": "^0.5.1",
-    "grunt-mocha-test": "0.13.3",
     "grunt-ts": "^5.5.1",
     "jit-grunt": "^0.10.0",
     "maildev": "1.0.0",

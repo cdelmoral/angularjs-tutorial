@@ -43,18 +43,6 @@ module.exports = function(grunt) {
       }
     },
 
-    mochaTest: {
-      test: {
-        options: {
-          reporter: 'spec',
-          require: 'should',
-          ui: 'bdd',
-          timeout: 10000
-        },
-        src: ['test/**/*.js']
-      }
-    },
-
     ts: {
       app: {
         files: [{
@@ -98,6 +86,4 @@ module.exports = function(grunt) {
     'copy:dist',
     'ts'
   ]);
-
-  grunt.registerTask('test', ['mochaTest']);
 };
