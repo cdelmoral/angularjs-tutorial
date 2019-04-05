@@ -25,7 +25,5 @@ deploy:
   skip_cleanup: true
   app: microposts-api
   on:
-    branch:
-    - master
-    - fix-ci
+    branch: master
     repo: cdelmoral/microposts
