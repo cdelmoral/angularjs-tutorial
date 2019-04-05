@@ -7,6 +7,9 @@
     "type": "git",
     "url": "git+https://github.com/cdelmoral/microposts.git"
   },
+  "engines": {
+    "node": "11.12.0"
+  },
   "author": "cdelmoral",
   "license": "CC-BY-4.0",
   "bugs": {
